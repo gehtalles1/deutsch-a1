@@ -11,10 +11,10 @@
         .app-container { max-width: 550px; margin: 0 auto; padding: 0 40px; }
         .main-card { background: #FFFFFF; border-radius: 50px; border: 2px solid #F1EFE0; box-shadow: 0 30px 80px rgba(6, 78, 59, 0.05); position: relative; }
         .btn-primary { background: #064E3B; color: white; font-weight: 900; }
-        .locked { filter: grayscale(1); opacity: 0.3; pointer-events: none; }
+        .locked { filter: grayscale(1); opacity: 0.3; pointer-events: none !important; cursor: not-allowed; }
         .hero-title { font-size: clamp(32px, 8vw, 48px); font-weight: 900; line-height: 1.5; letter-spacing: -1px; }
-        /* 勋章位：确保显示在卡片右上角，且不带任何多余数字 */
-        .medal-badge { position: absolute; top: -15px; right: -15px; font-size: 3rem; z-index: 50; pointer-events: none; }
+        /* 勋章定位：彻底解决数字2干扰 */
+        .medal-slot { position: absolute; top: -15px; right: -15px; font-size: 3rem; z-index: 50; pointer-events: none; }
     </style>
 </head>
 <body class="py-20">
@@ -31,9 +31,9 @@
             </div>
         </div>
 
-        <div class="space-y-8">
+        <div class="space-y-10">
             <div class="relative">
-                <div id="medal-display-1" class="medal-badge"></div>
+                <div id="medal-display-1" class="medal-slot"></div>
                 <a id="lv1" href="01-gender.html" class="locked main-card block p-8 flex items-center gap-6 border border-gray-50/50">
                     <div class="w-16 h-16 bg-emerald-800 rounded-3xl flex-shrink-0 flex items-center justify-center text-white font-black text-3xl italic">1</div>
                     <div class="flex-1">
@@ -44,13 +44,13 @@
             </div>
 
             <div class="relative">
-                <div id="lv2" class="locked main-card p-8 flex items-center gap-6 border border-gray-50/50">
+                <a id="lv2" href="javascript:void(0)" onclick="enterLv2()" class="locked main-card block p-8 flex items-center gap-6 border border-gray-50/50">
                     <div class="w-16 h-16 bg-emerald-600 rounded-3xl flex-shrink-0 flex items-center justify-center text-white font-black text-3xl italic">2</div>
                     <div class="flex-1">
                         <h3 class="font-black text-2xl text-emerald-950">动词变位</h3>
                         <p id="lv2-status" class="text-[10px] font-extrabold text-red-400 tracking-[0.3em] mt-2 uppercase">需完成第一关解锁</p>
                     </div>
-                </div>
+                </a>
             </div>
         </div>
 
@@ -68,32 +68,34 @@
             const stage1Cleared = localStorage.getItem('stage1_cleared') === 'true';
             const stage1Medal = localStorage.getItem('stage1_medal');
 
+            // 1. 处理激活状态
             if(isUnlocked) {
                 showSuccessState();
-                document.getElementById('lv1').classList.remove('locked');
+                const lv1 = document.getElementById('lv1');
+                lv1.classList.remove('locked');
+                lv1.style.pointerEvents = "auto";
             }
 
-            // 处理第一关勋章显示，彻底去掉数字2
+            // 2. 处理第一关勋章与第二关开启
             if(stage1Cleared) {
                 const medalDisplay = document.getElementById('medal-display-1');
-                if (stage1Medal === 'gold') {
-                    medalDisplay.innerHTML = '🥇';
-                } else {
-                    medalDisplay.innerHTML = '🥈';
-                }
+                // 强制只显示 Emoji，不加任何文字标签
+                medalDisplay.innerHTML = (stage1Medal === 'gold') ? '🥇' : '🥈';
                 
-                // 解锁第二关视觉提示
                 const lv2 = document.getElementById('lv2');
                 lv2.classList.remove('locked');
+                lv2.style.pointerEvents = "auto";
                 document.getElementById('lv2-status').innerText = "已开启挑战";
                 document.getElementById('lv2-status').classList.remove('text-red-400');
             }
         }
 
         function unlock() {
-            if(document.getElementById('unlock-code').value === '8888') {
+            const code = document.getElementById('unlock-code').value;
+            if(code === '8888') {
                 localStorage.setItem('isUnlocked', 'true');
                 refreshStatus();
+                playSuccessSound();
             } else {
                 alert("激活码无效");
             }
@@ -102,8 +104,27 @@
         function showSuccessState() {
             document.getElementById('auth-section').innerHTML = `
                 <div class="text-center py-10">
-                    <p class="text-emerald-900 font-black text-2xl">🎉 解锁成功！<br><span class="text-lg opacity-40">跟着刘老师，稳过 A1</span></p>
+                    <p class="text-emerald-900 font-black text-2xl leading-relaxed">🎉 解锁成功！<br><span class="text-lg opacity-40">跟着刘老师，稳过 A1</span></p>
                 </div>`;
+        }
+
+        function enterLv2() {
+            if(localStorage.getItem('stage1_cleared') === 'true') {
+                window.location.href = '02-verbs.html';
+            } else {
+                alert("请先完成第一关练习！");
+            }
+        }
+
+        function playSuccessSound() {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const g = ctx.createGain();
+            osc.connect(g); g.connect(ctx.destination);
+            osc.frequency.setValueAtTime(523, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(1046, ctx.currentTime + 0.4);
+            g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+            osc.start(); osc.stop(ctx.currentTime + 0.4);
         }
     </script>
 </body>
