@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>第一关：名词性别</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #F8F7F2; font-family: 'Noto Sans SC', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .quiz-card { background: #FFFFFF; border-radius: 40px; border: 2px solid #F1EFE0; shadow-sm; }
+    </style>
+</head>
+<body class="p-8">
+    <div class="max-w-[500px] mx-auto">
+        <button onclick="location.href='index.html'" class="mb-8 w-12 h-12 bg-white rounded-2xl flex items-center justify-center border-2 border-gray-100 shadow-sm text-emerald-900">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg>
+        </button>
+
+        <div class="quiz-card p-12 text-center mb-10 min-h-[260px] flex flex-col justify-center">
+            <h2 id="word" class="text-6xl font-black text-emerald-950 mb-3 tracking-tight"></h2>
+            <p id="mean" class="text-xl font-bold text-gray-300"></p>
+        </div>
+
+        <div class="grid grid-cols-3 gap-4">
+            <button onclick="check('der')" class="bg-blue-50 py-8 rounded-[2rem] font-black text-blue-800 text-2xl border-b-8 border-blue-200 active:translate-y-1 active:border-b-0 transition-all">der</button>
+            <button onclick="check('die')" class="bg-red-50 py-8 rounded-[2rem] font-black text-red-800 text-2xl border-b-8 border-red-200 active:translate-y-1 active:border-b-0 transition-all">die</button>
+            <button onclick="check('das')" class="bg-green-50 py-8 rounded-[2rem] font-black text-green-800 text-2xl border-b-8 border-green-200 active:translate-y-1 active:border-b-0 transition-all">das</button>
+        </div>
+    </div>
+
+    <script>
+        const quiz = [
+            {w:"Apfel", m:"苹果", a:"der"}, {w:"Banane", m:"香蕉", a:"die"},
+            {w:"Kind", m:"小孩", a:"das"}, {w:"Tisch", m:"桌子", a:"der"},
+            {w:"Blume", m:"花朵", a:"die"}, {w:"Auto", m:"汽车", a:"das"}
+        ];
+        let cur = 0;
+
+        function load() {
+            document.getElementById('word').innerText = quiz[cur].w;
+            document.getElementById('mean').innerText = quiz[cur].m;
+        }
+
+        function check(a) {
+            if(a === quiz[cur].a) {
+                if(cur < quiz.length - 1) { cur++; load(); }
+                else {
+                    localStorage.setItem('stage1_cleared', 'true');
+                    alert("🎉 恭喜通关！");
+                    location.href = 'index.html';
+                }
+            } else { alert("再想想哦！"); }
+        }
+
+        window.onload = function() {
+            if(localStorage.getItem('isUnlocked') !== 'true') location.href = 'index.html';
+            load();
+        }
+    </script>
+</body>
+</html>
