@@ -9,23 +9,22 @@
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@700;900&display=swap');
         body { background: #F0F9F4; font-family: 'Noto Sans SC', sans-serif; color: #164E63; -webkit-tap-highlight-color: transparent; }
         .app-container { max-width: 550px; margin: 0 auto; padding: 0 40px; }
-        .main-card { background: #FFFFFF; border-radius: 40px; border: 2px solid #E2E8F0; box-shadow: 0 15px 35px rgba(22, 78, 99, 0.05); transition: all 0.3s; position: relative; }
+        .main-card { background: #FFFFFF; border-radius: 40px; border: 2px solid #E2E8F0; box-shadow: 0 15px 35px rgba(22, 78, 99, 0.05); transition: all 0.3s; cursor: pointer; }
         .btn-primary { background: linear-gradient(135deg, #059669 0%, #10B981 100%); color: white; font-weight: 900; }
         
-        /* 🚨 核心修复：locked 状态 */
-        .locked { filter: grayscale(1); opacity: 0.3; pointer-events: none !important; cursor: not-allowed; }
+        /* 🚨 这里的灰色仅做视觉展示，不再拦截点击逻辑 */
+        .is-locked { filter: grayscale(1); opacity: 0.3; }
         
-        .hero-title { font-size: clamp(32px, 8vw, 48px); font-weight: 900; line-height: 1.3; letter-spacing: -1px; }
+        .hero-title { font-size: clamp(32px, 8vw, 48px); font-weight: 900; line-height: 1.3; }
         .highlight-text { color: #059669; position: relative; display: inline-block; }
         .highlight-text::after { content: ''; position: absolute; bottom: 8px; left: 0; width: 100%; height: 12px; background: #D1FAE5; z-index: -1; }
-        .medal-badge { position: absolute; top: -12px; right: -12px; font-size: 2.8rem; filter: drop-shadow(0 8px 12px rgba(0,0,0,0.15)); z-index: 10; }
+        .medal-badge { position: absolute; top: -12px; right: -12px; font-size: 2.8rem; z-index: 10; }
     </style>
 </head>
 <body class="py-16">
     <div class="app-container">
         <header class="text-center mb-16">
             <h1 class="hero-title text-slate-800">A1 德语焦虑<br><span class="highlight-text">直接清零</span></h1>
-            <div class="h-1.5 w-12 bg-emerald-400 mx-auto mt-8 rounded-full"></div>
         </header>
 
         <div id="auth-section" class="main-card p-10 mb-12 border-emerald-100">
@@ -36,31 +35,26 @@
         </div>
 
         <div class="space-y-8">
-            <div class="relative">
-                <a id="lv1" href="01-gender.html" class="locked main-card block p-8 flex items-center gap-6 group hover:border-emerald-300">
-                    <div class="w-16 h-16 bg-emerald-500 rounded-3xl flex-shrink-0 flex items-center justify-center text-white font-black text-3xl shadow-lg">1</div>
-                    <div class="flex-1">
-                        <h3 class="font-black text-xl text-slate-800">名词词性捕手</h3>
-                        <p class="text-[10px] font-extrabold text-emerald-600/40 tracking-[0.2em] mt-1 uppercase">der die das 终结者</p>
-                    </div>
-                    <div id="medal-display-1" class="medal-badge"></div> 
-                </a>
+            <div id="lv1-card" onclick="goToStage1()" class="main-card is-locked p-8 flex items-center gap-6 group relative">
+                <div class="w-16 h-16 bg-emerald-500 rounded-3xl flex-shrink-0 flex items-center justify-center text-white font-black text-3xl shadow-lg">1</div>
+                <div class="flex-1">
+                    <h3 class="font-black text-xl text-slate-800">名词词性捕手</h3>
+                    <p class="text-[10px] font-extrabold text-emerald-600/40 tracking-[0.2em] mt-1 uppercase">der die das 终结者</p>
+                </div>
+                <div id="medal-display-1" class="medal-badge"></div> 
             </div>
 
-            <div class="relative">
-                <a id="lv2" href="javascript:void(0)" onclick="checkStage2()" class="locked main-card block p-8 flex items-center gap-6 group">
-                    <div class="w-16 h-16 bg-cyan-500 rounded-3xl flex-shrink-0 flex items-center justify-center text-white font-black text-3xl shadow-lg">2</div>
-                    <div class="flex-1">
-                        <h3 class="font-black text-xl text-slate-800">动词变位大师</h3>
-                        <p id="lv2-status" class="text-[10px] font-extrabold text-cyan-600/40 tracking-[0.2em] mt-1 uppercase text-rose-400">需完成第一关解锁</p>
-                    </div>
-                </a>
+            <div id="lv2-card" onclick="goToStage2()" class="main-card is-locked p-8 flex items-center gap-6 group relative">
+                <div class="w-16 h-16 bg-cyan-500 rounded-3xl flex-shrink-0 flex items-center justify-center text-white font-black text-3xl shadow-lg">2</div>
+                <div class="flex-1">
+                    <h3 class="font-black text-xl text-slate-800">动词变位大师</h3>
+                    <p id="lv2-status" class="text-[10px] font-extrabold text-rose-400 tracking-[0.2em] mt-1 uppercase">需完成第一关解锁</p>
+                </div>
             </div>
         </div>
 
-        <footer class="mt-24 text-center pb-10">
-            <p class="text-[11px] text-slate-400 font-black tracking-[0.4em] mb-6 uppercase">Lehrer Liu Nian</p>
-            <div class="inline-block px-8 py-3 rounded-full bg-white border border-emerald-100 shadow-sm text-xs font-bold text-slate-400">
+        <footer class="mt-24 text-center">
+            <div class="inline-block px-8 py-3 rounded-full bg-white border border-emerald-100 text-xs font-bold text-slate-400">
                 咨询微信: <span class="text-emerald-600">gehtalles</span>
             </div>
         </footer>
@@ -76,45 +70,44 @@
 
             if(isUnlocked) {
                 showSuccessState();
-                // ✅ 核心修复：彻底移除锁定类
-                const lv1Btn = document.getElementById('lv1');
-                lv1Btn.classList.remove('locked');
+                document.getElementById('lv1-card').classList.remove('is-locked');
             }
 
             if(stage1Cleared) {
                 const medalIcon = (stage1Medal === 'gold') ? "🥇" : "🥈";
                 document.getElementById('medal-display-1').innerText = medalIcon;
-                const lv2Btn = document.getElementById('lv2');
-                lv2Btn.classList.remove('locked');
+                document.getElementById('lv2-card').classList.remove('is-locked');
                 document.getElementById('lv2-status').innerText = "已开启挑战";
-                document.getElementById('lv2-status').style.color = "#0891b2";
+                document.getElementById('lv2-status').className = "text-[10px] font-extrabold text-cyan-600/40 tracking-[0.2em] mt-1 uppercase";
             }
         }
 
         function unlock() {
-            const val = document.getElementById('unlock-code').value;
-            if(val === '8888') {
+            if(document.getElementById('unlock-code').value === '8888') {
                 localStorage.setItem('isUnlocked', 'true');
-                // 📢 修复：点击解锁后立即执行刷新逻辑，不要让用户刷新页面
-                refreshStatus(); 
+                refreshStatus();
+            } else { alert("激活码无效"); }
+        }
+
+        // 🚨 核心跳转函数：直接通过 JS 跳转，绕过 A 标签的各种限制
+        function goToStage1() {
+            if(localStorage.getItem('isUnlocked') === 'true') {
+                window.location.href = "01-gender.html"; // 必须与 GitHub 文件名完全一致
             } else {
-                alert("激活码无效");
+                alert("请先输入激活码解锁！");
             }
         }
 
-        function checkStage2() {
+        function goToStage2() {
             if(localStorage.getItem('stage1_cleared') === 'true') {
-                window.location.href = "02-verbs.html"; 
+                window.location.href = "02-verbs.html";
             } else {
-                alert("⏳ 请先完成第一关！");
+                alert("⏳ 请先通关第一关！");
             }
         }
 
         function showSuccessState() {
-            document.getElementById('auth-section').innerHTML = `
-                <div class="text-center py-6">
-                    <p class="text-emerald-600 font-black text-2xl">🎉 解锁成功！</p>
-                </div>`;
+            document.getElementById('auth-section').innerHTML = '<div class="text-center py-6"><p class="text-emerald-600 font-black text-2xl">🎉 解锁成功！</p></div>';
         }
     </script>
 </body>
