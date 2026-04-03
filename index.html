@@ -12,7 +12,7 @@
         .main-card { background: #FFFFFF; border-radius: 40px; border: 2px solid #F1EFE0; box-shadow: 0 20px 50px rgba(6, 78, 59, 0.03); transition: all 0.3s; cursor: pointer; }
         .btn-primary { background: #064E3B; color: white; font-weight: 900; }
         
-        /* 🚨 关键改动：只改颜色，不加 pointer-events: none，把控制权交给 JS */
+        /* 🚨 核心修复：移除 pointer-events: none，防止点击被物理拦截 */
         .is-gray { filter: grayscale(1); opacity: 0.3; }
         
         .hero-title { font-size: clamp(32px, 8vw, 48px); font-weight: 900; line-height: 1.5; }
@@ -21,7 +21,6 @@
 </head>
 <body class="py-16">
     <div class="app-container">
-        
         <header class="text-center mb-16">
             <h1 class="hero-title text-emerald-950">A1 德语焦虑<br><span class="text-emerald-700">直接清零</span></h1>
         </header>
@@ -34,7 +33,7 @@
         </div>
 
         <div class="space-y-10">
-            <div id="lv1" onclick="handleLv1Click()" class="main-card p-8 flex items-center gap-6 border border-gray-50/50 relative is-gray">
+            <div id="lv1" onclick="navTo('01-gender.html')" class="main-card p-8 flex items-center gap-6 border border-gray-50/50 relative is-gray">
                 <div class="w-14 h-14 bg-emerald-800 rounded-2xl flex-shrink-0 flex items-center justify-center text-white font-black text-2xl shadow-lg">1</div>
                 <div class="flex-1">
                     <h3 class="font-black text-xl text-emerald-950">名词词性捕手</h3>
@@ -43,7 +42,7 @@
                 <div id="medal-display-1" class="medal-badge"></div> 
             </div>
 
-            <div id="lv2" onclick="handleLv2Click()" class="main-card p-8 flex items-center gap-6 border border-gray-50/50 relative is-gray">
+            <div id="lv2" onclick="navToStage2()" class="main-card p-8 flex items-center gap-6 border border-gray-50/50 relative is-gray">
                 <div class="w-14 h-14 bg-emerald-600 rounded-2xl flex-shrink-0 flex items-center justify-center text-white font-black text-2xl shadow-lg">2</div>
                 <div class="flex-1">
                     <h3 class="font-black text-xl text-emerald-950">动词变位大师</h3>
@@ -85,21 +84,19 @@
             if(document.getElementById('unlock-code').value === '8888') {
                 localStorage.setItem('isUnlocked', 'true');
                 refreshStatus();
-            } else {
-                alert("激活码无效");
-            }
+            } else { alert("激活码无效"); }
         }
 
-        // 🚨 核心逻辑改在这里：只要解锁了，哪怕界面还没变色，点它也强制跳转
-        function handleLv1Click() {
+        // 🚨 强制跳转逻辑：绕过所有 CSS 限制
+        function navTo(url) {
             if(localStorage.getItem('isUnlocked') === 'true') {
-                window.location.href = "01-gender.html";
+                window.location.href = url;
             } else {
                 alert("请先输入激活码解锁！");
             }
         }
 
-        function handleLv2Click() {
+        function navToStage2() {
             if(localStorage.getItem('stage1_cleared') === 'true') {
                 window.location.href = "02-verbs.html";
             } else {
