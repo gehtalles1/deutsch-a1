@@ -3,130 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>刘老师德语 A1 闯关 - 名词性别</title>
+    <title>德语 A1 闯关 - 第一关</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@700;900&display=swap');
         body { background: #F8F7F2; font-family: 'Noto Sans SC', sans-serif; color: #064E3B; -webkit-tap-highlight-color: transparent; }
-        .app-container { max-width: 550px; margin: 0 auto; padding: 20px; }
-        .game-card { background: #FFFFFF; border-radius: 40px; border: 2px solid #F1EFE0; box-shadow: 0 20px 50px rgba(6, 78, 59, 0.03); }
+        .game-card { background: white; border-radius: 40px; border: 2px solid #F1EFE0; }
         .option-btn { transition: all 0.2s; border: 2px solid #F1EFE0; border-radius: 25px; font-weight: 900; }
-        .option-btn:active { transform: scale(0.95); }
         .correct { background: #059669 !important; color: white !important; border-color: #059669 !important; }
         .wrong { background: #EF4444 !important; color: white !important; border-color: #EF4444 !important; }
-        .progress-bar { height: 8px; background: #E5E7EB; border-radius: 4px; overflow: hidden; }
-        .progress-fill { height: 100%; background: #059669; transition: width 0.3s; }
     </style>
 </head>
-<body class="py-8">
-    <div class="app-container">
-        <div class="flex justify-between items-center mb-6 px-4">
+<body class="py-12 px-6">
+    <div class="max-w-md mx-auto">
+        <div class="flex justify-between items-center mb-10">
             <button onclick="window.location.href='index.html'" class="text-emerald-800 font-bold">✕ 退出</button>
-            <div class="flex-1 mx-8">
-                <div class="progress-bar"><div id="progress" class="progress-fill" style="width: 0%"></div></div>
-            </div>
-            <div id="score-display" class="font-black text-emerald-900">0/50</div>
+            <div id="counter" class="font-black text-emerald-900 text-xl">0/50</div>
         </div>
 
-        <div class="game-card p-10 text-center mb-10">
-            <div id="word-display" class="text-5xl font-black text-emerald-950 mb-4">加载中...</div>
-            <div id="meaning-display" class="text-emerald-600/50 font-bold italic text-lg mb-8">...</div>
+        <div class="game-card p-10 text-center shadow-lg">
+            <div id="word" class="text-5xl font-black text-emerald-950 mb-4">加载中...</div>
+            <div id="meaning" class="text-emerald-600/50 font-bold mb-10 text-lg">...</div>
             
-            <div class="grid grid-cols-1 gap-4">
-                <button onclick="checkAnswer('der')" class="option-btn py-5 text-xl text-emerald-900 bg-blue-50/50 border-blue-100">Der (阳性)</button>
-                <button onclick="checkAnswer('die')" class="option-btn py-5 text-xl text-emerald-900 bg-pink-50/50 border-pink-100">Die (阴性)</button>
-                <button onclick="checkAnswer('das')" class="option-btn py-5 text-xl text-emerald-900 bg-green-50/50 border-green-100">Das (中性)</button>
+            <div class="grid gap-4">
+                <button onclick="check('der')" class="option-btn py-5 text-xl bg-blue-50/50">Der (阳性)</button>
+                <button onclick="check('die')" class="option-btn py-5 text-xl bg-pink-50/50">Die (阴性)</button>
+                <button onclick="check('das')" class="option-btn py-5 text-xl bg-green-50/50">Das (中性)</button>
             </div>
         </div>
     </div>
 
-    <div id="result-modal" class="fixed inset-0 bg-emerald-950/90 hidden flex items-center justify-center p-6 z-50">
-        <div class="bg-white rounded-[50px] p-12 text-center max-w-sm w-full">
+    <div id="modal" class="fixed inset-0 bg-emerald-950/90 hidden flex items-center justify-center p-6 z-50">
+        <div class="bg-white rounded-[40px] p-12 text-center w-full max-w-xs">
             <div id="medal-icon" class="text-8xl mb-6"></div>
-            <h2 id="result-title" class="text-3xl font-black text-emerald-950 mb-2"></h2>
-            <p id="result-desc" class="text-emerald-700/60 font-bold mb-10"></p>
-            <button onclick="window.location.href='index.html'" class="w-full py-5 bg-emerald-950 text-white rounded-[2rem] font-black text-xl shadow-xl">返回主页</button>
+            <h2 id="final-score" class="text-3xl font-black text-emerald-950 mb-8"></h2>
+            <button onclick="window.location.href='index.html'" class="w-full py-5 bg-emerald-950 text-white rounded-3xl font-black text-lg">回到主页领取勋章</button>
         </div>
     </div>
 
     <script>
-        const quizData = [
-            { w: "Apfel", g: "der", m: "苹果" }, { w: "Banane", g: "die", m: "香蕉" }, { w: "Auto", g: "das", m: "汽车" },
-            { w: "Vater", g: "der", m: "父亲" }, { w: "Mutter", g: "die", m: "母亲" }, { w: "Kind", g: "das", m: "孩子" },
-            { w: "Tisch", g: "der", m: "桌子" }, { w: "Tasche", g: "die", m: "包" }, { w: "Buch", g: "das", m: "书" },
-            { w: "Stuhl", g: "der", m: "椅子" }, { w: "Lampe", g: "die", m: "灯" }, { w: "Haus", g: "das", m: "房子" },
-            { w: "Löffel", g: "der", m: "勺子" }, { w: "Gabel", g: "die", m: "叉子" }, { w: "Messer", g: "das", m: "刀" },
-            { w: "Hund", g: "der", m: "狗" }, { w: "Katze", g: "die", m: "猫" }, { w: "Pferd", g: "das", m: "马" },
-            { w: "Lehrer", g: "der", m: "男老师" }, { w: "Lehrerin", g: "die", m: "女老师" }, { w: "Mädchen", g: "das", m: "女孩" },
-            { w: "Kaffee", g: "der", m: "咖啡" }, { w: "Milch", g: "die", m: "牛奶" }, { w: "Wasser", g: "das", m: "水" },
-            { w: "Wein", g: "der", m: "葡萄酒" }, { w: "Pizza", g: "die", m: "比萨" }, { w: "Bier", g: "das", m: "啤酒" },
-            { w: "Tag", g: "der", m: "白天" }, { w: "Nacht", g: "die", m: "夜晚" }, { w: "Jahr", g: "das", m: "年份" },
-            { w: "Montag", g: "der", m: "周一" }, { w: "Woche", g: "die", m: "周" }, { w: "Wochenende", g: "das", m: "周末" },
-            { w: "Computer", g: "der", m: "电脑" }, { w: "Tastatur", g: "die", m: "键盘" }, { w: "Handy", g: "das", m: "手机" },
-            { w: "Schlüssel", g: "der", m: "钥匙" }, { w: "Tür", g: "die", m: "门" }, { w: "Fenster", g: "das", m: "窗户" },
-            { w: "Garten", g: "der", m: "花园" }, { w: "Blume", g: "die", m: "花" }, { w: "Bett", g: "das", m: "床" },
-            { w: "Zug", g: "der", m: "火车" }, { w: "U-Bahn", g: "die", m: "地铁" }, { w: "Fahrrad", g: "das", m: "自行车" },
-            { w: "Markt", g: "der", m: "市场" }, { w: "Bäckerei", g: "die", m: "面包店" }, { w: "Kino", g: "das", m: "电影院" },
-            { w: "Park", g: "der", m: "公园" }, { w: "Stadt", g: "die", m: "城市" }
+        const data = [
+            {w:"Apfel",g:"der",m:"苹果"}, {w:"Banane",g:"die",m:"香蕉"}, {w:"Auto",g:"das",m:"汽车"},
+            {w:"Vater",g:"der",m:"父亲"}, {w:"Mutter",g:"die",m:"母亲"}, {w:"Kind",g:"das",m:"孩子"},
+            {w:"Tisch",g:"der",m:"桌子"}, {w:"Tasche",g:"die",m:"包"}, {w:"Buch",g:"das",m:"书"},
+            {w:"Stuhl",g:"der",m:"椅子"}, {w:"Lampe",g:"die",m:"灯"}, {w:"Haus",g:"das",m:"房子"},
+            {w:"Hund",g:"der",m:"狗"}, {w:"Katze",g:"die",m:"猫"}, {w:"Pferd",g:"das",m:"马"},
+            {w:"Lehrer",g:"der",m:"男老师"}, {w:"Lehrerin",g:"die",m:"女老师"}, {w:"Mädchen",g:"das",m:"女孩"},
+            {w:"Kaffee",g:"der",m:"咖啡"}, {w:"Milch",g:"die",m:"牛奶"}, {w:"Wasser",g:"das",m:"水"},
+            {w:"Tag",g:"der",m:"白天"}, {w:"Nacht",g:"die",m:"夜晚"}, {w:"Jahr",g:"das",m:"年份"},
+            {w:"Computer",g:"der",m:"电脑"}, {w:"Handy",g:"das",m:"手机"}, {w:"Bett",g:"das",m:"床"},
+            {w:"Schlüssel",g:"der",m:"钥匙"}, {w:"Tür",g:"die",m:"门"}, {w:"Fenster",g:"das",m:"窗户"},
+            {w:"Wein",g:"der",m:"葡萄酒"}, {w:"Bier",g:"das",m:"啤酒"}, {w:"Pizza",g:"die",m:"比萨"},
+            {w:"Park",g:"der",m:"公园"}, {w:"Stadt",g:"die",m:"城市"}, {w:"Kino",g:"das",m:"电影院"},
+            {w:"Bus",g:"der",m:"公交车"}, {w:"Taxi",g:"das",m:"出租车"}, {w:"Fahrrad",g:"das",m:"自行车"},
+            {w:"Bruder",g:"der",m:"兄弟"}, {w:"Schwester",g:"die",m:"姐妹"}, {w:"Baby",g:"das",m:"婴儿"},
+            {w:"Sonne",g:"die",m:"太阳"}, {w:"Regen",g:"der",m:"雨"}, {w:"Licht",g:"das",m:"光"},
+            {w:"Opa",g:"der",m:"爷爷"}, {w:"Oma",g:"die",m:"奶奶"}, {w:"Markt",g:"der",m:"市场"},
+            {w:"Schule",g:"die",m:"学校"}, {w:"Hotel",g:"das",m:"酒店"}
         ];
 
-        let currentIdx = 0;
-        let score = 0;
-
-        function initQuiz() {
-            if(currentIdx >= quizData.length) { showResult(); return; }
-            const q = quizData[currentIdx];
-            document.getElementById('word-display').innerText = q.w;
-            document.getElementById('meaning-display').innerText = q.m;
-            document.getElementById('score-display').innerText = `${currentIdx}/50`;
-            document.getElementById('progress').style.width = `${(currentIdx/50)*100}%`;
+        let idx = 0, score = 0;
+        function load() {
+            if(idx >= data.length) return end();
+            document.getElementById('word').innerText = data[idx].w;
+            document.getElementById('meaning').innerText = data[idx].m;
+            document.getElementById('counter').innerText = `${idx}/50`;
         }
 
-        function checkAnswer(ans) {
-            const correctAns = quizData[currentIdx].g;
-            const buttons = document.querySelectorAll('.option-btn');
-            
-            if(ans === correctAns) {
+        function check(ans) {
+            const correct = data[idx].g;
+            const btns = document.querySelectorAll('.option-btn');
+            if(ans === correct) {
                 score++;
-                // 找到正确的按钮变绿
-                buttons.forEach(b => { if(b.innerText.toLowerCase().includes(ans)) b.classList.add('correct'); });
+                btns.forEach(b => { if(b.innerText.toLowerCase().includes(ans)) b.classList.add('correct'); });
             } else {
-                buttons.forEach(b => { 
+                btns.forEach(b => {
                     if(b.innerText.toLowerCase().includes(ans)) b.classList.add('wrong');
-                    if(b.innerText.toLowerCase().includes(correctAns)) b.classList.add('correct');
+                    if(b.innerText.toLowerCase().includes(correct)) b.classList.add('correct');
                 });
             }
-
             setTimeout(() => {
-                buttons.forEach(b => b.classList.remove('correct', 'wrong'));
-                currentIdx++;
-                initQuiz();
-            }, 600);
+                btns.forEach(b => b.classList.remove('correct', 'wrong'));
+                idx++; load();
+            }, 500);
         }
 
-        function showResult() {
-            const modal = document.getElementById('result-modal');
-            const medal = document.getElementById('medal-icon');
-            const title = document.getElementById('result-title');
-            const desc = document.getElementById('result-desc');
-            
-            modal.classList.remove('hidden');
+        function end() {
             localStorage.setItem('stage1_cleared', 'true');
-
-            if(score === 50) {
-                medal.innerText = "🥇";
-                title.innerText = "满分通关！";
-                desc.innerText = "太棒了，你已经掌握了全部单词！";
-                localStorage.setItem('stage1_medal', 'gold');
-            } else {
-                medal.innerText = "🥈";
-                title.innerText = "挑战成功！";
-                desc.innerText = `获得了 ${score} 分，继续努力！`;
-                localStorage.setItem('stage1_medal', 'silver');
-            }
+            const medal = score === 50 ? 'gold' : 'silver';
+            localStorage.setItem('stage1_medal', medal);
+            document.getElementById('modal').classList.remove('hidden');
+            document.getElementById('medal-icon').innerText = medal === 'gold' ? '🥇' : '🥈';
+            document.getElementById('final-score').innerText = `得分: ${score}/50`;
         }
-
-        initQuiz();
+        load();
     </script>
 </body>
 </html>
