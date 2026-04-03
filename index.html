@@ -1,138 +1,45 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>刘老师德语 A1 闯关</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@700;900&display=swap');
-        body { background: #F8F7F2; font-family: 'Noto Sans SC', sans-serif; color: #064E3B; -webkit-tap-highlight-color: transparent; }
-        .app-container { max-width: 550px; margin: 0 auto; padding: 0 40px; }
-        .main-card { background: #FFFFFF; border-radius: 40px; border: 2px solid #F1EFE0; box-shadow: 0 20px 50px rgba(6, 78, 59, 0.03); transition: all 0.3s; }
-        .btn-primary { background: #064E3B; color: white; font-weight: 900; }
-        .locked { filter: grayscale(1); opacity: 0.3; pointer-events: none; }
-        .hero-title { font-size: clamp(32px, 8vw, 48px); font-weight: 900; line-height: 1.5; letter-spacing: -1px; }
-        /* 勋章悬浮样式 */
-        .medal-badge { position: absolute; top: -10px; right: -10px; font-size: 2.5rem; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1)); }
-    </style>
-</head>
-<body class="py-16">
-    <div class="app-container">
+window.onload = function() {
+    refreshStatus();
+}
+
+function refreshStatus() {
+    const isUnlocked = localStorage.getItem('isUnlocked') === 'true';
+    const stage1Cleared = localStorage.getItem('stage1_cleared') === 'true';
+    const stage1Medal = localStorage.getItem('stage1_medal'); 
+
+    // 1. 处理激活状态
+    if(isUnlocked) {
+        showSuccessState();
+        // 激活后，第一关必须可以点击，去掉 locked
+        document.getElementById('lv1').classList.remove('locked');
+    }
+
+    // 2. 修复银牌显示问题，不再显示数字2
+    if(stage1Cleared) {
+        const medalDisplay = document.getElementById('medal-display-1');
+        if (stage1Medal === 'gold') {
+            medalDisplay.innerHTML = '<span style="filter: drop-shadow(0 0 5px #FFD700)">🥇</span>';
+        } else {
+            medalDisplay.innerHTML = '<span style="filter: drop-shadow(0 0 5px #C0C0C0)">🥈</span>';
+        }
         
-        <header class="text-center mb-16">
-            <h1 class="hero-title text-emerald-950">
-                A1 德语焦虑<br><span class="text-emerald-700">直接清零</span>
-            </h1>
-            <div class="h-1.5 w-12 bg-emerald-700/10 mx-auto mt-8 rounded-full"></div>
-        </header>
+        // 3. 解锁第二关
+        const lv2 = document.getElementById('lv2');
+        lv2.classList.remove('locked');
+        lv2.style.pointerEvents = "auto"; // 确保可以点击
+        document.getElementById('lv2-status').innerText = "已开启挑战";
+        document.getElementById('lv2-status').classList.remove('text-red-400');
+    }
+}
 
-        <div id="auth-section" class="main-card p-10 mb-12">
-            <div class="flex flex-col gap-6">
-                <input id="unlock-code" type="text" placeholder="输入 4 位激活码" class="w-full px-4 py-5 rounded-[2rem] bg-gray-50 border-none outline-none text-center font-black text-2xl text-emerald-900 ring-1 ring-gray-100 focus:ring-emerald-800 transition-all">
-                <button onclick="unlock()" class="w-full py-5 btn-primary rounded-[2rem] shadow-xl active:scale-95 transition-all text-xl">立即解锁全关卡</button>
-            </div>
-        </div>
-
-        <div class="space-y-10">
-            <div class="relative">
-                <a id="lv1" href="01-gender.html" class="locked main-card block p-8 flex items-center gap-6 border border-gray-50/50">
-                    <div class="w-14 h-14 bg-emerald-800 rounded-2xl flex-shrink-0 flex items-center justify-center text-white font-black text-2xl shadow-lg">1</div>
-                    <div class="flex-1">
-                        <h3 class="font-black text-xl text-emerald-950">名词性别</h3>
-                        <p class="text-[10px] font-extrabold text-emerald-800/30 tracking-[0.3em] mt-1 uppercase">Der / Die / Das</p>
-                    </div>
-                    <div id="medal-display-1" class="medal-badge"></div> </a>
-            </div>
-
-            <div class="relative">
-                <a id="lv2" href="javascript:void(0)" onclick="checkStage2()" class="locked main-card block p-8 flex items-center gap-6 border border-gray-50/50">
-                    <div class="w-14 h-14 bg-emerald-600 rounded-2xl flex-shrink-0 flex items-center justify-center text-white font-black text-2xl shadow-lg">2</div>
-                    <div class="flex-1">
-                        <h3 class="font-black text-xl text-emerald-950">动词变位</h3>
-                        <p id="lv2-status" class="text-[10px] font-extrabold text-emerald-800/30 tracking-[0.3em] mt-1 uppercase text-red-400">需完成第一关解锁</p>
-                    </div>
-                </a>
-            </div>
-        </div>
-
-        <footer class="mt-24 text-center pb-10">
-            <p class="text-[10px] text-gray-300 font-black tracking-[0.5em] mb-6 uppercase">Lehrer Liu Nian</p>
-            <div class="inline-block px-8 py-3 rounded-full border border-gray-200 text-xs font-bold text-gray-400">
-                咨询微信: <span class="text-emerald-800">gehtalles</span>
-            </div>
-        </footer>
-    </div>
-
-    <script>
-        window.onload = function() {
-            refreshStatus();
-        }
-
-        // 刷新页面状态逻辑
-        function refreshStatus() {
-            const isUnlocked = localStorage.getItem('isUnlocked') === 'true';
-            const stage1Cleared = localStorage.getItem('stage1_cleared') === 'true';
-            const stage1Medal = localStorage.getItem('stage1_medal'); // 获取勋章
-
-            // 1. 处理激活码逻辑
-            if(isUnlocked) {
-                showSuccessState();
-                document.getElementById('lv1').classList.remove('locked');
-            }
-
-            // 2. 处理第一关勋章显示
-            if(stage1Cleared) {
-                const medalIcon = (stage1Medal === 'gold') ? "🥇" : "🥈";
-                document.getElementById('medal-display-1').innerText = medalIcon;
-                
-                // 3. 只要过关了（不论金银），就开启第二关入口
-                const lv2 = document.getElementById('lv2');
-                lv2.classList.remove('locked');
-                document.getElementById('lv2-status').innerText = "已开启挑战";
-                document.getElementById('lv2-status').classList.remove('text-red-400');
-            }
-        }
-
-        function unlock() {
-            const code = document.getElementById('unlock-code').value;
-            if(code === '8888') {
-                localStorage.setItem('isUnlocked', 'true');
-                refreshStatus();
-                playSuccessSound();
-            } else {
-                alert("激活码无效，请咨询微信：gehtalles");
-            }
-        }
-
-        function checkStage2() {
-            const stage1Cleared = localStorage.getItem('stage1_cleared') === 'true';
-            if(stage1Cleared) {
-                window.location.href = "02-verbs.html"; 
-            } else {
-                alert("⏳ 必须先完成第一关，证明您的实力后才能进入！");
-            }
-        }
-
-        function showSuccessState() {
-            document.getElementById('auth-section').innerHTML = `
-                <div class="text-center py-6">
-                    <p class="text-emerald-900 font-black text-2xl leading-relaxed">
-                    🎉 解锁成功！<br><span class="text-lg opacity-40 italic">跟着刘老师，稳过 A1</span>
-                    </p>
-                </div>`;
-        }
-
-        function playSuccessSound() {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = ctx.createOscillator();
-            const g = ctx.createGain();
-            osc.connect(g); g.connect(ctx.destination);
-            osc.frequency.setValueAtTime(523, ctx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(1046, ctx.currentTime + 0.4);
-            g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
-            osc.start(); osc.stop(ctx.currentTime + 0.4);
-        }
-    </script>
-</body>
-</html>
+// 激活码逻辑保持不变
+function unlock() {
+    const code = document.getElementById('unlock-code').value;
+    if(code === '8888') {
+        localStorage.setItem('isUnlocked', 'true');
+        refreshStatus();
+        playSuccessSound();
+    } else {
+        alert("激活码无效，请咨询微信：gehtalles");
+    }
+}
