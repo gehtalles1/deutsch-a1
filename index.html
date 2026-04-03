@@ -3,75 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>刘老师德语通关</title>
+    <title>德语 A1 名词性别闯关</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@700;900&display=swap');
         body { background: #F8F7F2; font-family: 'Noto Sans SC', sans-serif; color: #064E3B; -webkit-tap-highlight-color: transparent; }
-        .app-container { max-width: 500px; margin: 0 auto; padding: 20px 40px; }
-        .main-card { background: white; border-radius: 40px; border: 2px solid #F1EFE0; position: relative; cursor: pointer; }
-        .locked { opacity: 0.3; filter: grayscale(1); pointer-events: none !important; }
-        .medal-badge { position: absolute; top: -12px; right: -12px; font-size: 2.8rem; z-index: 50; }
+        .game-card { background: white; border-radius: 40px; border: 2px solid #F1EFE0; }
+        .option-btn { transition: all 0.2s; border: 2px solid #F1EFE0; border-radius: 25px; font-weight: 900; }
+        .correct { background: #059669 !important; color: white !important; border-color: #059669 !important; }
+        .wrong { background: #EF4444 !important; color: white !important; border-color: #EF4444 !important; }
     </style>
 </head>
-<body class="py-12">
-    <div class="app-container">
-        <header class="text-center mb-16">
-            <h1 class="text-4xl font-black text-emerald-950 leading-tight">A1 德语练习<br><span class="text-emerald-600 text-3xl">通关宝盒</span></h1>
-        </header>
-
-        <div id="auth-section" class="main-card p-10 mb-12 shadow-sm">
-            <input id="code-input" type="text" placeholder="输入 8888 激活" class="w-full p-5 mb-6 rounded-3xl bg-gray-50 border-none text-center font-bold text-xl outline-none ring-2 ring-emerald-50 focus:ring-emerald-500">
-            <button onclick="handleUnlock()" class="w-full py-5 bg-emerald-900 text-white rounded-3xl font-black text-lg active:scale-95 shadow-lg">立即激活</button>
+<body class="py-8 px-4">
+    <div class="max-w-md mx-auto">
+        <div class="flex justify-between items-center mb-6">
+            <button onclick="window.location.href='index.html'" class="text-emerald-800 font-bold">✕ 退出</button>
+            <div id="progress-text" class="font-black text-emerald-900">0/50</div>
         </div>
 
-        <div class="space-y-8">
-            <div class="relative">
-                <div id="medal-1" class="medal-badge"></div>
-                <div id="lv1-card" onclick="goToLevel1()" class="locked main-card p-8 flex items-center gap-6">
-                    <div class="w-14 h-14 bg-emerald-800 rounded-2xl flex-shrink-0 flex items-center justify-center text-white font-black text-2xl italic">1</div>
-                    <div class="flex-1">
-                        <h3 class="font-black text-xl text-emerald-950">名词性别挑战</h3>
-                        <p id="lv1-status" class="text-[10px] font-bold text-gray-400 tracking-widest mt-1 uppercase">未解锁</p>
-                    </div>
-                </div>
+        <div class="game-card p-10 text-center shadow-sm">
+            <div id="word" class="text-5xl font-black text-emerald-950 mb-2">加载中...</div>
+            <div id="meaning" class="text-emerald-600/50 font-bold mb-8">...</div>
+            
+            <div class="grid gap-4">
+                <button onclick="check('der')" class="option-btn py-5 text-xl bg-blue-50/50">Der (阳性)</button>
+                <button onclick="check('die')" class="option-btn py-5 text-xl bg-pink-50/50">Die (阴性)</button>
+                <button onclick="check('das')" class="option-btn py-5 text-xl bg-green-50/50">Das (中性)</button>
             </div>
         </div>
     </div>
 
+    <div id="modal" class="fixed inset-0 bg-emerald-950/90 hidden flex items-center justify-center p-6 z-50">
+        <div class="bg-white rounded-[40px] p-10 text-center w-full max-w-xs">
+            <div id="medal" class="text-7xl mb-4"></div>
+            <h2 id="msg" class="text-2xl font-black text-emerald-950 mb-6"></h2>
+            <button onclick="window.location.href='index.html'" class="w-full py-4 bg-emerald-950 text-white rounded-2xl font-black">返回主页查看勋章</button>
+        </div>
+    </div>
+
     <script>
-        window.onload = function() { updateUI(); };
+        const data = [
+            {w:"Apfel",g:"der",m:"苹果"}, {w:"Banane",g:"die",m:"香蕉"}, {w:"Auto",g:"das",m:"汽车"},
+            {w:"Vater",g:"der",m:"父亲"}, {w:"Mutter",g:"die",m:"母亲"}, {w:"Kind",g:"das",m:"孩子"},
+            {w:"Tisch",g:"der",m:"桌子"}, {w:"Tasche",g:"die",m:"包"}, {w:"Buch",g:"das",m:"书"},
+            {w:"Stuhl",g:"der",m:"椅子"}, {w:"Lampe",g:"die",m:"灯"}, {w:"Haus",g:"das",m:"房子"},
+            {w:"Kaffee",g:"der",m:"咖啡"}, {w:"Milch",g:"die",m:"牛奶"}, {w:"Wasser",g:"das",m:"水"},
+            {w:"Lehrer",g:"der",m:"男老师"}, {w:"Lehrerin",g:"die",m:"女老师"}, {w:"Mädchen",g:"das",m:"女孩"},
+            {w:"Hund",g:"der",m:"狗"}, {w:"Katze",g:"die",m:"猫"}, {w:"Pferd",g:"das",m:"马"},
+            {w:"Tag",g:"der",m:"白天"}, {w:"Nacht",g:"die",m:"夜晚"}, {w:"Jahr",g:"das",m:"年份"},
+            {w:"Schlüssel",g:"der",m:"钥匙"}, {w:"Tür",g:"die",m:"门"}, {w:"Fenster",g:"das",m:"窗户"},
+            {w:"Computer",g:"der",m:"电脑"}, {w:"Handy",g:"das",m:"手机"}, {w:"Bett",g:"das",m:"床"},
+            {w:"Bruder",g:"der",m:"兄弟"}, {w:"Schwester",g:"die",m:"姐妹"}, {w:"Baby",g:"das",m:"婴儿"},
+            {w:"Wein",g:"der",m:"葡萄酒"}, {w:"Suppe",g:"die",m:"汤"}, {w:"Brot",g:"das",m:"面包"},
+            {w:"Park",g:"der",m:"公园"}, {w:"Stadt",g:"die",m:"城市"}, {w:"Kino",g:"das",m:"电影院"},
+            {w:"Bus",g:"der",m:"公交车"}, {w:"U-Bahn",g:"die",m:"地铁"}, {w:"Taxi",g:"das",m:"出租车"},
+            {w:"Mantel",g:"der",m:"大衣"}, {w:"Hose",g:"die",m:"裤子"}, {w:"Hemd",g:"das",m:"衬衫"},
+            {w:"Regen",g:"der",m:"雨"}, {w:"Sonne",g:"die",m:"太阳"}, {w:"Licht",g:"das",m:"光"},
+            {w:"Opa",g:"der",m:"爷爷"}, {w:"Oma",g:"die",m:"奶奶"}
+        ];
 
-        function handleUnlock() {
-            if(document.getElementById('code-input').value === '8888') {
-                localStorage.setItem('isUnlocked', 'true');
-                updateUI();
-            } else { alert("激活码无效"); }
+        let idx = 0, score = 0;
+        function load() {
+            if(idx >= data.length) return end();
+            document.getElementById('word').innerText = data[idx].w;
+            document.getElementById('meaning').innerText = data[idx].m;
+            document.getElementById('progress-text').innerText = `${idx}/50`;
         }
 
-        function updateUI() {
-            const isUnlocked = localStorage.getItem('isUnlocked') === 'true';
-            const cleared = localStorage.getItem('stage1_cleared') === 'true';
-            const medal = localStorage.getItem('stage1_medal');
-
-            if(isUnlocked) {
-                document.getElementById('auth-section').innerHTML = `<p class="text-center font-black text-emerald-800 py-4 text-xl">🎉 欢迎刘老师的学生！</p>`;
-                document.getElementById('lv1-card').classList.remove('locked');
-                document.getElementById('lv1-status').innerText = "点击进入第一关";
-                document.getElementById('lv1-status').classList.replace('text-gray-400', 'text-emerald-600');
+        function check(ans) {
+            const correct = data[idx].g;
+            const btns = document.querySelectorAll('.option-btn');
+            if(ans === correct) {
+                score++;
+                btns.forEach(b => { if(b.innerText.toLowerCase().includes(ans)) b.classList.add('correct'); });
+            } else {
+                btns.forEach(b => {
+                    if(b.innerText.toLowerCase().includes(ans)) b.classList.add('wrong');
+                    if(b.innerText.toLowerCase().includes(correct)) b.classList.add('correct');
+                });
             }
-
-            if(cleared && medal) {
-                document.getElementById('medal-1').innerHTML = (medal === 'gold') ? '🥇' : '🥈';
-            }
+            setTimeout(() => {
+                btns.forEach(b => b.classList.remove('correct', 'wrong'));
+                idx++; load();
+            }, 500);
         }
 
-        // 强制跳转函数，防止 <a> 标签失效
-        function goToLevel1() {
-            if(localStorage.getItem('isUnlocked') === 'true') {
-                window.location.href = "01-gender.html";
-            }
+        function end() {
+            localStorage.setItem('stage1_cleared', 'true');
+            const medal = score === 50 ? 'gold' : 'silver';
+            localStorage.setItem('stage1_medal', medal);
+            document.getElementById('modal').classList.remove('hidden');
+            document.getElementById('medal').innerText = medal === 'gold' ? '🥇' : '🥈';
+            document.getElementById('msg').innerText = `得分：${score}/50`;
         }
+        load();
     </script>
 </body>
 </html>
