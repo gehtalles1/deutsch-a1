@@ -7,108 +7,64 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@700;900&display=swap');
-        body { background: #F8F7F2; font-family: 'Noto Sans SC', sans-serif; color: #064E3B; -webkit-tap-highlight-color: transparent; }
-        .app-container { max-width: 550px; margin: 0 auto; padding: 0 40px; }
-        .main-card { background: #FFFFFF; border-radius: 40px; border: 2px solid #F1EFE0; box-shadow: 0 20px 50px rgba(6, 78, 59, 0.03); transition: all 0.3s; cursor: pointer; position: relative; }
-        
-        /* 🚨 核心修复：只变灰色，绝对不准加 pointer-events: none */
-        .is-locked { filter: grayscale(1); opacity: 0.4; }
-        
-        .hero-title { font-size: clamp(30px, 7vw, 40px); font-weight: 900; line-height: 1.4; text-align: center; margin-bottom: 40px; }
-        .btn-primary { background: #064E3B; color: white; font-weight: 900; box-shadow: 0 10px 30px rgba(6, 78, 59, 0.2); }
-        .medal-badge { position: absolute; top: -10px; right: -10px; font-size: 2.5rem; z-index: 10; }
+        body { background: #F8F7F2; font-family: 'Noto Sans SC', sans-serif; }
+        .main-card { background: #FFFFFF; border-radius: 40px; border: 2px solid #F1EFE0; }
+        .btn-primary { background: #064E3B; color: white; font-weight: 900; }
+        /* 视觉灰化，但不设 pointer-events，确保 JS 能捕获点击 */
+        .is-locked { filter: grayscale(1); opacity: 0.3; }
     </style>
 </head>
-<body class="py-12">
-    <div class="app-container">
-        <h1 class="hero-title text-emerald-950">A1 德语焦虑<br><span class="text-emerald-700">直接清零</span></h1>
+<body class="py-12 px-8">
+    <div class="max-w-[500px] mx-auto">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-black text-emerald-950 mb-2">A1 德语焦虑</h1>
+            <p class="text-emerald-700 font-black">直接清零</p>
+        </header>
 
-        <div id="auth-section" class="main-card p-10 mb-10 border-emerald-50">
-            <div id="input-group" class="flex flex-col gap-5">
-                <input id="unlock-code" type="text" placeholder="输入激活码 8888" class="w-full py-5 rounded-3xl bg-gray-50 border-none outline-none text-center font-black text-2xl text-emerald-900 focus:ring-2 focus:ring-emerald-500 transition-all">
-                <button onclick="handleUnlock()" class="w-full py-5 btn-primary rounded-3xl active:scale-95 transition-all text-xl">立即解锁全关卡</button>
+        <div id="dynamic-container" class="mb-10">
+            <div id="auth-box" class="main-card p-8">
+                <input id="unlock-code" type="text" placeholder="输入激活码" class="w-full py-4 text-center rounded-2xl bg-gray-50 mb-4 outline-none">
+                <button onclick="unlock()" class="w-full py-4 btn-primary rounded-2xl">立即解锁</button>
+            </div>
+            <div id="success-msg" class="main-card p-6 text-center text-emerald-800 font-black hidden">
+                🎉 解锁成功！跟着刘老师，稳过 A1
             </div>
         </div>
 
-        <div class="space-y-8">
-            <div id="lv1-btn" onclick="startLevel(1)" class="main-card p-8 flex items-center gap-6 is-locked">
-                <div class="w-14 h-14 bg-emerald-800 rounded-2xl flex-shrink-0 flex items-center justify-center text-white font-black text-2xl shadow-lg">1</div>
-                <div class="flex-1">
-                    <h3 class="font-black text-xl text-emerald-950">名词词性捕手</h3>
-                    <p class="text-[10px] font-extrabold text-emerald-800/30 tracking-widest mt-1 uppercase">Der / Die / Das 终结者</p>
-                </div>
-                <div id="medal-1" class="medal-badge"></div>
-            </div>
-
-            <div id="lv2-btn" onclick="startLevel(2)" class="main-card p-8 flex items-center gap-6 is-locked">
-                <div class="w-14 h-14 bg-emerald-600 rounded-2xl flex-shrink-0 flex items-center justify-center text-white font-black text-2xl shadow-lg">2</div>
-                <div class="flex-1">
-                    <h3 class="font-black text-xl text-emerald-950">动词变位大师</h3>
-                    <p id="lv2-hint" class="text-[10px] font-extrabold text-red-400 tracking-widest mt-1 uppercase">需完成第一关解锁</p>
-                </div>
+        <div class="space-y-6">
+            <div id="lv1-btn" onclick="startLevel(1)" class="main-card p-6 flex items-center gap-4 is-locked">
+                <div class="w-12 h-12 bg-emerald-800 rounded-2xl text-white flex items-center justify-center font-black">1</div>
+                <h3 class="font-black text-lg">名词词性捕手</h3>
             </div>
         </div>
-
-        <footer class="mt-20 text-center pb-10">
-            <div class="inline-block px-8 py-3 rounded-full border border-gray-100 bg-white text-xs font-bold text-gray-400 shadow-sm">
-                咨询微信: <span class="text-emerald-800">gehtalles</span>
-            </div>
-        </footer>
     </div>
 
     <script>
-        // 初始化刷新状态
-        window.onload = updateUI;
+        window.onload = refresh;
 
-        function updateUI() {
-            const isUnlocked = localStorage.getItem('isUnlocked') === 'true';
-            const s1Cleared = localStorage.getItem('stage1_cleared') === 'true';
-            const s1Medal = localStorage.getItem('stage1_medal');
-
-            if (isUnlocked) {
-                document.getElementById('auth-section').innerHTML = '<div class="text-center py-4"><p class="text-emerald-700 font-black text-2xl">🎉 解锁成功！去闯关吧</p></div>';
+        function refresh() {
+            const unlocked = localStorage.getItem('isUnlocked') === 'true';
+            if (unlocked) {
+                document.getElementById('auth-box').classList.add('hidden');
+                document.getElementById('success-msg').classList.remove('hidden');
                 document.getElementById('lv1-btn').classList.remove('is-locked');
             }
-
-            if (s1Cleared) {
-                document.getElementById('medal-1').innerText = (s1Medal === 'gold') ? "🥇" : "🥈";
-                document.getElementById('lv2-btn').classList.remove('is-locked');
-                const hint = document.getElementById('lv2-hint');
-                hint.innerText = "已开启挑战";
-                hint.classList.remove('text-red-400');
-                hint.classList.add('text-emerald-600/40');
-            }
         }
 
-        function handleUnlock() {
-            const code = document.getElementById('unlock-code').value;
-            if (code === '8888') {
+        function unlock() {
+            if(document.getElementById('unlock-code').value === '8888') {
                 localStorage.setItem('isUnlocked', 'true');
-                updateUI();
-            } else {
-                alert("激活码有误，请重新输入");
-            }
+                refresh();
+            } else { alert("代码有误"); }
         }
 
-        // 🚨 跳转核心函数
         function startLevel(num) {
-            const isUnlocked = localStorage.getItem('isUnlocked') === 'true';
-            const s1Cleared = localStorage.getItem('stage1_cleared') === 'true';
-
-            if (num === 1) {
-                if (isUnlocked) {
-                    // 确保文件名与 GitHub 完全一致
-                    window.location.href = "01-gender.html";
-                } else {
-                    alert("请先输入激活码解锁！");
-                }
-            } else if (num === 2) {
-                if (s1Cleared) {
-                    window.location.href = "02-verbs.html";
-                } else {
-                    alert("⏳ 请先通过第一关！");
-                }
+            // 🚨 严谨的单层逻辑判断
+            if (localStorage.getItem('isUnlocked') !== 'true') {
+                alert("请先解锁");
+                return;
             }
+            window.location.href = "01-gender.html";
         }
     </script>
 </body>
