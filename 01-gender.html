@@ -6,19 +6,33 @@
     <title>第一关：名词性别挑战</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* 引入思源黑体 */
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@700;900&display=swap');
+        
         body { background: #F8F7F2; font-family: 'Noto Sans SC', sans-serif; color: #064E3B; overflow: hidden; -webkit-tap-highlight-color: transparent; }
         .word-card { background: white; border-radius: 54px; border: 3px solid #F1EFE0; min-height: 280px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; position: relative; overflow: hidden; }
         .btn-gender { border-radius: 35px; font-weight: 900; transition: all 0.2s; box-shadow: 0 4px 0px rgba(0,0,0,0.05); }
         .btn-der { background: #E1E9F5; color: #3563A3; }
         .btn-die { background: #F5E1E1; color: #A33535; }
         .btn-das { background: #E1F5E5; color: #35A352; }
+        
+        /* 进度条与答错遮罩 */
         .progress-fill { height: 100%; background: #064E3B; width: 0%; transition: width 0.3s; }
         #tip-overlay { position: absolute; inset: 0; background: #991B1B; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; padding: 30px; text-align: center; z-index: 50; cursor: pointer; animation: shake 0.3s ease-in-out; }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
         
-        /* 返回按钮样式 */
-        .back-btn { background: white; width: 44px; height: 44px; border-radius: 15px; display: flex; items-center; justify-content: center; border: 2px solid #F1EFE0; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+        /* 🌟 核心修复：把箭头锁在正中央 */
+        .back-btn { 
+            background: white; 
+            width: 44px; 
+            height: 44px; 
+            border-radius: 15px; 
+            display: flex; 
+            align-items: center;    /* 垂直居中 */
+            justify-content: center; /* 水平居中 */
+            border: 2px solid #F1EFE0; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03); 
+        }
     </style>
 </head>
 <body class="p-6">
@@ -26,7 +40,7 @@
         <div class="mb-6">
             <div class="flex justify-between items-center mb-6">
                 <button onclick="confirmExit()" class="back-btn active:scale-90 transition-transform">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
                 </button>
                 <div id="counter" class="text-2xl font-black text-emerald-950/30 font-mono italic">1 / 50</div>
             </div>
@@ -55,56 +69,57 @@
     </div>
 
     <script>
+        // 完整的 50 个单词数据
         const quiz = [
             {w:"Apfel", cn:"苹果", g:"der", t:"🍎 水果通常 die，但苹果是 der 例外！"},
             {w:"Milch", cn:"牛奶", g:"die", t:"🥛 饮料多为 der，牛奶是例外！"},
-            {w:"Mädchen", cn:"女孩", g:"das", t:"👧 记住：所有 -chen 结尾都是 das！"},
+            {w:"Mädchen", cn:"女孩", g:"das", t:"👧 所有 -chen 结尾都是 das！"},
             {w:"Auto", cn:"汽车", g:"das", t:"🚗 交通工具多为 das。"},
             {w:"Zeitung", cn:"报纸", g:"die", t:"📰 结尾是 -ung 的词，100% 是 die！"},
-            {w:"Lehrer", cn:"老师", g:"der", t:"👨‍🏫 -er 结尾的职业词通常是 der。"},
-            {w:"Bäckerei", cn:"面包店", g:"die", t:"🥖 -ei 结尾的地点/职业词全是 die。"},
+            {w:"Lehrer", cn:"老师", g:"der", t:"👨‍🏫 -er 结尾职业通常是 der。"},
+            {w:"Bäckerei", cn:"面包店", g:"die", t:"🥖 -ei 结尾全是 die。"},
             {w:"Kind", cn:"孩子", g:"das", t:"👶 生命初期常为 das。"},
-            {w:"Kaffee", cn:"咖啡", g:"der", t:"☕ 大部分饮料都是 der。"},
-            {w:"Haus", cn:"房子", g:"das", t:"🏠 基础建筑词很多是 das。"},
+            {w:"Kaffee", cn:"咖啡", g:"der", t:"☕ 饮料多为 der。"},
+            {w:"Haus", cn:"房子", g:"das", t:"🏠 基础建筑多是 das。"},
             {w:"Zucker", cn:"糖", g:"der", t:"🧂 调味品多为 der。"},
             {w:"Sonne", cn:"太阳", g:"die", t:"☀️ 太阳是阴性 die。"},
-            {w:"Fenster", cn:"窗户", g:"das", t:"🪟 注意：虽然是 -er 结尾，但它是 das。"},
-            {w:"Bus", cn:"公交车", g:"der", t:"🚌 交通工具后缀词常是 der。"},
-            {w:"Universität", cn:"大学", g:"die", t:"🏫 结尾是 -tät 的词 100% 是 die。"},
+            {w:"Fenster", cn:"窗户", g:"das", t:"🪟 注意：是 das。"},
+            {w:"Bus", cn:"公交车", g:"der", t:"🚌 交通工具常是 der。"},
+            {w:"Universität", cn:"大学", g:"die", t:"🏫 结尾是 -tät 100% 是 die。"},
             {w:"Wasser", cn:"水", g:"das", t:"💧 自然元素多为 das。"},
             {w:"Tag", cn:"白天", g:"der", t:"☀️ 时间概念多为 der。"},
-            {w:"Blume", cn:"花", g:"die", t:"🌸 以 -e 结尾的植物多是 die。"},
-            {w:"Handy", cn:"手机", g:"das", t:"📱 现代电子产品多为 das。"},
-            {w:"Bier", cn:"啤酒", g:"das", t:"🍺 酒类 der，但啤酒是 das！"},
-            {w:"Wein", cn:"葡萄酒", g:"der", t:"🍷 酒类基本都是 der！"},
-            {w:"Situation", cn:"情况", g:"die", t:"📋 结尾是 -tion 的词全是 die。"},
-            {w:"Bett", cn:"床", g:"das", t:"🛏️ 家具类中性 das 比例很高。"},
-            {w:"Computer", cn:"电脑", g:"der", t:"💻 外来工具词，-er 结尾多为 der。"},
-            {w:"Freiheit", cn:"自由", g:"die", t:"🗽 结尾是 -heit 的全是 die！"},
+            {w:"Blume", cn:"花", g:"die", t:"🌸 -e 植物多是 die。"},
+            {w:"Handy", cn:"手机", g:"das", t:"📱 电子产品多为 das。"},
+            {w:"Bier", cn:"啤酒", g:"das", t:"🍺 注意例外：酒类 der，啤酒是 das。"},
+            {w:"Wein", cn:"葡萄酒", g:"der", t:"🍷 酒类基本都是 der。"},
+            {w:"Situation", cn:"情况", g:"die", t:"📋 结尾是 -tion 全是 die。"},
+            {w:"Bett", cn:"床", g:"das", t:"🛏️ 家具类 das 比例高。"},
+            {w:"Computer", cn:"电脑", g:"der", t:"💻 外来工具词 -er 结尾常是 der。"},
+            {w:"Freiheit", cn:"自由", g:"die", t:"🗽 -heit 全是 die。"},
             {w:"Essen", cn:"食物", g:"das", t:"🍲 动词变名词，永远是 das。"},
-            {w:"Honig", cn:"蜂蜜", g:"der", t:"🍯 -ig 结尾的词 100% 是 der。"},
-            {w:"Natur", cn:"自然", g:"die", t:"🌿 结尾是 -ur 的词大多是 die。"},
-            {w:"Kindheit", cn:"童年", g:"die", t:"🎠 结尾是 -heit 的词 100% 是 die。"},
-            {w:"Brot", cn:"面包", g:"das", t:"🍞 基础主食名词常为 das。"},
-            {w:"Schule", cn:"学校", g:"die", t:"🏫 -e 结尾的词 90% 都是 die。"},
-            {w:"Kino", cn:"电影院", g:"das", t:"🎬 以 -o 结尾的外来词多为 das。"},
-            {w:"Optimismus", cn:"乐观", g:"der", t:"✨ -ismus 结尾的抽象词全是 der。"},
-            {w:"Musik", cn:"音乐", g:"die", t:"🎵 结尾是 -ik 的外来词通常是 die。"},
-            {w:"Fräulein", cn:"小姐", g:"das", t:"👒 结尾是 -lein 的词 100% 是 das。"},
-            {w:"Regen", cn:"雨", g:"der", t:"🌧️ 自然降雨全是 der。"},
-            {w:"Wurst", cn:"香肠", g:"die", t:"🌭 德国特产香肠是 die。"},
+            {w:"Honig", cn:"蜂蜜", g:"der", t:"🍯 -ig 100% 是 der。"},
+            {w:"Natur", cn:"自然", g:"die", t:"🌿 -ur 结尾多是 die。"},
+            {w:"Kindheit", cn:"童年", g:"die", t:"🎠 -heit 100% 是 die。"},
+            {w:"Brot", cn:"面包", g:"das", t:"🍞 主食常为 das。"},
+            {w:"Schule", cn:"学校", g:"die", t:"🏫 -e 结尾词 90% 都是 die。"},
+            {w:"Kino", cn:"电影院", g:"das", t:"🎬 -o 结尾外来词多为 das。"},
+            {w:"Optimismus", cn:"乐观", g:"der", t:"✨ -ismus 抽象词全是 der。"},
+            {w:"Musik", cn:"音乐", g:"die", t:"🎵 -ik 外来词常是 die。"},
+            {w:"Fräulein", cn:"小姐", g:"das", t:"👒 -lein 结尾 100% 是 das。"},
+            {w:"Regen", cn:"雨", g:"der", t:"🌧️ 自然降水全是 der。"},
+            {w:"Wurst", cn:"香肠", g:"die", t:"🌭 德国香肠是 die。"},
             {w:"Buch", cn:"书", g:"das", t:"📚 纸质载体常为 das。"},
-            {w:"Studentin", cn:"女学生", g:"die", t:"👩‍🎓 职业后加 -in 必然是 die。"},
+            {w:"Studentin", cn:"女学生", g:"die", t:"👩‍🎓 职业后加 -in 变女性，全是 die。"},
             {w:"Tisch", cn:"桌子", g:"der", t:"🪑 单音节家具常为 der。"},
-            {w:"Lampe", cn:"灯", g:"die", t:"💡 结尾是 -e 的词，稳选 die。"},
-            {w:"Tasche", cn:"包", g:"die", t:"👜 又是 -e 结尾，大几率是 die。"},
-            {w:"Geld", cn:"钱", g:"das", t:"💰 钱是中性的 das。"},
+            {w:"Lampe", cn:"灯", g:"die", t:"💡 -e 结尾稳选 die。"},
+            {w:"Tasche", cn:"包", g:"die", t:"👜 又是 -e 结尾，几率 die。"},
+            {w:"Geld", cn:"钱", g:"das", t:"💰 钱是 das。"},
             {w:"Brief", cn:"信件", g:"der", t:"✉️ 书信、公文常为 der。"},
             {w:"Stadt", cn:"城市", g:"die", t:"🏙️ 城市名词多为 die。"},
-            {w:"Baby", cn:"婴儿", g:"das", t:"👶 婴儿不分性别，用 das。"},
-            {w:"Wohnung", cn:"公寓", g:"die", t:"🏠 看到 -ung 就要选 die！"},
+            {w:"Baby", cn:"婴儿", g:"das", t:"👶 婴儿不分性别用 das。"},
+            {w:"Wohnung", cn:"公寓", g:"die", t:"🏠 -ung 全是 die。"},
             {w:"Tee", cn:"茶", g:"der", t:"🍵 饮料多为 der。"},
-            {w:"Datum", cn:"日期", g:"das", t:"📅 结尾是 -um 的词多为 das。"},
+            {w:"Datum", cn:"日期", g:"das", t:"📅 -um 结尾多为 das。"},
             {w:"Frau", cn:"女人", g:"die", t:"👩 生物性别决定词性。"}
         ];
 
@@ -147,6 +162,7 @@
         function next() {
             if (current < quiz.length - 1) { current++; loadWord(); }
             else {
+                // 闯关成功逻辑
                 localStorage.setItem('stage1_cleared', 'true');
                 const medal = (errors === 0) ? 'gold' : 'silver';
                 localStorage.setItem('stage1_medal', medal);
@@ -157,7 +173,7 @@
 
         // 退出确认逻辑
         function confirmExit() {
-            if(confirm("确定要返回地图吗？当前的闯关进度将不会被保存。")) {
+            if(confirm("确定要返回地图吗？当前的闯关进度将丢失。")) {
                 window.location.href = "index.html";
             }
         }
