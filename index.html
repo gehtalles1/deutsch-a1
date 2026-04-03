@@ -7,11 +7,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@700;900&display=swap');
-        body { background: #F8F7F2; font-family: 'Noto Sans SC', sans-serif; }
-        .main-card { background: #FFFFFF; border-radius: 40px; border: 2px solid #F1EFE0; }
+        body { background: #F8F7F2; font-family: 'Noto Sans SC', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .main-card { background: #FFFFFF; border-radius: 40px; border: 2px solid #F1EFE0; transition: all 0.3s; cursor: pointer; }
         .btn-primary { background: #064E3B; color: white; font-weight: 900; }
-        /* 视觉灰化，但不设 pointer-events，确保 JS 能捕获点击 */
         .is-locked { filter: grayscale(1); opacity: 0.3; }
+        .medal-icon { position: absolute; top: -10px; right: -10px; font-size: 2.5rem; }
     </style>
 </head>
 <body class="py-12 px-8">
@@ -21,50 +21,79 @@
             <p class="text-emerald-700 font-black">直接清零</p>
         </header>
 
-        <div id="dynamic-container" class="mb-10">
+        <div id="top-area" class="mb-10">
             <div id="auth-box" class="main-card p-8">
-                <input id="unlock-code" type="text" placeholder="输入激活码" class="w-full py-4 text-center rounded-2xl bg-gray-50 mb-4 outline-none">
-                <button onclick="unlock()" class="w-full py-4 btn-primary rounded-2xl">立即解锁</button>
+                <input id="code-input" type="text" placeholder="输入 8888 开启挑战" class="w-full py-4 text-center rounded-2xl bg-gray-50 mb-4 outline-none border-2 border-transparent focus:border-emerald-500 font-bold text-xl">
+                <button onclick="doUnlock()" class="w-full py-4 btn-primary rounded-2xl text-lg shadow-lg">立即激活</button>
             </div>
-            <div id="success-msg" class="main-card p-6 text-center text-emerald-800 font-black hidden">
-                🎉 解锁成功！跟着刘老师，稳过 A1
+            <div id="success-banner" class="main-card p-8 text-center hidden">
+                <p class="text-2xl mb-2">🎉</p>
+                <p class="text-emerald-800 font-black text-xl">跟着刘老师，稳过 A1</p>
             </div>
         </div>
 
         <div class="space-y-6">
-            <div id="lv1-btn" onclick="startLevel(1)" class="main-card p-6 flex items-center gap-4 is-locked">
-                <div class="w-12 h-12 bg-emerald-800 rounded-2xl text-white flex items-center justify-center font-black">1</div>
-                <h3 class="font-black text-lg">名词词性捕手</h3>
+            <div id="stage-1" onclick="go(1)" class="main-card p-6 flex items-center gap-5 relative is-locked">
+                <div class="w-14 h-14 bg-emerald-800 rounded-2xl text-white flex items-center justify-center font-black text-2xl shadow-md">1</div>
+                <div>
+                    <h3 class="font-black text-xl text-emerald-950">名词词性捕手</h3>
+                    <p id="s1-status" class="text-xs text-gray-400 font-bold tracking-widest mt-1 uppercase">Der / Die / Das 终结者</p>
+                </div>
+                <div id="medal-1" class="medal-icon"></div>
+            </div>
+
+            <div id="stage-2" onclick="go(2)" class="main-card p-6 flex items-center gap-5 relative is-locked">
+                <div class="w-14 h-14 bg-emerald-600 rounded-2xl text-white flex items-center justify-center font-black text-2xl shadow-md">2</div>
+                <div>
+                    <h3 class="font-black text-xl text-emerald-950">动词变位大师</h3>
+                    <p id="s2-status" class="text-xs text-red-400 font-bold tracking-widest mt-1 uppercase">未解锁</p>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        window.onload = refresh;
+        window.onload = checkStatus;
 
-        function refresh() {
-            const unlocked = localStorage.getItem('isUnlocked') === 'true';
-            if (unlocked) {
-                document.getElementById('auth-box').classList.add('hidden');
-                document.getElementById('success-msg').classList.remove('hidden');
-                document.getElementById('lv1-btn').classList.remove('is-locked');
+        function checkStatus() {
+            const isUnlocked = localStorage.getItem('isUnlocked') === 'true';
+            const s1Done = localStorage.getItem('stage1_cleared') === 'true';
+
+            if (isUnlocked) {
+                // 1. 隐藏输入框，显示刘老师那句话
+                document.getElementById('auth-box').style.display = 'none';
+                document.getElementById('success-banner').style.display = 'block';
+                // 2. 第一关变色
+                document.getElementById('stage-1').classList.remove('is-locked');
+            }
+
+            if (s1Done) {
+                // 3. 显示勋章并开启第二关
+                document.getElementById('medal-1').innerText = "🥇";
+                document.getElementById('stage-2').classList.remove('is-locked');
+                document.getElementById('s2-status').innerText = "已开启挑战";
+                document.getElementById('s2-status').className = "text-xs text-emerald-600 font-bold tracking-widest mt-1 uppercase";
             }
         }
 
-        function unlock() {
-            if(document.getElementById('unlock-code').value === '8888') {
+        function doUnlock() {
+            if(document.getElementById('code-input').value === '8888') {
                 localStorage.setItem('isUnlocked', 'true');
-                refresh();
-            } else { alert("代码有误"); }
+                checkStatus();
+            } else { alert("激活码错误"); }
         }
 
-        function startLevel(num) {
-            // 🚨 严谨的单层逻辑判断
-            if (localStorage.getItem('isUnlocked') !== 'true') {
-                alert("请先解锁");
-                return;
+        function go(level) {
+            const unlocked = localStorage.getItem('isUnlocked') === 'true';
+            const s1Done = localStorage.getItem('stage1_cleared') === 'true';
+
+            if (level === 1) {
+                if (unlocked) { window.location.href = "01-gender.html"; }
+                else { alert("请先输入激活码！"); }
+            } else if (level === 2) {
+                if (s1Done) { window.location.href = "02-verbs.html"; }
+                else { alert("请先通关第一关！"); }
             }
-            window.location.href = "01-gender.html";
         }
     </script>
 </body>
