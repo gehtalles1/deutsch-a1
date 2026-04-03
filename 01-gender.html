@@ -6,24 +6,19 @@
     <title>第一关：名词性别挑战</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* 引入思源黑体 */
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@700;900&display=swap');
         body { background: #F8F7F2; font-family: 'Noto Sans SC', sans-serif; color: #064E3B; overflow: hidden; -webkit-tap-highlight-color: transparent; }
-        
-        /* 卡片与按钮设计 */
         .word-card { background: white; border-radius: 54px; border: 3px solid #F1EFE0; min-height: 280px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; position: relative; overflow: hidden; }
         .btn-gender { border-radius: 35px; font-weight: 900; transition: all 0.2s; box-shadow: 0 4px 0px rgba(0,0,0,0.05); }
         .btn-der { background: #E1E9F5; color: #3563A3; }
         .btn-die { background: #F5E1E1; color: #A33535; }
         .btn-das { background: #E1F5E5; color: #35A352; }
-        
-        /* 进度条与错题遮罩 */
         .progress-fill { height: 100%; background: #064E3B; width: 0%; transition: width 0.3s; }
         #tip-overlay { position: absolute; inset: 0; background: #991B1B; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; padding: 30px; text-align: center; z-index: 50; cursor: pointer; animation: shake 0.3s ease-in-out; }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
     </style>
 </head>
-<body class="p-6 pb-20">
+<body class="p-6">
     <div class="max-w-md mx-auto h-screen flex flex-col justify-between py-12">
         <div>
             <div class="flex justify-between items-end mb-4 px-2">
@@ -37,9 +32,8 @@
 
         <div class="relative">
             <div class="word-card p-12 text-center shadow-sm">
-                <h2 id="word" class="text-5xl font-black text-emerald-950 tracking-tight"></h2>
+                <h2 id="word" class="text-5xl font-black text-emerald-950 tracking-tight">加载中...</h2>
                 <p id="word-cn" class="text-xl text-gray-400 font-medium"></p>
-                
                 <div id="tip-overlay" onclick="closeTip()">
                     <p class="text-3xl font-black mb-6 tracking-widest">答错啦！</p>
                     <p id="tip-text" class="text-lg font-medium leading-relaxed bg-white/10 p-4 rounded-2xl"></p>
@@ -56,34 +50,34 @@
     </div>
 
     <script>
-        // 50 道词汇数据与名师解释
+        // 核心修复：完整的 50 个单词数据
         const quiz = [
-            {w:"Apfel", cn:"苹果", g:"der", t:"🍎 水果通常 die，但苹果是 der (显眼包)！"},
-            {w:"Milch", cn:"牛奶", g:"die", t:"🥛 几乎所有饮料 der，但牛奶 die！"},
+            {w:"Apfel", cn:"苹果", g:"der", t:"🍎 水果通常 die，但苹果是 der 例外！"},
+            {w:"Milch", cn:"牛奶", g:"die", t:"🥛 饮料多为 der，牛奶是例外！"},
             {w:"Mädchen", cn:"女孩", g:"das", t:"👧 记住：所有 -chen 结尾都是 das！"},
             {w:"Auto", cn:"汽车", g:"das", t:"🚗 交通工具、汽车多为 das。"},
             {w:"Zeitung", cn:"报纸", g:"die", t:"📰 结尾是 -ung 的词，100% 是 die！"},
             {w:"Lehrer", cn:"老师", g:"der", t:"👨‍🏫 -er 结尾的职业词通常是 der。"},
             {w:"Bäckerei", cn:"面包店", g:"die", t:"🥖 -ei 结尾的地点/职业词全是 die。"},
             {w:"Kind", cn:"孩子", g:"das", t:"👶 生命的初期阶段常为 das。"},
-            {w:"Kaffee", cn:"咖啡", g:"der", t:"☕ 大部分饮料（除了牛奶）都是 der。"},
+            {w:"Kaffee", cn:"咖啡", g:"der", t:"☕ 大部分饮料都是 der。"},
             {w:"Haus", cn:"房子", g:"das", t:"🏠 基础建筑词很多是 das。"},
             {w:"Zucker", cn:"糖", g:"der", t:"🧂 调味品多为 der。"},
-            {w:"Sonne", cn:"太阳", g:"die", t:"☀️ 太阳是阴性 die，月亮(Mond)是阳性。"},
+            {w:"Sonne", cn:"太阳", g:"die", t:"☀️ 太阳是阴性 die，月亮是 der。"},
             {w:"Fenster", cn:"窗户", g:"das", t:"🪟 注意：虽然是 -er 结尾，但它是 das。"},
-            {w:"Bus", cn:"公交车", g:"der", t:"🚌 绝大多数交通工具后缀词是 der。"},
+            {w:"Bus", cn:"公交车", g:"der", t:"🚌 交通工具后缀词常是 der。"},
             {w:"Universität", cn:"大学", g:"die", t:"🏫 结尾是 -tät 的词 100% 是 die。"},
-            {w:"Wasser", cn:"水", g:"das", t:"💧 基础自然元素（水、金、铁）多为 das。"},
+            {w:"Wasser", cn:"水", g:"das", t:"💧 自然元素多为 das。"},
             {w:"Tag", cn:"白天", g:"der", t:"☀️ 时间概念多为 der。"},
-            {w:"Blume", cn:"花", g:"die", t:"🌸 绝大多数以 -e 结尾的植物是 die。"},
+            {w:"Blume", cn:"花", g:"die", t:"🌸 以 -e 结尾的植物多是 die。"},
             {w:"Handy", cn:"手机", g:"das", t:"📱 现代电子产品多为 das。"},
-            {w:"Bier", cn:"啤酒", g:"das", t:"🍺 重点：酒类 der，但啤酒是 das！"},
+            {w:"Bier", cn:"啤酒", g:"das", t:"🍺 酒类 der，但啤酒是 das！"},
             {w:"Wein", cn:"葡萄酒", g:"der", t:"🍷 酒类基本都是 der！"},
             {w:"Situation", cn:"情况", g:"die", t:"📋 结尾是 -tion 的词全是 die。"},
             {w:"Bett", cn:"床", g:"das", t:"🛏️ 家具类中性 das 比例很高。"},
-            {w:"Computer", cn:"电脑", g:"der", t:"💻 外来语工具词，-er 结尾多为 der。"},
+            {w:"Computer", cn:"电脑", g:"der", t:"💻 外来工具词，-er 结尾多为 der。"},
             {w:"Freiheit", cn:"自由", g:"die", t:"🗽 结尾是 -heit 的全是 die！"},
-            {w:"Essen", cn:"食物", g:"das", t:"🍲 动词直接当名词用时，永远是 das。"},
+            {w:"Essen", cn:"食物", g:"das", t:"🍲 动词变名词，永远是 das。"},
             {w:"Honig", cn:"蜂蜜", g:"der", t:"🍯 -ig 结尾的词 100% 是 der。"},
             {w:"Natur", cn:"自然", g:"die", t:"🌿 结尾是 -ur 的词大多是 die。"},
             {w:"Kindheit", cn:"童年", g:"die", t:"🎠 结尾是 -heit 的词 100% 是 die。"},
@@ -93,18 +87,70 @@
             {w:"Optimismus", cn:"乐观", g:"der", t:"✨ -ismus 结尾的抽象词全是 der。"},
             {w:"Musik", cn:"音乐", g:"die", t:"🎵 结尾是 -ik 的外来词通常是 die。"},
             {w:"Fräulein", cn:"小姐", g:"das", t:"👒 结尾是 -lein 的词 100% 是 das。"},
-            {w:"Regen", cn:"雨", g:"der", t:"🌧️ 自然降水（雨雪风霜）全是 der。"},
+            {w:"Regen", cn:"雨", g:"der", t:"🌧️ 自然降雨全是 der。"},
             {w:"Wurst", cn:"香肠", g:"die", t:"🌭 德国特产香肠是 die。"},
-            {w:"Buch", cn:"书", g:"das", t:"📚 纸质载体、工具书常为 das。"},
-            {w:"Studentin", cn:"女学生", g:"die", t:"👩‍🎓 职业后加 -in 变女性，全是 die。"},
-            {w:"Tisch", cn:"桌子", g:"der", t:"🪑 单音节家具词常为 der。"},
+            {w:"Buch", cn:"书", g:"das", t:"📚 纸质载体常为 das。"},
+            {w:"Studentin", cn:"女学生", g:"die", t:"👩‍🎓 职业后加 -in 必然是 die。"},
+            {w:"Tisch", cn:"桌子", g:"der", t:"🪑 单音节家具常为 der。"},
             {w:"Lampe", cn:"灯", g:"die", t:"💡 结尾是 -e 的词，稳选 die。"},
             {w:"Tasche", cn:"包", g:"die", t:"👜 又是 -e 结尾，大几率是 die。"},
             {w:"Geld", cn:"钱", g:"das", t:"💰 钱是中性的 das。"},
             {w:"Brief", cn:"信件", g:"der", t:"✉️ 书信、公文常为 der。"},
-            {w:"Stadt", cn:"城市", g:"die", t:"🏙️ 城市、国家名词（带冠词的）多为 die。"},
+            {w:"Stadt", cn:"城市", g:"die", t:"🏙️ 城市名词多为 die。"},
             {w:"Baby", cn:"婴儿", g:"das", t:"👶 婴儿不分性别，用 das。"},
             {w:"Wohnung", cn:"公寓", g:"die", t:"🏠 看到 -ung 就要选 die！"},
-            {w:"Tee", cn:"茶", g:"der", t:"🍵 除了牛奶，饮料多为 der。"},
+            {w:"Tee", cn:"茶", g:"der", t:"🍵 饮料多为 der。"},
             {w:"Datum", cn:"日期", g:"das", t:"📅 结尾是 -um 的词多为 das。"},
-            {w:"Frau", cn:"女人", g:"die", t:"👩
+            {w:"Frau", cn:"女人", g:"die", t:"👩 生物性别决定词性。"}
+        ];
+
+        let current = 0; let errors = 0; let audioCtx;
+        function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+        
+        function playSuccess() {
+            initAudio(); const osc = audioCtx.createOscillator(); const g = audioCtx.createGain();
+            osc.connect(g); g.connect(audioCtx.destination); osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1); osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+        }
+
+        function playError() {
+            initAudio(); const osc = audioCtx.createOscillator(); const g = audioCtx.createGain();
+            osc.connect(g); g.connect(audioCtx.destination); osc.frequency.setValueAtTime(110, audioCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4); osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+        }
+
+        function loadWord() {
+            if(!quiz[current]) return;
+            document.getElementById('word').innerText = quiz[current].w;
+            document.getElementById('word-cn').innerText = quiz[current].cn;
+            document.getElementById('counter').innerText = `${current + 1} / ${quiz.length}`;
+            document.getElementById('progress').style.width = `${((current + 1) / quiz.length) * 100}%`;
+        }
+
+        function check(guess) {
+            initAudio();
+            if (document.getElementById('tip-overlay').style.display === 'flex') return;
+            if (guess === quiz[current].g) { playSuccess(); next(); }
+            else { 
+                errors++; playError(); 
+                document.getElementById('tip-text').innerText = quiz[current].t; 
+                document.getElementById('tip-overlay').style.display = 'flex'; 
+            }
+        }
+
+        function closeTip() { document.getElementById('tip-overlay').style.display = 'none'; next(); }
+
+        function next() {
+            if (current < quiz.length - 1) { current++; loadWord(); }
+            else {
+                localStorage.setItem('stage1_cleared', 'true');
+                const medal = (errors === 0) ? 'gold' : 'silver';
+                localStorage.setItem('stage1_medal', medal);
+                alert(`🎉 闯关成功！获得：${medal === 'gold' ? '🥇 金牌' : '🥈 银牌'}`);
+                window.location.href = "index.html";
+            }
+        }
+        window.onload = loadWord;
+    </script>
+</body>
+</html>
