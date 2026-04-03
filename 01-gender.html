@@ -16,14 +16,19 @@
         .progress-fill { height: 100%; background: #064E3B; width: 0%; transition: width 0.3s; }
         #tip-overlay { position: absolute; inset: 0; background: #991B1B; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; padding: 30px; text-align: center; z-index: 50; cursor: pointer; animation: shake 0.3s ease-in-out; }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        
+        /* 返回按钮样式 */
+        .back-btn { background: white; width: 44px; height: 44px; border-radius: 15px; display: flex; items-center; justify-content: center; border: 2px solid #F1EFE0; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
     </style>
 </head>
 <body class="p-6">
     <div class="max-w-md mx-auto h-screen flex flex-col justify-between py-12">
-        <div>
-            <div class="flex justify-between items-end mb-4 px-2">
-                <span class="text-[12px] font-black opacity-20 uppercase tracking-[0.4em]">【关卡进度】</span>
-                <span id="counter" class="text-2xl font-black text-emerald-950/30 font-mono">1 / 50</span>
+        <div class="mb-6">
+            <div class="flex justify-between items-center mb-6">
+                <button onclick="confirmExit()" class="back-btn active:scale-90 transition-transform">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                </button>
+                <div id="counter" class="text-2xl font-black text-emerald-950/30 font-mono italic">1 / 50</div>
             </div>
             <div class="h-2 bg-emerald-700/5 rounded-full overflow-hidden">
                 <div id="progress" class="progress-fill"></div>
@@ -50,20 +55,19 @@
     </div>
 
     <script>
-        // 核心修复：完整的 50 个单词数据
         const quiz = [
             {w:"Apfel", cn:"苹果", g:"der", t:"🍎 水果通常 die，但苹果是 der 例外！"},
             {w:"Milch", cn:"牛奶", g:"die", t:"🥛 饮料多为 der，牛奶是例外！"},
             {w:"Mädchen", cn:"女孩", g:"das", t:"👧 记住：所有 -chen 结尾都是 das！"},
-            {w:"Auto", cn:"汽车", g:"das", t:"🚗 交通工具、汽车多为 das。"},
+            {w:"Auto", cn:"汽车", g:"das", t:"🚗 交通工具多为 das。"},
             {w:"Zeitung", cn:"报纸", g:"die", t:"📰 结尾是 -ung 的词，100% 是 die！"},
             {w:"Lehrer", cn:"老师", g:"der", t:"👨‍🏫 -er 结尾的职业词通常是 der。"},
             {w:"Bäckerei", cn:"面包店", g:"die", t:"🥖 -ei 结尾的地点/职业词全是 die。"},
-            {w:"Kind", cn:"孩子", g:"das", t:"👶 生命的初期阶段常为 das。"},
+            {w:"Kind", cn:"孩子", g:"das", t:"👶 生命初期常为 das。"},
             {w:"Kaffee", cn:"咖啡", g:"der", t:"☕ 大部分饮料都是 der。"},
             {w:"Haus", cn:"房子", g:"das", t:"🏠 基础建筑词很多是 das。"},
             {w:"Zucker", cn:"糖", g:"der", t:"🧂 调味品多为 der。"},
-            {w:"Sonne", cn:"太阳", g:"die", t:"☀️ 太阳是阴性 die，月亮是 der。"},
+            {w:"Sonne", cn:"太阳", g:"die", t:"☀️ 太阳是阴性 die。"},
             {w:"Fenster", cn:"窗户", g:"das", t:"🪟 注意：虽然是 -er 结尾，但它是 das。"},
             {w:"Bus", cn:"公交车", g:"der", t:"🚌 交通工具后缀词常是 der。"},
             {w:"Universität", cn:"大学", g:"die", t:"🏫 结尾是 -tät 的词 100% 是 die。"},
@@ -150,6 +154,14 @@
                 window.location.href = "index.html";
             }
         }
+
+        // 退出确认逻辑
+        function confirmExit() {
+            if(confirm("确定要返回地图吗？当前的闯关进度将不会被保存。")) {
+                window.location.href = "index.html";
+            }
+        }
+
         window.onload = loadWord;
     </script>
 </body>
