@@ -7,61 +7,60 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@700;900&display=swap');
-        body { background: #F0F9F4; font-family: 'Noto Sans SC', sans-serif; color: #164E63; -webkit-tap-highlight-color: transparent; }
+        body { background: #F8F7F2; font-family: 'Noto Sans SC', sans-serif; color: #064E3B; -webkit-tap-highlight-color: transparent; }
         .app-container { max-width: 550px; margin: 0 auto; padding: 0 40px; }
-        .main-card { background: #FFFFFF; border-radius: 40px; border: 2px solid #E2E8F0; box-shadow: 0 15px 35px rgba(22, 78, 99, 0.05); transition: all 0.3s; cursor: pointer; }
-        .btn-primary { background: linear-gradient(135deg, #059669 0%, #10B981 100%); color: white; font-weight: 900; }
+        .main-card { background: #FFFFFF; border-radius: 40px; border: 2px solid #F1EFE0; box-shadow: 0 20px 50px rgba(6, 78, 59, 0.03); transition: all 0.3s; cursor: pointer; }
+        .btn-primary { background: #064E3B; color: white; font-weight: 900; }
         
-        /* 🚨 这里的灰色仅做视觉展示，不再拦截点击逻辑 */
-        .is-locked { filter: grayscale(1); opacity: 0.3; }
+        /* 🚨 关键改动：只改颜色，不加 pointer-events: none，把控制权交给 JS */
+        .is-gray { filter: grayscale(1); opacity: 0.3; }
         
-        .hero-title { font-size: clamp(32px, 8vw, 48px); font-weight: 900; line-height: 1.3; }
-        .highlight-text { color: #059669; position: relative; display: inline-block; }
-        .highlight-text::after { content: ''; position: absolute; bottom: 8px; left: 0; width: 100%; height: 12px; background: #D1FAE5; z-index: -1; }
-        .medal-badge { position: absolute; top: -12px; right: -12px; font-size: 2.8rem; z-index: 10; }
+        .hero-title { font-size: clamp(32px, 8vw, 48px); font-weight: 900; line-height: 1.5; }
+        .medal-badge { position: absolute; top: -10px; right: -10px; font-size: 2.5rem; z-index: 10; }
     </style>
 </head>
 <body class="py-16">
     <div class="app-container">
+        
         <header class="text-center mb-16">
-            <h1 class="hero-title text-slate-800">A1 德语焦虑<br><span class="highlight-text">直接清零</span></h1>
+            <h1 class="hero-title text-emerald-950">A1 德语焦虑<br><span class="text-emerald-700">直接清零</span></h1>
         </header>
 
-        <div id="auth-section" class="main-card p-10 mb-12 border-emerald-100">
+        <div id="auth-section" class="main-card p-10 mb-12">
             <div class="flex flex-col gap-6">
-                <input id="unlock-code" type="text" placeholder="输入 4 位激活码" class="w-full px-4 py-5 rounded-[2rem] bg-emerald-50/50 border-none outline-none text-center font-black text-2xl text-emerald-900 ring-2 ring-transparent focus:ring-emerald-400 transition-all">
-                <button onclick="unlock()" class="w-full py-5 btn-primary rounded-[2rem] active:scale-95 transition-all text-xl">立即解锁全关卡</button>
+                <input id="unlock-code" type="text" placeholder="输入 4 位激活码" class="w-full px-4 py-5 rounded-[2rem] bg-gray-50 border-none outline-none text-center font-black text-2xl text-emerald-900 ring-1 ring-gray-100 focus:ring-emerald-800 transition-all">
+                <button onclick="unlock()" class="w-full py-5 btn-primary rounded-[2rem] shadow-xl active:scale-95 transition-all text-xl">立即解锁全关卡</button>
             </div>
         </div>
 
-        <div class="space-y-8">
-            <div id="lv1-card" onclick="goToStage1()" class="main-card is-locked p-8 flex items-center gap-6 group relative">
-                <div class="w-16 h-16 bg-emerald-500 rounded-3xl flex-shrink-0 flex items-center justify-center text-white font-black text-3xl shadow-lg">1</div>
+        <div class="space-y-10">
+            <div id="lv1" onclick="handleLv1Click()" class="main-card p-8 flex items-center gap-6 border border-gray-50/50 relative is-gray">
+                <div class="w-14 h-14 bg-emerald-800 rounded-2xl flex-shrink-0 flex items-center justify-center text-white font-black text-2xl shadow-lg">1</div>
                 <div class="flex-1">
-                    <h3 class="font-black text-xl text-slate-800">名词词性捕手</h3>
-                    <p class="text-[10px] font-extrabold text-emerald-600/40 tracking-[0.2em] mt-1 uppercase">der die das 终结者</p>
+                    <h3 class="font-black text-xl text-emerald-950">名词词性捕手</h3>
+                    <p class="text-[10px] font-extrabold text-emerald-800/30 tracking-[0.3em] mt-1 uppercase">Der / Die / Das 终结者</p>
                 </div>
                 <div id="medal-display-1" class="medal-badge"></div> 
             </div>
 
-            <div id="lv2-card" onclick="goToStage2()" class="main-card is-locked p-8 flex items-center gap-6 group relative">
-                <div class="w-16 h-16 bg-cyan-500 rounded-3xl flex-shrink-0 flex items-center justify-center text-white font-black text-3xl shadow-lg">2</div>
+            <div id="lv2" onclick="handleLv2Click()" class="main-card p-8 flex items-center gap-6 border border-gray-50/50 relative is-gray">
+                <div class="w-14 h-14 bg-emerald-600 rounded-2xl flex-shrink-0 flex items-center justify-center text-white font-black text-2xl shadow-lg">2</div>
                 <div class="flex-1">
-                    <h3 class="font-black text-xl text-slate-800">动词变位大师</h3>
-                    <p id="lv2-status" class="text-[10px] font-extrabold text-rose-400 tracking-[0.2em] mt-1 uppercase">需完成第一关解锁</p>
+                    <h3 class="font-black text-xl text-emerald-950">动词变位大师</h3>
+                    <p id="lv2-status" class="text-[10px] font-extrabold text-red-400 tracking-[0.3em] mt-1 uppercase">需完成第一关解锁</p>
                 </div>
             </div>
         </div>
 
-        <footer class="mt-24 text-center">
-            <div class="inline-block px-8 py-3 rounded-full bg-white border border-emerald-100 text-xs font-bold text-slate-400">
-                咨询微信: <span class="text-emerald-600">gehtalles</span>
+        <footer class="mt-24 text-center pb-10">
+            <div class="inline-block px-8 py-3 rounded-full border border-gray-200 text-xs font-bold text-gray-400">
+                咨询微信: <span class="text-emerald-800">gehtalles</span>
             </div>
         </footer>
     </div>
 
     <script>
-        window.onload = function() { refreshStatus(); }
+        window.onload = refreshStatus;
 
         function refreshStatus() {
             const isUnlocked = localStorage.getItem('isUnlocked') === 'true';
@@ -70,15 +69,15 @@
 
             if(isUnlocked) {
                 showSuccessState();
-                document.getElementById('lv1-card').classList.remove('is-locked');
+                document.getElementById('lv1').classList.remove('is-gray');
             }
 
             if(stage1Cleared) {
                 const medalIcon = (stage1Medal === 'gold') ? "🥇" : "🥈";
                 document.getElementById('medal-display-1').innerText = medalIcon;
-                document.getElementById('lv2-card').classList.remove('is-locked');
+                document.getElementById('lv2').classList.remove('is-gray');
                 document.getElementById('lv2-status').innerText = "已开启挑战";
-                document.getElementById('lv2-status').className = "text-[10px] font-extrabold text-cyan-600/40 tracking-[0.2em] mt-1 uppercase";
+                document.getElementById('lv2-status').classList.remove('text-red-400');
             }
         }
 
@@ -86,28 +85,33 @@
             if(document.getElementById('unlock-code').value === '8888') {
                 localStorage.setItem('isUnlocked', 'true');
                 refreshStatus();
-            } else { alert("激活码无效"); }
+            } else {
+                alert("激活码无效");
+            }
         }
 
-        // 🚨 核心跳转函数：直接通过 JS 跳转，绕过 A 标签的各种限制
-        function goToStage1() {
+        // 🚨 核心逻辑改在这里：只要解锁了，哪怕界面还没变色，点它也强制跳转
+        function handleLv1Click() {
             if(localStorage.getItem('isUnlocked') === 'true') {
-                window.location.href = "01-gender.html"; // 必须与 GitHub 文件名完全一致
+                window.location.href = "01-gender.html";
             } else {
                 alert("请先输入激活码解锁！");
             }
         }
 
-        function goToStage2() {
+        function handleLv2Click() {
             if(localStorage.getItem('stage1_cleared') === 'true') {
                 window.location.href = "02-verbs.html";
             } else {
-                alert("⏳ 请先通关第一关！");
+                alert("⏳ 必须先完成第一关！");
             }
         }
 
         function showSuccessState() {
-            document.getElementById('auth-section').innerHTML = '<div class="text-center py-6"><p class="text-emerald-600 font-black text-2xl">🎉 解锁成功！</p></div>';
+            document.getElementById('auth-section').innerHTML = `
+                <div class="text-center py-6">
+                    <p class="text-emerald-900 font-black text-2xl">🎉 解锁成功！</p>
+                </div>`;
         }
     </script>
 </body>
