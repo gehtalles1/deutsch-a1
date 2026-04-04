@@ -27,46 +27,45 @@
         }
         .icon-btn { background: white; padding: 10px; border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
 
-        /* 核心：整体内容下压，腾出顶部空间 */
         .game-container {
             flex: 1; width: 100%;
-            padding-top: 28vh; 
+            padding-top: 25vh; 
             display: flex; flex-direction: column; align-items: center;
         }
 
         .main-game { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; }
 
-        /* 词卡尺寸微调 */
-        .card-stack { position: relative; width: 62vw; max-width: 260px; height: 330px; z-index: 10; }
+        /* 词卡瘦身：52vw 避免和左右冠词贴得太近 */
+        .card-stack { position: relative; width: 52vw; max-width: 220px; height: 300px; z-index: 10; }
         
         .card {
             position: absolute; width: 100%; height: 100%;
-            background: white; border-radius: 35px;
-            box-shadow: 0 25px 60px rgba(15, 23, 42, 0.15);
+            background: white; border-radius: 30px;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             border: 1px solid rgba(241, 245, 249, 1); cursor: grab; z-index: 20;
-            padding: 20px;
+            padding: 15px;
         }
         
         #word { 
-            font-size: clamp(1.6rem, 8.5vw, 2.5rem); 
+            font-size: clamp(1.4rem, 7vw, 2.1rem); 
             font-weight: 900; color: #0f172a; 
-            margin-bottom: 8px; text-align: center; line-height: 1.1;
+            margin-bottom: 6px; text-align: center; line-height: 1.1;
         }
-        #mean { font-size: 1.2rem; color: #475569; font-weight: 700; }
+        #mean { font-size: 1.1rem; color: #64748b; font-weight: 700; }
 
-        /* 颜色加深 & 距离缩短 */
-        .guide-label { position: absolute; font-weight: 900; font-size: 1.6rem; pointer-events: none; z-index: 5; }
-        .label-der { left: -50px; top: 50%; transform: translateY(-50%) rotate(-90deg); color: #1E3A8A; } /* 极深蓝 */
-        .label-die { top: -65px; left: 50%; transform: translateX(-50%); color: #991B1B; } /* 极深红 */
-        .label-das { right: -50px; top: 50%; transform: translateY(-50%) rotate(90deg); color: #065F46; } /* 极深绿 */
+        /* 拉开间距：-85px 确保有足够的呼吸感 */
+        .guide-label { position: absolute; font-weight: 900; font-size: 1.5rem; pointer-events: none; z-index: 5; }
+        .label-der { left: -85px; top: 50%; transform: translateY(-50%) rotate(-90deg); color: #1E3A8A; }
+        .label-die { top: -85px; left: 50%; transform: translateX(-50%); color: #991B1B; }
+        .label-das { right: -85px; top: 50%; transform: translateY(-50%) rotate(90deg); color: #065F46; }
 
         .bottom-info { 
-            margin-top: 45px;
-            display: flex; flex-direction: column; align-items: center; gap: 15px;
+            margin-top: 50px;
+            display: flex; flex-direction: column; align-items: center; gap: 12px;
             padding-bottom: env(safe-area-inset-bottom);
         }
-        .progress-box { background: #E2E8F0; padding: 8px 20px; border-radius: 20px; font-weight: 900; color: #1E293B; }
+        .progress-box { background: #F1F5F9; padding: 6px 18px; border-radius: 20px; font-weight: 900; color: #334155; font-size: 0.9rem; }
 
         #tips-container {
             display: none; position: fixed; inset: 0; z-index: 200; align-items: flex-end;
@@ -91,31 +90,31 @@
         </button>
     </div>
 
-    <div class="game-container" id="game-main-box">
+    <div class="game-container">
         <div class="main-game">
             <div class="card-stack">
                 <div class="guide-label label-der">← der</div>
                 <div class="guide-label label-die">↑ die</div>
                 <div class="guide-label label-das">das →</div>
                 <div id="active-card" class="card">
-                    <div id="word">Loading...</div>
-                    <div id="mean">加载中</div>
+                    <div id="word">加载中...</div>
+                    <div id="mean">Lade...</div>
                 </div>
             </div>
         </div>
 
         <div class="bottom-info">
             <div class="progress-box">
-                已掌握：<span id="cur-num" class="text-rose-600">1</span> <span class="text-slate-500">/ 50</span>
+                已掌握：<span id="cur-num" class="text-rose-600">1</span> <span class="text-slate-400">/ 50</span>
             </div>
-            <div class="text-[11px] font-black text-slate-400 tracking-[0.2em] uppercase">
+            <div class="text-[10px] font-black text-slate-400 tracking-[0.3em] uppercase opacity-60">
                 Viel Erfolg!
             </div>
         </div>
     </div>
 
     <div id="tips-container">
-        <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-md"></div>
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
         <div id="tips-card">
             <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-8"></div>
             <p id="tips-content" class="text-slate-800 font-bold mb-10 text-xl text-center leading-relaxed"></p>
@@ -205,14 +204,13 @@
             card.style.opacity = '1';
         }
 
-        // 核心修改：无需额外点击，页面加载即解锁
+        // 直接初始化，并静默锁定音频权限
         window.onload = () => {
             updateCard();
-            // 静默尝试解锁音频权限
             document.body.addEventListener('touchstart', () => {
                 if(!audioUnlocked) {
-                    sndOk.play().then(()=>sndOk.pause());
-                    sndErr.play().then(()=>sndErr.pause());
+                    sndOk.play().then(()=>sndOk.pause()).catch(()=>{});
+                    sndErr.play().then(()=>sndErr.pause()).catch(()=>{});
                     audioUnlocked = true;
                 }
             }, {once: true});
@@ -228,7 +226,6 @@
 
         mc.on("panend", (e) => {
             let answer = '';
-            // 判定阈值调小，让滑动更灵敏
             if (e.deltaX < -50) answer = 'der';
             else if (e.deltaY < -50) answer = 'die';
             else if (e.deltaX > 50) answer = 'das';
