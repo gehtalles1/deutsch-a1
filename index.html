@@ -3,84 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>刘老师德语闯关</title>
+    <title>Noun Challenge</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@700;900&display=swap');
-        body { background: #FFFFFF; font-family: 'Noto Sans SC', sans-serif; -webkit-tap-highlight-color: transparent; color: #4B4B4B; }
-        .duo-card { 
-            background: #FFFFFF; border: 2px solid #E5E5E5; border-bottom: 6px solid #E5E5E5;
-            border-radius: 24px; transition: all 0.2s; cursor: pointer;
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@900&display=swap');
+        body { background: #FFFFFF; font-family: 'Noto Sans SC', sans-serif; -webkit-tap-highlight-color: transparent; }
+        
+        .opt-btn { 
+            border-radius: 24px; font-weight: 900; font-size: 26px; transition: all 0.1s ease;
+            display: flex; align-items: center; justify-content: center; padding: 28px 0;
+            border-bottom: 6px solid #CBD5E1;
         }
-        .duo-card:active { transform: translateY(4px); border-bottom-width: 2px; }
-        .btn-green { 
-            background: #58CC02; border-bottom: 6px solid #46A302; color: white; 
-            border-radius: 16px; font-weight: 900;
-        }
-        .btn-green:active { transform: translateY(4px); border-bottom-width: 2px; }
-        .locked { filter: grayscale(1); opacity: 0.5; pointer-events: none; }
-        .medal-float { position: absolute; top: -12px; right: -12px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.1)); }
+        .opt-btn:active { transform: translateY(4px); border-bottom-width: 2px; }
+        
+        /* 雅致三色 */
+        .btn-der { background: #F0F9FF; color: #0EA5E9; border-color: #BAE6FD; }
+        .btn-die { background: #FEF2F2; color: #EF4444; border-color: #FECACA; }
+        .btn-das { background: #F0FDF4; color: #22C55E; border-color: #BBF7D0; }
+        
+        .progress-rail { height: 14px; background: #F1F5F9; border-radius: 100px; }
+        .progress-fill { height: 100%; background: #58CC02; border-radius: 100px; transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
     </style>
 </head>
-<body class="py-10 px-6">
-    <div class="max-w-[480px] mx-auto">
-        <header class="text-center mb-12">
-            <h1 class="text-3xl font-black text-[#3C3C3C] tracking-tight">A1 德语焦虑</h1>
-            <div class="inline-block mt-2 px-4 py-1 bg-[#CEE9FF] text-[#1899FF] rounded-xl text-sm font-black">直接清零</div>
-        </header>
-
-        <div id="hero-area" class="mb-10">
-            <div id="auth-section" class="duo-card p-8 text-center">
-                <p class="font-black text-xl mb-6">请输入激活码</p>
-                <input id="code" type="text" placeholder="输入 8888" class="w-full py-4 text-center bg-[#F7F7F7] rounded-2xl mb-6 outline-none font-black text-2xl border-2 border-transparent focus:border-[#84D8FF]">
-                <button onclick="unlock()" class="w-full py-4 btn-green text-xl">开启挑战</button>
-            </div>
-            <div id="welcome-msg" class="hidden duo-card p-6 flex items-center gap-4 border-[#DDF4FF] bg-[#F1F9FF]">
-                <span class="text-3xl">🎉</span>
-                <p class="font-black text-[#1899FF] text-lg">跟着刘老师，稳过 A1</p>
+<body class="p-8">
+    <div class="max-w-[440px] mx-auto h-screen flex flex-col">
+        <div class="flex items-center gap-6 mt-6 mb-16">
+            <button onclick="location.href='index.html'" class="text-[#CBD5E1] font-black text-3xl transition-colors hover:text-[#94A3B8]">✕</button>
+            <div class="progress-rail flex-1 shadow-inner">
+                <div id="bar" class="progress-fill shadow-sm" style="width: 10%"></div>
             </div>
         </div>
 
-        <div class="space-y-6">
-            <div id="lv1" onclick="location.href='01-gender.html'" class="duo-card p-6 flex items-center gap-5 relative locked">
-                <div class="w-16 h-16 bg-[#58CC02] rounded-2xl flex items-center justify-center text-white font-black text-3xl shadow-inner">1</div>
-                <div>
-                    <h3 class="font-black text-xl text-[#3C3C3C]">名词词性捕手</h3>
-                    <p id="s1-status" class="text-xs font-black text-[#AFAFAF] uppercase tracking-widest mt-1">Der / Die / Das</p>
-                </div>
-                <div id="medal-1" class="medal-float text-4xl"></div>
-            </div>
+        <div class="flex-1 flex flex-col justify-center text-center px-4">
+            <h1 id="word" class="text-7xl font-black text-[#1E293B] mb-5 tracking-tight"></h1>
+            <div class="w-12 h-1 bg-[#F1F5F9] mx-auto mb-5 rounded-full"></div>
+            <p id="mean" class="text-2xl font-bold text-[#94A3B8]"></p>
         </div>
 
-        <footer class="mt-24 text-center">
-            <div class="text-[#AFAFAF] font-black text-sm mb-4">咨询微信: gehtalles</div>
-            <button onclick="localStorage.clear();location.reload();" class="text-[8px] text-gray-100">Reset</button>
-        </footer>
+        <div class="grid grid-cols-1 gap-5 mb-16">
+            <button onclick="play('der')" class="opt-btn btn-der">der</button>
+            <button onclick="play('die')" class="opt-btn btn-die">die</button>
+            <button onclick="play('das')" class="opt-btn btn-das">das</button>
+        </div>
     </div>
 
-    <script>
-        function update() {
-            const isUnlocked = localStorage.getItem('isUnlocked') === 'true';
-            const s1Done = localStorage.getItem('stage1_cleared') === 'true';
+    <audio id="s-ok" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+    <audio id="s-win" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
 
-            if(isUnlocked) {
-                document.getElementById('auth-section').style.display = 'none';
-                document.getElementById('welcome-msg').style.display = 'flex';
-                document.getElementById('lv1').classList.remove('locked');
-            }
-            if(s1Done) {
-                document.getElementById('medal-1').innerText = "🥇";
-                document.getElementById('s1-status').innerText = "已完美通关";
-                document.getElementById('s1-status').style.color = "#58CC02";
+    <script>
+        const quiz = [
+            {w:"Apfel", m:"苹果", a:"der"}, {w:"Banane", m:"香蕉", a:"die"},
+            {w:"Kind", m:"小孩", a:"das"}, {w:"Tisch", m:"桌子", a:"der"},
+            {w:"Blume", m:"花朵", a:"die"}, {w:"Auto", m:"汽车", a:"das"}
+        ];
+        let step = 0;
+
+        function show() {
+            document.getElementById('word').innerText = quiz[step].w;
+            document.getElementById('mean').innerText = quiz[step].m;
+            document.getElementById('bar').style.width = ((step + 1) / quiz.length * 100) + "%";
+        }
+
+        function play(u) {
+            if(u === quiz[step].a) {
+                document.getElementById('s-ok').play();
+                if(step < quiz.length - 1) { step++; setTimeout(show, 250); }
+                else {
+                    document.getElementById('s-win').play();
+                    localStorage.setItem('stage1_cleared', 'true');
+                    setTimeout(() => { alert("MASTERED! ✨"); location.href='index.html'; }, 600);
+                }
+            } else {
+                if(window.navigator.vibrate) navigator.vibrate(40);
             }
         }
-        function unlock() {
-            if(document.getElementById('code').value === '8888') {
-                localStorage.setItem('isUnlocked', 'true');
-                update();
-            } else { alert("激活码错误"); }
-        }
-        window.onload = update;
+        window.onload = show;
     </script>
 </body>
 </html>
