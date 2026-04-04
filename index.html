@@ -7,48 +7,16 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
-        
-        body { 
-            background-color: #F8FAFC; 
-            font-family: 'Noto Sans SC', sans-serif; 
-            color: #1E293B;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        /* 电脑端大屏自动缩放 1.1 倍，解决头重脚轻感 */
-        @media (min-width: 1024px) {
-            .app-container { transform: scale(1.1); transform-origin: top; }
-        }
-
-        .premium-card {
-            background: #FFFFFF;
-            border: 1px solid #E2E8F0;
-            border-bottom: 4px solid #E2E8F0;
-            border-radius: 28px;
-            transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
-        }
-        .premium-card:active {
-            transform: translateY(2px);
-            border-bottom-width: 1px;
-        }
-
-        .duo-btn {
-            background: #58CC02;
-            border-bottom: 4px solid #46A302;
-            color: white;
-            border-radius: 18px;
-            font-weight: 900;
-        }
-        .duo-btn:active {
-            transform: translateY(2px);
-            border-bottom-width: 1px;
-        }
-
+        body { background-color: #F8FAFC; font-family: 'Noto Sans SC', sans-serif; color: #1E293B; -webkit-tap-highlight-color: transparent; }
+        @media (min-width: 1024px) { .app-container { transform: scale(1.1); transform-origin: top; } }
+        .premium-card { background: #FFFFFF; border: 1px solid #E2E8F0; border-bottom: 4px solid #E2E8F0; border-radius: 28px; transition: all 0.2s cubic-bezier(0, 0, 0.2, 1); }
+        .premium-card:active { transform: translateY(2px); border-bottom-width: 1px; }
+        .duo-btn { background: #58CC02; border-bottom: 4px solid #46A302; color: white; border-radius: 18px; font-weight: 900; }
         .locked-state { opacity: 0.45; filter: grayscale(0.85); pointer-events: none; }
     </style>
 </head>
 <body class="py-16 px-6">
-    <div class="app-container max-w-[480px] mx-auto flex flex-col min-h-[85vh]">
+    <div class="app-container max-w-[480px] mx-auto flex flex-col min-h-[90vh]">
         
         <header class="text-center mb-16">
             <h1 class="text-4xl lg:text-5xl font-black text-slate-900 mb-5 tracking-tighter">直击 A1 德语焦虑</h1>
@@ -60,54 +28,54 @@
         </header>
 
         <main class="flex-grow space-y-8">
-            
             <div id="dynamic-panel" class="p-4 text-center">
                 <p id="slogan" class="text-slate-500 font-bold mb-10 text-xl lg:text-2xl tracking-tight leading-relaxed">
                     跟着刘老师，稳过 A1
                 </p>
-                
                 <div id="auth-group" class="premium-card p-10 shadow-sm border-sky-100 bg-sky-50/50">
-                    <input id="key-input" type="text" placeholder="••••" 
-                           class="w-full py-5 text-center bg-slate-50 rounded-2xl mb-8 outline-none font-black text-3xl border-2 border-transparent focus:border-sky-400">
+                    <input id="key-input" type="text" placeholder="••••" class="w-full py-5 text-center bg-slate-50 rounded-2xl mb-8 outline-none font-black text-3xl border-2 border-transparent focus:border-sky-400">
                     <button onclick="unlock()" class="w-full py-5 duo-btn text-xl shadow-lg shadow-green-100">立即开始闯关</button>
                 </div>
             </div>
 
-            <div class="pt-4">
-                <div id="lvl1" onclick="go(1)" 
-                     class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm">
+            <div class="pt-4 space-y-8">
+                <div id="lvl1" onclick="go(1)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm">
                     <div class="w-16 h-16 bg-[#58CC02] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">1</div>
                     <div>
                         <h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">名词词性捕手</h3>
-                        <p id="lvl1-hint" class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">
-                            der / die / das
-                        </p>
+                        <p id="lvl1-hint" class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">der / die / das</p>
                     </div>
                     <div id="m1" class="absolute -top-3 -right-3 text-5xl"></div>
                 </div>
-            </div>
 
+                <div id="lvl2" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm opacity-60">
+                    <div class="w-16 h-16 bg-[#00D4FF] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">2</div>
+                    <div>
+                        <h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">核心动词大师</h3>
+                        <p class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">coming soon</p>
+                    </div>
+                </div>
+
+                <div class="premium-card p-7 flex items-center gap-6 relative opacity-30 grayscale pointer-events-none border-dashed border-2">
+                    <div class="w-16 h-16 bg-slate-200 rounded-[22px] flex items-center justify-center text-white font-black text-3xl">3</div>
+                    <div class="italic text-slate-400 font-bold">新内容正在赶路...</div>
+                </div>
+            </div>
         </main>
 
-        <footer class="mt-24 text-center space-y-8">
+        <footer class="mt-24 text-center space-y-8 pb-10">
             <div class="inline-flex items-center px-10 py-3 bg-white border border-slate-100 rounded-full shadow-sm">
                 <span class="text-xs font-black text-slate-300 uppercase tracking-widest">咨询微信:</span>
                 <span class="text-xs font-black text-slate-500 ml-2 uppercase">gehtalles</span>
             </div>
-            
-            <div>
-                <button onclick="clearAll()" class="text-[10px] font-bold text-slate-300 hover:text-slate-400 underline decoration-slate-100">
-                    RESET PROGRESS
-                </button>
-            </div>
+            <div><button onclick="clearAll()" class="text-[10px] font-bold text-slate-300 underline">RESET PROGRESS</button></div>
         </footer>
-
     </div>
 
     <script>
         function checkStatus() {
             const unlocked = localStorage.getItem('isUnlocked') === 'true';
-            const done = localStorage.getItem('stage1_cleared') === 'true';
+            const s1Score = localStorage.getItem('stage1_score'); 
 
             if (unlocked) {
                 document.getElementById('auth-group').style.display = 'none';
@@ -117,12 +85,10 @@
                 document.getElementById('lvl1').classList.remove('locked-state');
             }
 
-            if (done) {
+            if (s1Score === 'gold') {
                 document.getElementById('m1').innerText = "🥇";
-                const hint = document.getElementById('lvl1-hint');
-                hint.innerText = "Challenge Mastered";
-                hint.classList.replace('text-slate-400', 'text-emerald-500');
-                hint.classList.remove('lowercase'); // 完成后变英文不用小写强制
+            } else if (s1Score === 'silver') {
+                document.getElementById('m1').innerText = "🥈";
             }
         }
 
@@ -130,23 +96,12 @@
             if (document.getElementById('key-input').value === '8888') {
                 localStorage.setItem('isUnlocked', 'true');
                 checkStatus();
-            } else {
-                alert("请输入正确的激活码");
-            }
+            } else { alert("请输入正确的激活码"); }
         }
 
-        function go(num) {
-            if (localStorage.getItem('isUnlocked') === 'true') {
-                if (num === 1) window.location.href = '01-gender.html';
-            }
-        }
+        function go(n) { if (localStorage.getItem('isUnlocked') === 'true' && n === 1) window.location.href = '01-gender.html'; }
 
-        function clearAll() {
-            if (confirm("确定重置吗？")) {
-                localStorage.clear();
-                location.reload();
-            }
-        }
+        function clearAll() { if (confirm("确定重置吗？")) { localStorage.clear(); location.reload(); } }
 
         window.onload = checkStatus;
     </script>
