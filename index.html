@@ -48,9 +48,7 @@
                 <div id="lvl2" onclick="go(2)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm">
                     <div class="w-16 h-16 bg-[#00D4FF] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">2</div>
                     <div>
-                        <h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1 leading-tight">
-                            词性潜规则：一眼识破<br>der/die/das
-                        </h3>
+                        <h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1 leading-tight">词性潜规则：一眼识破<br>der/die/das</h3>
                         <p class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">der / die / das</p>
                     </div>
                 </div>
@@ -75,30 +73,24 @@
                 const slogan = document.getElementById('slogan');
                 slogan.classList.replace('text-slate-500', 'text-sky-800');
                 slogan.classList.add('animate-pulse');
-                
-                // 同时激活第一关和第二关
                 document.getElementById('lvl1').classList.remove('locked-state');
                 document.getElementById('lvl2').classList.remove('locked-state');
             }
             if (s1Score === 'gold') { document.getElementById('m1').innerText = "🥇"; }
             else if (s1Score === 'silver') { document.getElementById('m1').innerText = "🥈"; }
         }
-        
         function unlock() {
             if (document.getElementById('key-input').value === '8888') {
                 localStorage.setItem('isUnlocked', 'true');
                 checkStatus();
             } else { alert("请输入正确的激活码"); }
         }
-
-        // 修改跳转逻辑：支持 1 和 2
         function go(n) { 
             if (localStorage.getItem('isUnlocked') === 'true') {
                 if (n === 1) window.location.href = '01-gender.html';
                 if (n === 2) window.location.href = '02-classify.html';
             } 
         }
-
         function clearAll() { if (confirm("确定重置吗？")) { localStorage.clear(); location.reload(); } }
         window.onload = checkStatus;
     </script>
