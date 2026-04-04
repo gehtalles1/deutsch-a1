@@ -16,64 +16,70 @@
             height: 100vh; height: -webkit-fill-available;
         }
 
-        .header { height: 70px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; margin-top: 10px; flex-shrink: 0; }
-        .main-game { flex-grow: 1; display: flex; align-items: center; justify-content: center; position: relative; }
-        .footer { height: 70px; display: flex; align-items: center; justify-content: center; padding-bottom: 20px; flex-shrink: 0; }
+        .header { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; z-index: 50; }
+        
+        /* 核心修改：确保游戏区域能够容纳下所有标签 */
+        .main-game { 
+            flex-grow: 1; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            position: relative; 
+            padding: 40px 0; /* 留出上下呼吸空间 */
+        }
 
-        /* 核心修改：大幅缩小词卡宽度，为两侧留出巨大空间 */
-        .card-stack { position: relative; width: 65vw; max-width: 260px; height: 350px; z-index: 10; }
+        /* 缩小卡片，留出四周间距 */
+        .card-stack { position: relative; width: 60vw; max-width: 240px; height: 320px; z-index: 10; }
         
         .card {
             position: absolute; width: 100%; height: 100%;
-            background: white; border-radius: 35px;
-            box-shadow: 0 12px 35px rgba(0,0,0,0.07);
+            background: white; border-radius: 30px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.08);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             border: 1px solid #F1F5F9; cursor: grab; z-index: 20;
+            transition: transform 0.1s ease-out;
         }
         
-        #word { font-size: 2.5rem; font-weight: 900; color: #0f172a; margin-bottom: 4px; }
-        #mean { font-size: 1.2rem; color: #64748b; font-weight: 700; }
+        #word { font-size: 2.2rem; font-weight: 900; color: #0f172a; margin-bottom: 4px; }
+        #mean { font-size: 1.1rem; color: #64748b; font-weight: 700; }
 
-        /* 引导标签：位置更靠内，文字更醒目 */
+        /* 标签：位置向内微调，die 标签位置上移 */
         .guide-label {
-            position: absolute; font-weight: 900; font-size: 1.6rem; 
-            opacity: 0.9; pointer-events: none; transition: all 0.2s;
-            display: flex; align-items: center; gap: 6px;
+            position: absolute; font-weight: 900; font-size: 1.8rem; 
+            opacity: 1; pointer-events: none; 
+            display: flex; align-items: center; gap: 4px;
+            z-index: 5; /* 位于卡片下方但清晰可见 */
         }
-        /* der 往右移 */
-        .label-der { left: -60px; top: 50%; transform: translateY(-50%) rotate(-90deg); color: #1d4ed8; } 
-        /* die 往下移一点 */
-        .label-die { top: -65px; left: 50%; transform: translateX(-50%); color: #b91c1c; flex-direction: column; } 
-        /* das 往左移 */
-        .label-das { right: -60px; top: 50%; transform: translateY(-50%) rotate(90deg); color: #15803d; } 
+        
+        .label-der { left: -75px; top: 50%; transform: translateY(-50%) rotate(-90deg); color: #1d4ed8; } 
+        /* 修改：把 die 标签往上推得更远 */
+        .label-die { top: -90px; left: 50%; transform: translateX(-50%); color: #b91c1c; flex-direction: column; } 
+        .label-das { right: -75px; top: 50%; transform: translateY(-50%) rotate(90deg); color: #15803d; } 
 
-        .play-hint { font-size: 0.75rem; color: #94a3b8; font-weight: 900; letter-spacing: 0.05em; }
-
-        #tips-card { transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28); z-index: 100; }
-        #tips-card.show { transform: translateY(0); }
+        .footer { height: 60px; display: flex; align-items: center; justify-content: center; padding-bottom: 20px; z-index: 50; }
+        .play-hint { font-size: 0.8rem; color: #94a3b8; font-weight: 900; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <button onclick="location.href='index.html'" class="text-slate-300 active:scale-90 transition-transform">
+        <button onclick="location.href='index.html'" class="text-slate-300">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" /></svg>
         </button>
         <div class="flex items-center gap-3">
             <div class="bg-white px-4 py-1.5 rounded-full shadow-sm border border-slate-100">
-                <span class="text-[10px] font-black text-slate-400 uppercase">进度</span>
-                <span id="cur-num" class="text-sm font-black text-rose-500 ml-1">1</span>
+                <span id="cur-num" class="text-sm font-black text-rose-500">1</span>
                 <span class="text-[10px] font-black text-slate-300"> / 50</span>
             </div>
-            <button id="mute-toggle" class="p-2 text-slate-300 active:text-indigo-500">
+            <button id="mute-toggle" class="p-2 text-slate-300">
                 <svg id="mute-icon" xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
             </button>
         </div>
     </div>
 
     <div class="main-game">
-        <div id="feedback-tag" class="absolute top-10 text-5xl font-black opacity-0 transition-opacity uppercase z-50"></div>
-
+        <div id="feedback-tag" class="absolute top-4 text-5xl font-black opacity-0 transition-opacity uppercase z-40"></div>
+        
         <div class="card-stack">
             <div class="guide-label label-der"><span>←</span> der</div>
             <div class="guide-label label-die"><span>↑</span> die</div>
@@ -87,24 +93,20 @@
     </div>
 
     <div class="footer">
-        <div class="play-hint">
-            ← der | die ↑ | das →
-        </div>
+        <div class="play-hint">← der | die ↑ | das →</div>
     </div>
 
     <div id="tips-overlay" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[90]"></div>
-    <div id="tips-card" class="fixed bottom-0 left-0 right-0 bg-white rounded-t-[40px] p-8 pb-10 z-[100] border-t-4 border-rose-200 mx-auto max-w-md">
-        <div class="w-12 h-1.5 bg-slate-100 rounded-full mx-auto mb-6"></div>
-        <h4 class="text-rose-500 font-black mb-2 text-xs uppercase tracking-widest text-center">刘老师的锦囊</h4>
-        <p id="tips-content" class="text-slate-800 font-bold mb-10 text-xl text-center leading-relaxed px-4"></p>
-        <button id="close-tip-btn" class="w-full py-5 bg-slate-900 text-white rounded-2xl font-black text-lg active:scale-95 transition-transform">记住了</button>
+    <div id="tips-card" class="fixed bottom-0 left-0 right-0 bg-white rounded-t-[40px] p-8 pb-10 z-[100] border-t-4 border-rose-200">
+        <p id="tips-content" class="text-slate-800 font-bold mb-10 text-xl text-center"></p>
+        <button id="close-tip-btn" class="w-full py-5 bg-slate-900 text-white rounded-2xl font-black">记住了</button>
     </div>
 
     <audio id="snd-ok" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3" preload="auto"></audio>
     <audio id="snd-err" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" preload="auto"></audio>
 
     <script>
-        // ... (省略50个词汇数据，请沿用之前的 rawWords) ...
+        // ... 此处沿用之前的 rawWords 数据 ...
         const rawWords = [
             {w:"Bäckerei", m:"面包店", a:"die", t:"-ei 结尾表示场所，100%是 die。"},
             {w:"Übung", m:"练习", a:"die", t:"-ung 结尾的名词，100%是 die。"},
@@ -158,19 +160,18 @@
             {w:"Pfeffer", m:"胡椒", a:"der", t:"-er 结尾的调料名通常是 der。"}
         ];
 
-        const words = rawWords.sort(() => Math.random() - 0.5);
+        let words = [...rawWords].sort(() => Math.random() - 0.5);
         let currentIdx = 0, isMuted = false;
 
         const card = document.getElementById('active-card');
-        const feedbackTag = document.getElementById('feedback-tag');
         const sndOk = document.getElementById('snd-ok');
         const sndErr = document.getElementById('snd-err');
 
-        // 核心修复：触摸页面任何地方先触发一下音频，解决手机端限制
-        document.body.addEventListener('touchstart', function() {
+        // 预激活音频
+        document.body.addEventListener('touchstart', () => {
             if(!isMuted) {
-                sndOk.muted = true; sndOk.play(); sndOk.pause(); sndOk.muted = false;
-                sndErr.muted = true; sndErr.play(); sndErr.pause(); sndErr.muted = false;
+                sndOk.play().then(() => sndOk.pause());
+                sndErr.play().then(() => sndErr.pause());
             }
         }, { once: true });
 
@@ -179,7 +180,6 @@
             document.getElementById('word').innerText = words[currentIdx].w;
             document.getElementById('mean').innerText = words[currentIdx].m;
             document.getElementById('cur-num').innerText = currentIdx + 1;
-            card.style.transition = 'none';
             card.style.transform = 'translate(0,0) rotate(0)';
             card.style.opacity = '1';
         }
@@ -188,23 +188,10 @@
         mc.get('pan').set({ direction: Hammer.DIRECTION_ALL });
 
         mc.on("panmove", (e) => {
-            card.style.transition = 'none';
-            card.style.transform = `translate(${e.deltaX}px, ${e.deltaY}px) rotate(${e.deltaX/20}deg)`;
-            
-            if (e.deltaY < -50) showFeedback('die', '#b91c1c');
-            else if (e.deltaX < -50) showFeedback('der', '#1d4ed8');
-            else if (e.deltaX > 50) showFeedback('das', '#15803d');
-            else feedbackTag.style.opacity = '0';
+            card.style.transform = `translate(${e.deltaX}px, ${e.deltaY}px) rotate(${e.deltaX/15}deg)`;
         });
 
-        function showFeedback(text, color) {
-            feedbackTag.innerText = text;
-            feedbackTag.style.color = color;
-            feedbackTag.style.opacity = '0.8';
-        }
-
         mc.on("panend", (e) => {
-            feedbackTag.style.opacity = '0';
             let answer = '';
             if (e.deltaX < -70) answer = 'der';
             else if (e.deltaY < -70) answer = 'die';
@@ -213,28 +200,16 @@
             if (answer) {
                 if (answer === words[currentIdx].a) {
                     if(!isMuted) { sndOk.currentTime = 0; sndOk.play(); }
-                    card.style.transition = 'all 0.3s ease-out';
                     card.style.opacity = '0';
-                    card.style.transform += ' scale(0.6)';
-                    setTimeout(() => {
-                        currentIdx++;
-                        if (currentIdx >= 50) {
-                            alert("通关！");
-                            location.href = 'index.html';
-                        } else updateCard();
-                    }, 200);
+                    setTimeout(() => { currentIdx++; updateCard(); }, 200);
                 } else {
-                    // 错题声音强化：重置进度后播放
-                    if(!isMuted) { sndErr.currentTime = 0; sndErr.play().catch(e=>console.log(e)); }
-                    if (window.navigator.vibrate) window.navigator.vibrate(200); 
-                    
-                    card.style.transition = 'transform 0.4s';
-                    card.style.transform = 'translate(0,0) rotate(0)';
+                    if(!isMuted) { sndErr.currentTime = 0; sndErr.play(); }
+                    if (navigator.vibrate) navigator.vibrate(200);
+                    card.style.transform = 'translate(0,0)';
                     showTip(words[currentIdx].t);
                 }
             } else {
-                card.style.transition = 'transform 0.3s';
-                card.style.transform = 'translate(0,0) rotate(0)';
+                card.style.transform = 'translate(0,0)';
             }
         });
 
@@ -244,15 +219,10 @@
             document.getElementById('tips-card').classList.add('show');
         }
 
-        document.getElementById('close-tip-btn').onclick = function() {
+        document.getElementById('close-tip-btn').onclick = () => {
             document.getElementById('tips-overlay').classList.add('hidden');
             document.getElementById('tips-card').classList.remove('show');
-        }
-
-        document.getElementById('mute-toggle').onclick = function() {
-            isMuted = !isMuted;
-            this.classList.toggle('text-indigo-500', !isMuted);
-        }
+        };
 
         window.onload = updateCard;
     </script>
