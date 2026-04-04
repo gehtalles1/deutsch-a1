@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>刘老师德语 A1 闯关</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        
+        body { 
+            background-color: #F8FAFC; 
+            font-family: 'Noto Sans SC', sans-serif; 
+            color: #0F172A;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* 大厂质感卡片：极细边框 + 阴影感 */
+        .app-card {
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-bottom: 4px solid #E2E8F0;
+            border-radius: 24px;
+            transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
+        }
+        .app-card:active {
+            transform: translateY(2px);
+            border-bottom-width: 1px;
+        }
+
+        /* 引导性按钮：多邻国标志性绿色 */
+        .primary-btn {
+            background: #58CC02;
+            border-bottom: 4px solid #46A302;
+            color: white;
+            border-radius: 16px;
+            font-weight: 900;
+            letter-spacing: 0.02em;
+        }
+        .primary-btn:active {
+            transform: translateY(2px);
+            border-bottom-width: 1px;
+        }
+
+        /* 锁定状态：柔和遮罩 */
+        .locked-card {
+            opacity: 0.5;
+            filter: grayscale(0.8);
+            pointer-events: none;
+        }
+
+        /* 徽章悬浮感 */
+        .medal-float {
+            position: absolute;
+            top: -12px;
+            right: -12px;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+        }
+    </style>
+</head>
+<body class="py-12 px-6">
+    <div class="max-w-[420px] mx-auto flex flex-col min-h-[80vh]">
+        
+        <header class="text-center mb-12">
+            <h1 class="text-3xl font-black text-slate-900 mb-2 tracking-tight">A1 德语焦虑</h1>
+            <div class="inline-flex items-center px-3 py-1 bg-sky-50 text-sky-600 rounded-full text-xs font-black tracking-widest uppercase">
+                Direct Clear
+            </div>
+        </header>
+
+        <main class="flex-grow space-y-6">
+            
+            <div id="unlock-panel" class="app-card p-8 text-center shadow-sm">
+                <h2 class="text-slate-500 font-bold mb-6 text-sm">请输入专属激活码开启挑战</h2>
+                <input id="key-input" type="text" placeholder="••••" 
+                       class="w-full py-4 text-center bg-slate-50 rounded-xl mb-6 outline-none font-black text-3xl border-2 border-transparent focus:border-sky-400 transition-all">
+                <button onclick="performUnlock()" class="w-full py-4 primary-btn text-lg">立即解锁</button>
+            </div>
+
+            <div id="welcome-panel" class="hidden app-card p-6 flex items-center gap-4 border-sky-100 bg-sky-50/50">
+                <div class="text-3xl bg-white w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm">🎉</div>
+                <div>
+                    <p class="font-black text-sky-800 text-lg">解锁成功</p>
+                    <p class="text-sky-600/70 font-bold text-xs uppercase tracking-tight">跟着刘老师，稳过 A1</p>
+                </div>
+            </div>
+
+            <div class="pt-4">
+                <div id="stage-1" onclick="navigateToGame()" 
+                     class="app-card p-6 flex items-center gap-5 relative locked-card shadow-sm group">
+                    <div class="w-14 h-14 bg-[#58CC02] rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-inner">1</div>
+                    <div>
+                        <h3 class="font-black text-lg text-slate-800 mb-0.5">名词词性捕手</h3>
+                        <p id="stage-status" class="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Der / Die / Das</p>
+                    </div>
+                    <div id="medal-slot" class="medal-float text-4xl"></div>
+                </div>
+            </div>
+
+        </main>
+
+        <footer class="mt-16 text-center space-y-6">
+            <div class="inline-block px-6 py-2 bg-white border border-slate-100 rounded-full shadow-sm">
+                <span class="text-[10px] font-black text-slate-300 uppercase tracking-widest">咨询微信:</span>
+                <span class="text-[10px] font-black text-slate-500 ml-1 uppercase">gehtalles</span>
+            </div>
+            
+            <div>
+                <button onclick="resetApp()" class="text-[10px] font-bold text-slate-300 hover:text-slate-400 transition-colors underline decoration-slate-200">
+                    重置学习进度 (RESET PROGRESS)
+                </button>
+            </div>
+        </footer>
+
+    </div>
+
+    <script>
+        // 初始化检查：只判断UI显示，绝不自动跳转
+        function init() {
+            const isUnlocked = localStorage.getItem('isUnlocked') === 'true';
+            const isCleared = localStorage.getItem('stage1_cleared') === 'true';
+
+            if (isUnlocked) {
+                document.getElementById('unlock-panel').classList.add('hidden');
+                document.getElementById('welcome-panel').classList.remove('hidden');
+                document.getElementById('stage-1').classList.remove('locked-card');
+            }
+
+            if (isCleared) {
+                document.getElementById('medal-slot').innerText = "🥇";
+                const status = document.getElementById('stage-status');
+                status.innerText = "Challenge Mastered";
+                status.classList.replace('text-slate-400', 'text-emerald-500');
+            }
+        }
+
+        function performUnlock() {
+            const input = document.getElementById('key-input').value;
+            if (input === '8888') {
+                localStorage.setItem('isUnlocked', 'true');
+                // 刷新页面状态，不跳转
+                init(); 
+            } else {
+                alert("激活码无效，请联系刘老师");
+            }
+        }
+
+        function navigateToGame() {
+            // 只有手动点击且解锁后才跳转
+            if (localStorage.getItem('isUnlocked') === 'true') {
+                window.location.href = '01-gender.html';
+            }
+        }
+
+        function resetApp() {
+            if (confirm("确定要清除所有进度并重新激活吗？")) {
+                localStorage.clear();
+                window.location.reload();
+            }
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
