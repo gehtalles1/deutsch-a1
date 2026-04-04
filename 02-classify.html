@@ -18,36 +18,36 @@
 
         .header { height: 70px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; margin-top: 10px; flex-shrink: 0; }
         .main-game { flex-grow: 1; display: flex; align-items: center; justify-content: center; position: relative; }
-        .footer { height: 80px; display: flex; align-items: center; justify-content: center; padding-bottom: 20px; flex-shrink: 0; }
+        .footer { height: 70px; display: flex; align-items: center; justify-content: center; padding-bottom: 20px; flex-shrink: 0; }
 
-        /* 关键修改：缩小卡片容器，腾出侧边空间 */
-        .card-stack { position: relative; width: 75vw; max-width: 300px; height: 380px; z-index: 10; }
+        /* 核心修改：大幅缩小词卡宽度，为两侧留出巨大空间 */
+        .card-stack { position: relative; width: 65vw; max-width: 260px; height: 350px; z-index: 10; }
         
         .card {
             position: absolute; width: 100%; height: 100%;
-            background: white; border-radius: 40px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            background: white; border-radius: 35px;
+            box-shadow: 0 12px 35px rgba(0,0,0,0.07);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             border: 1px solid #F1F5F9; cursor: grab; z-index: 20;
         }
         
-        #word { font-size: 2.8rem; font-weight: 900; color: #0f172a; margin-bottom: 8px; }
-        #mean { font-size: 1.3rem; color: #64748b; font-weight: 700; }
+        #word { font-size: 2.5rem; font-weight: 900; color: #0f172a; margin-bottom: 4px; }
+        #mean { font-size: 1.2rem; color: #64748b; font-weight: 700; }
 
-        /* 标签：加大、加深颜色、增加箭头指示 */
+        /* 引导标签：位置更靠内，文字更醒目 */
         .guide-label {
-            position: absolute; font-weight: 900; font-size: 1.5rem; 
-            opacity: 0.8; pointer-events: none; transition: all 0.2s;
-            display: flex; align-items: center; gap: 4px;
+            position: absolute; font-weight: 900; font-size: 1.6rem; 
+            opacity: 0.9; pointer-events: none; transition: all 0.2s;
+            display: flex; align-items: center; gap: 6px;
         }
-        /* 左侧 der - 蓝色 */
-        .label-der { left: -75px; top: 50%; transform: translateY(-50%) rotate(-90deg); color: #2563eb; } 
-        /* 上侧 die - 红色 */
-        .label-die { top: -75px; left: 50%; transform: translateX(-50%); color: #dc2626; flex-direction: column; } 
-        /* 右侧 das - 绿色 */
-        .label-das { right: -75px; top: 50%; transform: translateY(-50%) rotate(90deg); color: #16a34a; } 
+        /* der 往右移 */
+        .label-der { left: -60px; top: 50%; transform: translateY(-50%) rotate(-90deg); color: #1d4ed8; } 
+        /* die 往下移一点 */
+        .label-die { top: -65px; left: 50%; transform: translateX(-50%); color: #b91c1c; flex-direction: column; } 
+        /* das 往左移 */
+        .label-das { right: -60px; top: 50%; transform: translateY(-50%) rotate(90deg); color: #15803d; } 
 
-        .play-hint { font-size: 0.8rem; color: #94a3b8; font-weight: 900; letter-spacing: 0.05em; opacity: 0.6; }
+        .play-hint { font-size: 0.75rem; color: #94a3b8; font-weight: 900; letter-spacing: 0.05em; }
 
         #tips-card { transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28); z-index: 100; }
         #tips-card.show { transform: translateY(0); }
@@ -80,8 +80,8 @@
             <div class="guide-label label-das">das <span>→</span></div>
             
             <div id="active-card" class="card">
-                <div id="word">Teppich</div>
-                <div id="mean">地毯</div>
+                <div id="word">Laden...</div>
+                <div id="mean">请稍候</div>
             </div>
         </div>
     </div>
@@ -97,14 +97,14 @@
         <div class="w-12 h-1.5 bg-slate-100 rounded-full mx-auto mb-6"></div>
         <h4 class="text-rose-500 font-black mb-2 text-xs uppercase tracking-widest text-center">刘老师的锦囊</h4>
         <p id="tips-content" class="text-slate-800 font-bold mb-10 text-xl text-center leading-relaxed px-4"></p>
-        <button onclick="hideTip()" class="w-full py-5 bg-slate-900 text-white rounded-2xl font-black text-lg active:scale-95 transition-transform">记住了</button>
+        <button id="close-tip-btn" class="w-full py-5 bg-slate-900 text-white rounded-2xl font-black text-lg active:scale-95 transition-transform">记住了</button>
     </div>
 
     <audio id="snd-ok" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3" preload="auto"></audio>
     <audio id="snd-err" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" preload="auto"></audio>
 
     <script>
-        // 50个词汇数据 (保持不变)
+        // ... (省略50个词汇数据，请沿用之前的 rawWords) ...
         const rawWords = [
             {w:"Bäckerei", m:"面包店", a:"die", t:"-ei 结尾表示场所，100%是 die。"},
             {w:"Übung", m:"练习", a:"die", t:"-ung 结尾的名词，100%是 die。"},
@@ -166,6 +166,14 @@
         const sndOk = document.getElementById('snd-ok');
         const sndErr = document.getElementById('snd-err');
 
+        // 核心修复：触摸页面任何地方先触发一下音频，解决手机端限制
+        document.body.addEventListener('touchstart', function() {
+            if(!isMuted) {
+                sndOk.muted = true; sndOk.play(); sndOk.pause(); sndOk.muted = false;
+                sndErr.muted = true; sndErr.play(); sndErr.pause(); sndErr.muted = false;
+            }
+        }, { once: true });
+
         function updateCard() {
             if (currentIdx >= words.length) return;
             document.getElementById('word').innerText = words[currentIdx].w;
@@ -183,10 +191,10 @@
             card.style.transition = 'none';
             card.style.transform = `translate(${e.deltaX}px, ${e.deltaY}px) rotate(${e.deltaX/20}deg)`;
             
-            if (e.deltaY < -60) { showFeedback('die', '#dc2626'); }
-            else if (e.deltaX < -60) { showFeedback('der', '#2563eb'); }
-            else if (e.deltaX > 60) { showFeedback('das', '#16a34a'); }
-            else { feedbackTag.style.opacity = '0'; }
+            if (e.deltaY < -50) showFeedback('die', '#b91c1c');
+            else if (e.deltaX < -50) showFeedback('der', '#1d4ed8');
+            else if (e.deltaX > 50) showFeedback('das', '#15803d');
+            else feedbackTag.style.opacity = '0';
         });
 
         function showFeedback(text, color) {
@@ -198,27 +206,27 @@
         mc.on("panend", (e) => {
             feedbackTag.style.opacity = '0';
             let answer = '';
-            if (e.deltaX < -80) answer = 'der';
-            else if (e.deltaY < -80) answer = 'die';
-            else if (e.deltaX > 80) answer = 'das';
+            if (e.deltaX < -70) answer = 'der';
+            else if (e.deltaY < -70) answer = 'die';
+            else if (e.deltaX > 70) answer = 'das';
 
             if (answer) {
                 if (answer === words[currentIdx].a) {
-                    if(!isMuted) sndOk.play().catch(()=>{});
+                    if(!isMuted) { sndOk.currentTime = 0; sndOk.play(); }
                     card.style.transition = 'all 0.3s ease-out';
                     card.style.opacity = '0';
-                    card.style.transform += ' scale(0.7)';
+                    card.style.transform += ' scale(0.6)';
                     setTimeout(() => {
                         currentIdx++;
                         if (currentIdx >= 50) {
-                            alert("通关啦！");
+                            alert("通关！");
                             location.href = 'index.html';
-                        } else { updateCard(); }
+                        } else updateCard();
                     }, 200);
                 } else {
-                    // 答错反馈：声音 + 震动
-                    if(!isMuted) sndErr.play().catch(()=>{});
-                    if (window.navigator.vibrate) window.navigator.vibrate(150); 
+                    // 错题声音强化：重置进度后播放
+                    if(!isMuted) { sndErr.currentTime = 0; sndErr.play().catch(e=>console.log(e)); }
+                    if (window.navigator.vibrate) window.navigator.vibrate(200); 
                     
                     card.style.transition = 'transform 0.4s';
                     card.style.transform = 'translate(0,0) rotate(0)';
@@ -236,7 +244,7 @@
             document.getElementById('tips-card').classList.add('show');
         }
 
-        function hideTip() {
+        document.getElementById('close-tip-btn').onclick = function() {
             document.getElementById('tips-overlay').classList.add('hidden');
             document.getElementById('tips-card').classList.remove('show');
         }
