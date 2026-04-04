@@ -10,61 +10,55 @@
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@700;900&display=swap');
         
         body { 
-            background: #F8FAFC; 
-            font-family: 'Noto Sans SC', sans-serif; 
-            margin: 0; padding: 0;
-            overflow: hidden; 
-            touch-action: none;
+            background: #F8FAFC; font-family: 'Noto Sans SC', sans-serif; 
+            margin: 0; overflow: hidden; touch-action: none;
             display: flex; flex-direction: column;
             height: 100vh; height: -webkit-fill-available;
         }
 
-        /* 顶部导航 */
-        .header { height: 70px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; margin-top: 10px; }
-
-        /* 核心游戏区 */
+        .header { height: 70px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; margin-top: 10px; flex-shrink: 0; }
         .main-game { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+        .footer { height: 100px; display: flex; align-items: center; justify-content: center; padding-bottom: 20px; flex-shrink: 0; }
 
-        /* 底部提示区 - 稍微加高一点，确保文字在手机底部不局促 */
-        .footer { height: 120px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; padding-bottom: 20px; }
-
-        .card-stack { position: relative; width: 85vw; max-width: 340px; height: 420px; }
-        
+        /* 卡片容器 */
+        .card-stack { position: relative; width: 85vw; max-width: 340px; height: 420px; z-index: 10; }
         .card {
             position: absolute; width: 100%; height: 100%;
             background: white; border-radius: 45px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.05);
+            box-shadow: 0 15px 45px rgba(0,0,0,0.06);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             border: 1px solid #F1F5F9; cursor: grab; z-index: 20;
         }
         
-        #word { font-size: 3rem; font-weight: 900; color: #1e293b; margin-bottom: 12px; }
+        #word { font-size: 3rem; font-weight: 900; color: #1e293b; margin-bottom: 8px; }
         #mean { font-size: 1.4rem; color: #94a3b8; font-weight: 700; }
 
-        /* 提示标签位置微调 */
-        .guide-label { position: absolute; font-weight: 900; font-size: 1.1rem; opacity: 0.15; pointer-events: none; }
-        .label-der { left: -50px; top: 50%; transform: translateY(-50%) rotate(-90deg); color: #1e40af; } 
-        .label-die { top: -45px; left: 50%; transform: translateX(-50%); color: #991b1b; } 
-        .label-das { right: -50px; top: 50%; transform: translateY(-50%) rotate(90deg); color: #065f46; } 
+        /* 引导标签：重新加入并优化位置 */
+        .guide-label {
+            position: absolute; font-weight: 900; font-size: 1.2rem; 
+            color: #cbd5e1; opacity: 0.4; pointer-events: none; transition: opacity 0.3s;
+        }
+        .label-der { left: -60px; top: 50%; transform: translateY(-50%) rotate(-90deg); } 
+        .label-die { top: -60px; left: 50%; transform: translateX(-50%); } 
+        .label-das { right: -60px; top: 50%; transform: translateY(-50%) rotate(90deg); } 
 
-        /* 底部规则提示文字 - 颜色加深一点点 */
-        .play-hint { font-size: 0.8rem; color: #94a3b8; font-weight: 900; letter-spacing: 0.15em; }
+        .play-hint { font-size: 0.85rem; color: #94a3b8; font-weight: 900; letter-spacing: 0.1em; }
 
-        /* 弹窗样式 */
-        #tips-card { transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28); z-index: 100; max-width: 400px; }
+        /* 弹窗动画 */
+        #tips-card { transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28); z-index: 100; }
         #tips-card.show { transform: translateY(0); }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <button onclick="location.href='index.html'" class="p-2 text-slate-300 active:text-slate-500">
+        <button onclick="location.href='index.html'" class="text-slate-300 active:scale-90 transition-transform">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" /></svg>
         </button>
-        <div class="flex items-center gap-4">
-            <div class="bg-slate-50 px-3 py-1 rounded-full border border-slate-100 shadow-sm">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">进度 </span>
-                <span id="cur-num" class="text-sm font-black text-rose-500">1</span>
+        <div class="flex items-center gap-3">
+            <div class="bg-slate-100/50 px-4 py-1.5 rounded-full border border-slate-100">
+                <span class="text-[10px] font-black text-slate-400 uppercase">进度</span>
+                <span id="cur-num" class="text-sm font-black text-rose-500 ml-1">1</span>
                 <span class="text-[10px] font-black text-slate-300"> / 50</span>
             </div>
             <button id="mute-toggle" class="p-2 text-slate-300 active:text-indigo-500">
@@ -74,38 +68,38 @@
     </div>
 
     <div class="main-game">
-        <div id="feedback-tag" class="absolute top-0 text-4xl font-black opacity-0 transition-all uppercase tracking-widest z-50"></div>
+        <div id="feedback-tag" class="absolute top-0 text-4xl font-black opacity-0 transition-opacity uppercase z-50"></div>
 
         <div class="card-stack">
-            <div class="guide-label label-der">← DER</div>
-            <div class="guide-label label-die">DIE ↑</div>
-            <div class="guide-label label-das">DAS →</div>
+            <div class="guide-label label-der">der</div>
+            <div class="guide-label label-die">die</div>
+            <div class="guide-label label-das">das</div>
             
             <div id="active-card" class="card">
-                <div id="word">Laden...</div>
-                <div id="mean">请稍候</div>
+                <div id="word">Teppich</div>
+                <div id="mean">地毯</div>
             </div>
         </div>
     </div>
 
     <div class="footer">
-        <div class="play-hint uppercase">
-            左滑 der / 上滑 die / 右滑 das
+        <div class="play-hint">
+            ← 左滑 der / 上滑 die / 右滑 das →
         </div>
     </div>
 
     <div id="tips-overlay" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[90]"></div>
-    <div id="tips-card" class="fixed bottom-0 left-0 right-0 bg-white rounded-t-[45px] p-10 pb-12 z-[100] border-t-4 border-rose-200 mx-auto shadow-2xl">
+    <div id="tips-card" class="fixed bottom-0 left-0 right-0 bg-white rounded-t-[45px] p-10 pb-12 z-[100] border-t-4 border-rose-200 mx-auto max-w-md shadow-2xl">
         <div class="w-12 h-1.5 bg-slate-100 rounded-full mx-auto mb-6"></div>
-        <h4 class="text-rose-500 font-black mb-3 text-xs uppercase tracking-widest">刘老师的锦囊</h4>
+        <h4 class="text-rose-500 font-black mb-2 text-xs uppercase tracking-widest">刘老师的锦囊</h4>
         <p id="tips-content" class="text-slate-700 font-bold mb-10 text-xl leading-relaxed"></p>
         <button onclick="hideTip()" class="w-full py-5 bg-slate-900 text-white rounded-2xl font-black text-lg active:scale-95 transition-transform">记住了</button>
     </div>
 
     <audio id="snd-ok" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3" preload="auto"></audio>
+    <audio id="snd-err" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" preload="auto"></audio>
 
     <script>
-        // ... (保持之前的 rawWords 数据不变) ...
         const rawWords = [
             {w:"Bäckerei", m:"面包店", a:"die", t:"-ei 结尾表示场所，100%是 die。"},
             {w:"Übung", m:"练习", a:"die", t:"-ung 结尾的名词，100%是 die。"},
@@ -160,11 +154,12 @@
         ];
 
         const words = rawWords.sort(() => Math.random() - 0.5);
-        let currentIdx = 0, score = 0, isMuted = false;
+        let currentIdx = 0, isMuted = false;
 
         const card = document.getElementById('active-card');
         const feedbackTag = document.getElementById('feedback-tag');
         const sndOk = document.getElementById('snd-ok');
+        const sndErr = document.getElementById('snd-err');
 
         function updateCard() {
             if (currentIdx >= words.length) return;
@@ -192,7 +187,7 @@
         function showFeedback(text, color) {
             feedbackTag.innerText = text;
             feedbackTag.style.color = color;
-            feedbackTag.style.opacity = '1';
+            feedbackTag.style.opacity = '0.6';
         }
 
         mc.on("panend", (e) => {
@@ -202,24 +197,31 @@
             else if (e.deltaY < -100) answer = 'die';
             else if (e.deltaX > 100) answer = 'das';
 
-            if (answer === words[currentIdx].a) {
-                if(!isMuted) sndOk.play().catch(()=>{});
-                card.style.transition = 'all 0.3s ease-out';
-                card.style.opacity = '0';
-                card.style.transform += ' scale(0.8)';
-                setTimeout(() => {
-                    currentIdx++;
-                    if (currentIdx >= 50) {
-                        alert("通关啦！所有的词性潜规则都难不倒你！");
-                        location.href = 'index.html';
-                    } else {
-                        updateCard();
-                    }
-                }, 200);
-            } else if (answer !== '') {
-                card.style.transition = 'transform 0.4s cubic-bezier(0.17, 0.67, 0.83, 0.67)';
-                card.style.transform = 'translate(0,0) rotate(0)';
-                showTip(words[currentIdx].t);
+            if (answer) {
+                if (answer === words[currentIdx].a) {
+                    // 正确
+                    if(!isMuted) sndOk.play().catch(()=>{});
+                    card.style.transition = 'all 0.3s ease-out';
+                    card.style.opacity = '0';
+                    card.style.transform += ' scale(0.8)';
+                    setTimeout(() => {
+                        currentIdx++;
+                        if (currentIdx >= 50) {
+                            alert("太强了！50个规律全部识破！🥇");
+                            location.href = 'index.html';
+                        } else {
+                            updateCard();
+                        }
+                    }, 200);
+                } else {
+                    // 错误：增加声音和震动反馈
+                    if(!isMuted) sndErr.play().catch(()=>{});
+                    if (window.navigator.vibrate) window.navigator.vibrate(100); 
+                    
+                    card.style.transition = 'transform 0.4s';
+                    card.style.transform = 'translate(0,0) rotate(0)';
+                    showTip(words[currentIdx].t);
+                }
             } else {
                 card.style.transition = 'transform 0.3s';
                 card.style.transform = 'translate(0,0) rotate(0)';
