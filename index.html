@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>刘老师德语闯关 | 大厂Pro修订</title>
+    <title>刘老师德语 A1 | 清零负担</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
@@ -15,13 +15,11 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* 🚨 核心平衡：电脑端适配系统 */
-        /* 在电脑大屏下，物理放大所有元素 */
+        /* 电脑端大屏自动缩放 1.1 倍，解决头重脚轻感 */
         @media (min-width: 1024px) {
             .app-container { transform: scale(1.1); transform-origin: top; }
         }
 
-        /* 大厂质感卡片：柔和、悬浮 */
         .premium-card {
             background: #FFFFFF;
             border: 1px solid #E2E8F0;
@@ -34,87 +32,72 @@
             border-bottom-width: 1px;
         }
 
-        /* DuoStyle 绿色按钮：Q弹 */
         .duo-btn {
             background: #58CC02;
             border-bottom: 4px solid #46A302;
             color: white;
             border-radius: 18px;
             font-weight: 900;
-            letter-spacing: 0.05em;
         }
         .duo-btn:active {
             transform: translateY(2px);
             border-bottom-width: 1px;
         }
 
-        /* 锁定状态遮罩 */
-        .locked-card {
-            opacity: 0.45;
-            filter: grayscale(0.85);
-            pointer-events: none;
-        }
-
-        /* 勋章悬浮感 */
-        .medal-badge {
-            position: absolute;
-            top: -14px;
-            right: -14px;
-            filter: drop-shadow(0 6px 8px rgba(0,0,0,0.1));
-        }
+        .locked-state { opacity: 0.45; filter: grayscale(0.85); pointer-events: none; }
     </style>
 </head>
 <body class="py-16 px-6">
     <div class="app-container max-w-[480px] mx-auto flex flex-col min-h-[85vh]">
         
         <header class="text-center mb-16">
-            <h1 class="text-4xl lg:text-5xl font-black text-slate-900 mb-4 tracking-tighter">A1 德语焦虑</h1>
-            <div class="flex items-center justify-center gap-4 text-slate-400 font-bold text-sm lg:text-base tracking-[0.1em]">
-                <div class="w-8 h-px bg-slate-200 rounded-full"></div>
-                <h2>直击焦虑，清零负担</h2>
-                <div class="w-8 h-px bg-slate-200 rounded-full"></div>
+            <h1 class="text-4xl lg:text-5xl font-black text-slate-900 mb-5 tracking-tighter">直击 A1 德语焦虑</h1>
+            <div class="flex items-center justify-center gap-5 text-slate-400 font-bold tracking-[0.3em] uppercase">
+                <div class="w-10 h-px bg-slate-200 rounded-full"></div>
+                <h2 class="text-lg lg:text-xl">清零负担</h2>
+                <div class="w-10 h-px bg-slate-200 rounded-full"></div>
             </div>
         </header>
 
         <main class="flex-grow space-y-8">
             
-            <div id="unlock-panel" class="p-4 text-center">
-                <p id="welcome-text" class="text-slate-500 font-bold mb-10 text-lg lg:text-xl tracking-tight transition-colors">
-                    解锁成功，跟着刘老师，稳过 A1
+            <div id="dynamic-panel" class="p-4 text-center">
+                <p id="slogan" class="text-slate-500 font-bold mb-10 text-xl lg:text-2xl tracking-tight leading-relaxed">
+                    跟着刘老师，稳过 A1
                 </p>
                 
-                <div id="auth-input-group" class="premium-card p-10 shadow-sm border-sky-100 bg-sky-50/50">
+                <div id="auth-group" class="premium-card p-10 shadow-sm border-sky-100 bg-sky-50/50">
                     <input id="key-input" type="text" placeholder="••••" 
-                           class="w-full py-5 text-center bg-slate-50 rounded-2xl mb-8 outline-none font-black text-3xl border-2 border-transparent focus:border-sky-400 transition-all">
-                    <button onclick="handleUnlock()" class="w-full py-5 duo-btn text-xl">立即激活</button>
+                           class="w-full py-5 text-center bg-slate-50 rounded-2xl mb-8 outline-none font-black text-3xl border-2 border-transparent focus:border-sky-400">
+                    <button onclick="unlock()" class="w-full py-5 duo-btn text-xl shadow-lg shadow-green-100">立即开始闯关</button>
                 </div>
             </div>
 
-            <div class="pt-2">
-                <div id="stage-1" onclick="navigateToLevel(1)" 
+            <div class="pt-4">
+                <div id="lvl1" onclick="go(1)" 
                      class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm">
-                    <div class="w-16 h-16 lg:w-18 lg:h-18 bg-[#58CC02] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">1</div>
+                    <div class="w-16 h-16 bg-[#58CC02] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">1</div>
                     <div>
                         <h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">名词词性捕手</h3>
-                        <p id="s1-hint" class="text-xs font-bold text-slate-400 uppercase tracking-[0.2em] transition-colors">
+                        <p id="lvl1-hint" class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">
                             der / die / das
                         </p>
                     </div>
-                    <div id="m1-display" class="medal-badge text-5xl"></div>
+                    <div id="m1" class="absolute -top-3 -right-3 text-5xl"></div>
                 </div>
             </div>
 
         </main>
 
-        <footer class="mt-20 text-center space-y-7">
-            <div class="inline-flex items-center px-8 py-2.5 bg-white border border-slate-100 rounded-full shadow-sm">
-                <span class="text-[11px] font-black text-slate-300 uppercase tracking-widest">咨询微信:</span>
-                <span class="text-[11px] font-black text-slate-500 ml-1.5 uppercase">gehtalles</span>
+        <footer class="mt-24 text-center space-y-8">
+            <div class="inline-flex items-center px-10 py-3 bg-white border border-slate-100 rounded-full shadow-sm">
+                <span class="text-xs font-black text-slate-300 uppercase tracking-widest">咨询微信:</span>
+                <span class="text-xs font-black text-slate-500 ml-2 uppercase">gehtalles</span>
             </div>
             
-            <div class="pt-4">
-                <button onclick="resetApp()" class="text-[10px] font-bold text-slate-300 hover:text-slate-400 underline decoration-slate-100 transition-colors">
-                    重置学习进度 (RESET PROGRESS)
+            <div>
+                <button onclick="clearAll()" class="text-[10px] font-bold text-slate-300 hover:text-slate-400 underline decoration-slate-100">
+                    RESET PROGRESS
                 </button>
             </div>
         </footer>
@@ -122,61 +105,50 @@
     </div>
 
     <script>
-        // 初始化刷新函数：只更新显示，不做任何自动跳转
-        function initUI() {
-            const isUnlocked = localStorage.getItem('isUnlocked') === 'true';
-            const s1Done = localStorage.getItem('stage1_cleared') === 'true';
+        function checkStatus() {
+            const unlocked = localStorage.getItem('isUnlocked') === 'true';
+            const done = localStorage.getItem('stage1_cleared') === 'true';
 
-            if (isUnlocked) {
-                // 已解锁：隐藏输入框，美化语录
-                document.getElementById('auth-input-group').style.display = 'none';
-                const welcome = document.getElementById('welcome-text');
-                welcome.classList.replace('text-slate-500', 'text-sky-700');
-                welcome.classList.add('animate-pulse');
-                
-                // 开启第一关
-                document.getElementById('stage-1').classList.remove('locked-state');
-            } else {
-                // 未解锁：重设颜色（防止缓存残留问题）
-                const welcome = document.getElementById('welcome-text');
-                welcome.classList.replace('text-sky-700', 'text-slate-500');
-                welcome.classList.remove('animate-pulse');
+            if (unlocked) {
+                document.getElementById('auth-group').style.display = 'none';
+                const slogan = document.getElementById('slogan');
+                slogan.classList.replace('text-slate-500', 'text-sky-800');
+                slogan.classList.add('animate-pulse');
+                document.getElementById('lvl1').classList.remove('locked-state');
             }
 
-            if (s1Done) {
-                document.getElementById('m1-display').innerText = "🥇";
-                const hint = document.getElementById('s1-hint');
-                hint.innerText = "Mastered";
+            if (done) {
+                document.getElementById('m1').innerText = "🥇";
+                const hint = document.getElementById('lvl1-hint');
+                hint.innerText = "Challenge Mastered";
                 hint.classList.replace('text-slate-400', 'text-emerald-500');
+                hint.classList.remove('lowercase'); // 完成后变英文不用小写强制
             }
         }
 
-        function handleUnlock() {
+        function unlock() {
             if (document.getElementById('key-input').value === '8888') {
                 localStorage.setItem('isUnlocked', 'true');
-                initUI(); // 立即更新 UI，绝不执行 window.location.href 跳转
+                checkStatus();
             } else {
-                alert("校验失败，请重新输入激活码");
+                alert("请输入正确的激活码");
             }
         }
 
-        function navigateToLevel(levelNum) {
+        function go(num) {
             if (localStorage.getItem('isUnlocked') === 'true') {
-                if (levelNum === 1) window.location.href = '01-gender.html';
-            } else {
-                alert("请先完成激活！");
+                if (num === 1) window.location.href = '01-gender.html';
             }
         }
 
-        function resetApp() {
-            if (confirm("确定要重置所有进度吗？")) {
+        function clearAll() {
+            if (confirm("确定重置吗？")) {
                 localStorage.clear();
-                initUI(); // 刷新 UI 到初始状态
-                location.reload(); // 强制刷新防止状态残留
+                location.reload();
             }
         }
 
-        window.onload = initUI;
+        window.onload = checkStatus;
     </script>
 </body>
 </html>
