@@ -17,6 +17,7 @@
 </head>
 <body class="py-16 px-6">
     <div class="app-container max-w-[480px] mx-auto flex flex-col min-h-[90vh]">
+        
         <header class="text-center mb-16">
             <h1 class="text-4xl lg:text-5xl font-black text-slate-900 mb-5 tracking-tighter">直击 A1 德语焦虑</h1>
             <div class="flex items-center justify-center gap-5 text-slate-400 font-bold tracking-[0.3em] uppercase">
@@ -35,24 +36,7 @@
                 </div>
             </div>
 
-            <div class="pt-4 space-y-8">
-                <div id="lvl1" onclick="go(1)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm">
-                    <div class="w-16 h-16 bg-[#58CC02] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">1</div>
-                    <div>
-                        <h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">名词词性捕手</h3>
-                        <p id="lvl1-hint" class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">der / die / das</p>
-                    </div>
-                    <div id="m1" class="absolute -top-3 -right-3 text-5xl drop-shadow-md"></div>
-                </div>
-
-                <div class="premium-card p-7 flex items-center gap-6 relative locked-state opacity-60">
-                    <div class="w-16 h-16 bg-[#00D4FF] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">2</div>
-                    <div>
-                        <h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">核心动词大师</h3>
-                        <p class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">coming soon</p>
-                    </div>
-                </div>
-            </div>
+            <div id="level-list" class="pt-4 space-y-8"></div>
         </main>
 
         <footer class="mt-24 text-center space-y-8 pb-10">
@@ -65,28 +49,67 @@
     </div>
 
     <script>
-        function checkStatus() {
+        // 🛠️ 刘老师，以后加新关卡，只需要改这里！
+        const LEVELS = [
+            { id: 1, title: "名词词性捕手", hint: "der / die / das", file: "01-gender.html", color: "#58CC02" },
+            { id: 2, title: "名词词性分类", hint: "互动归类大作战", file: "02-classify.html", color: "#00D4FF" },
+            { id: 3, title: "核心动词进阶", hint: "动词变位挑战", file: "03-verbs.html", color: "#FF9F00" },
+            // 想加第 4 关？在这里复制一行就行
+        ];
+
+        function renderMap() {
             const unlocked = localStorage.getItem('isUnlocked') === 'true';
-            const s1Score = localStorage.getItem('stage1_score'); 
+            const container = document.getElementById('level-list');
+            container.innerHTML = ''; // 清空重新渲染
+
+            LEVELS.forEach(lv => {
+                const score = localStorage.getItem(`stage${lv.id}_score`);
+                const isCleared = localStorage.getItem(`stage${lv.id}_cleared`) === 'true';
+                const medal = score === 'gold' ? '🥇' : (score === 'silver' ? '🥈' : '');
+                
+                // 渲染 HTML
+                const card = `
+                    <div onclick="go('${lv.file}')" class="premium-card p-7 flex items-center gap-6 relative shadow-sm ${unlocked ? '' : 'locked-state'}">
+                        <div class="w-16 h-16 rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner" style="background:${lv.color}">${lv.id}</div>
+                        <div>
+                            <h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">${lv.title}</h3>
+                            <p class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">${lv.hint}</p>
+                        </div>
+                        <div class="absolute -top-3 -right-3 text-5xl drop-shadow-md">${medal}</div>
+                    </div>
+                `;
+                container.innerHTML += card;
+            });
+
             if (unlocked) {
                 document.getElementById('auth-group').style.display = 'none';
                 const slogan = document.getElementById('slogan');
                 slogan.classList.replace('text-slate-500', 'text-sky-800');
                 slogan.classList.add('animate-pulse');
-                document.getElementById('lvl1').classList.remove('locked-state');
             }
-            if (s1Score === 'gold') { document.getElementById('m1').innerText = "🥇"; }
-            else if (s1Score === 'silver') { document.getElementById('m1').innerText = "🥈"; }
         }
+
         function unlock() {
             if (document.getElementById('key-input').value === '8888') {
                 localStorage.setItem('isUnlocked', 'true');
-                checkStatus();
+                renderMap();
             } else { alert("请输入正确的激活码"); }
         }
-        function go(n) { if (localStorage.getItem('isUnlocked') === 'true' && n === 1) window.location.href = '01-gender.html'; }
-        function clearAll() { if (confirm("确定重置吗？")) { localStorage.clear(); location.reload(); } }
-        window.onload = checkStatus;
+
+        function go(file) {
+            if (localStorage.getItem('isUnlocked') === 'true') {
+                window.location.href = file;
+            }
+        }
+
+        function clearAll() {
+            if (confirm("确定重置吗？")) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        window.onload = renderMap;
     </script>
 </body>
 </html>
