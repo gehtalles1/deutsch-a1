@@ -3,88 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>词性规律一眼破 | 刘老师德语</title>
+    <title>词性规律一眼识破 | 刘老师德语</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@700;900&display=swap');
-        body { background: #F8FAFC; font-family: 'Noto Sans SC', sans-serif; overflow: hidden; touch-action: none; margin: 0; }
         
-        /* 容器适配优化 */
-        .game-wrapper { height: 100vh; height: -webkit-fill-available; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        body { 
+            background: #F8FAFC; 
+            font-family: 'Noto Sans SC', sans-serif; 
+            margin: 0; padding: 0;
+            overflow: hidden; 
+            touch-action: none;
+            display: flex; flex-direction: column;
+            height: 100vh; height: -webkit-fill-available;
+        }
 
-        .card-stack { position: relative; width: 85vw; max-width: 340px; height: 420px; z-index: 10; }
+        /* 顶部导航 */
+        .header { height: 70px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; margin-top: 10px; }
+
+        /* 核心游戏区 */
+        .main-game { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+
+        /* 底部提示区 - 稍微加高一点，确保文字在手机底部不局促 */
+        .footer { height: 120px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; padding-bottom: 20px; }
+
+        .card-stack { position: relative; width: 85vw; max-width: 340px; height: 420px; }
+        
         .card {
             position: absolute; width: 100%; height: 100%;
-            background: white; border-radius: 44px;
-            box-shadow: 0 30px 70px rgba(0,0,0,0.08);
+            background: white; border-radius: 45px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.05);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            border: 1px solid #F1F5F9; cursor: grab; touch-action: none;
-            z-index: 20; backface-visibility: hidden;
+            border: 1px solid #F1F5F9; cursor: grab; z-index: 20;
         }
         
-        #word { font-size: 3rem; font-weight: 900; color: #1e293b; margin-bottom: 0.5rem; letter-spacing: -0.02em; }
+        #word { font-size: 3rem; font-weight: 900; color: #1e293b; margin-bottom: 12px; }
         #mean { font-size: 1.4rem; color: #94a3b8; font-weight: 700; }
 
-        /* 指引标签优化 */
-        .guide-label {
-            position: absolute; font-weight: 900; font-size: 1.4rem; opacity: 0.4;
-            text-transform: lowercase; letter-spacing: 0.1em; pointer-events: none; white-space: nowrap;
-        }
-        .label-der { top: 50%; left: -80px; transform: translateY(-50%) rotate(-90deg); color: #0ea5e9; } 
-        .label-die { top: -70px; left: 50%; transform: translateX(-50%); color: #f43f5e; } 
-        .label-das { top: 50%; right: -80px; transform: translateY(-50%) rotate(90deg); color: #10b981; } 
+        /* 提示标签位置微调 */
+        .guide-label { position: absolute; font-weight: 900; font-size: 1.1rem; opacity: 0.15; pointer-events: none; }
+        .label-der { left: -50px; top: 50%; transform: translateY(-50%) rotate(-90deg); color: #1e40af; } 
+        .label-die { top: -45px; left: 50%; transform: translateX(-50%); color: #991b1b; } 
+        .label-das { right: -50px; top: 50%; transform: translateY(-50%) rotate(90deg); color: #065f46; } 
 
-        .play-hint { font-size: 0.85rem; color: #cbd5e1; font-weight: 800; margin-top: 40px; text-align: center; }
-        
-        #tips-card { transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28); z-index: 100; }
+        /* 底部规则提示文字 - 颜色加深一点点 */
+        .play-hint { font-size: 0.8rem; color: #94a3b8; font-weight: 900; letter-spacing: 0.15em; }
+
+        /* 弹窗样式 */
+        #tips-card { transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28); z-index: 100; max-width: 400px; }
         #tips-card.show { transform: translateY(0); }
     </style>
 </head>
 <body>
 
-    <div class="game-wrapper">
-        <div class="fixed top-0 w-full max-w-[480px] px-8 pt-8 pb-4 flex justify-between items-center z-50">
-            <button onclick="location.href='index.html'" class="text-slate-300">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" /></svg>
-            </button>
-            <div class="flex items-center gap-3">
-                <div class="px-3 py-1 bg-white rounded-full shadow-sm border border-slate-100">
-                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">进度: <span id="cur-num" class="text-rose-500">1</span> / 50</span>
-                </div>
-                <button id="mute-toggle" class="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-sm border border-slate-100 text-slate-300 active:text-sky-500">
-                    <svg id="mute-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
-                </button>
+    <div class="header">
+        <button onclick="location.href='index.html'" class="p-2 text-slate-300 active:text-slate-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" /></svg>
+        </button>
+        <div class="flex items-center gap-4">
+            <div class="bg-slate-50 px-3 py-1 rounded-full border border-slate-100 shadow-sm">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">进度 </span>
+                <span id="cur-num" class="text-sm font-black text-rose-500">1</span>
+                <span class="text-[10px] font-black text-slate-300"> / 50</span>
             </div>
+            <button id="mute-toggle" class="p-2 text-slate-300 active:text-indigo-500">
+                <svg id="mute-icon" xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+            </button>
         </div>
+    </div>
+
+    <div class="main-game">
+        <div id="feedback-tag" class="absolute top-0 text-4xl font-black opacity-0 transition-all uppercase tracking-widest z-50"></div>
 
         <div class="card-stack">
-            <div class="guide-label label-der">← der</div>
-            <div class="guide-label label-die">↑ die</div>
-            <div class="guide-label label-das">das →</div>
+            <div class="guide-label label-der">← DER</div>
+            <div class="guide-label label-die">DIE ↑</div>
+            <div class="guide-label label-das">DAS →</div>
             
             <div id="active-card" class="card">
-                <div id="word">Bäckerei</div>
-                <div id="mean">面包店</div>
+                <div id="word">Laden...</div>
+                <div id="mean">请稍候</div>
             </div>
         </div>
+    </div>
 
-        <div class="play-hint uppercase tracking-widest">
+    <div class="footer">
+        <div class="play-hint uppercase">
             左滑 der / 上滑 die / 右滑 das
         </div>
     </div>
 
-    <div id="tips-overlay" class="hidden fixed inset-0 bg-slate-900/20 backdrop-blur-md z-[90]"></div>
-    <div id="tips-card" class="fixed bottom-0 left-0 right-0 bg-white rounded-t-[40px] p-10 z-[100] border-t-4 border-rose-100 max-w-[480px] mx-auto shadow-2xl text-center">
-        <div class="w-12 h-1 bg-slate-100 rounded-full mx-auto mb-6"></div>
-        <h4 class="text-rose-500 font-black mb-4 text-xs uppercase tracking-widest italic">Liu's Tips</h4>
-        <p id="tips-content" class="text-slate-700 font-bold mb-10 text-xl leading-relaxed px-4"></p>
-        <button onclick="hideTip()" class="w-full py-5 bg-slate-900 text-white rounded-[24px] font-black text-lg active:scale-95 transition-transform">我记住了</button>
+    <div id="tips-overlay" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[90]"></div>
+    <div id="tips-card" class="fixed bottom-0 left-0 right-0 bg-white rounded-t-[45px] p-10 pb-12 z-[100] border-t-4 border-rose-200 mx-auto shadow-2xl">
+        <div class="w-12 h-1.5 bg-slate-100 rounded-full mx-auto mb-6"></div>
+        <h4 class="text-rose-500 font-black mb-3 text-xs uppercase tracking-widest">刘老师的锦囊</h4>
+        <p id="tips-content" class="text-slate-700 font-bold mb-10 text-xl leading-relaxed"></p>
+        <button onclick="hideTip()" class="w-full py-5 bg-slate-900 text-white rounded-2xl font-black text-lg active:scale-95 transition-transform">记住了</button>
     </div>
 
     <audio id="snd-ok" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3" preload="auto"></audio>
 
     <script>
+        // ... (保持之前的 rawWords 数据不变) ...
         const rawWords = [
             {w:"Bäckerei", m:"面包店", a:"die", t:"-ei 结尾表示场所，100%是 die。"},
             {w:"Übung", m:"练习", a:"die", t:"-ung 结尾的名词，100%是 die。"},
@@ -139,28 +160,21 @@
         ];
 
         const words = rawWords.sort(() => Math.random() - 0.5);
-        let score = 0, currentIdx = 0, isMuted = false;
-        
+        let currentIdx = 0, score = 0, isMuted = false;
+
         const card = document.getElementById('active-card');
-        const wordEl = document.getElementById('word');
-        const meanEl = document.getElementById('mean');
+        const feedbackTag = document.getElementById('feedback-tag');
         const sndOk = document.getElementById('snd-ok');
-        const muteBtn = document.getElementById('mute-toggle');
 
         function updateCard() {
-            if (!words[currentIdx]) return;
-            wordEl.innerText = words[currentIdx].w;
-            meanEl.innerText = words[currentIdx].m;
-            document.getElementById('cur-num').innerText = score + 1;
+            if (currentIdx >= words.length) return;
+            document.getElementById('word').innerText = words[currentIdx].w;
+            document.getElementById('mean').innerText = words[currentIdx].m;
+            document.getElementById('cur-num').innerText = currentIdx + 1;
             card.style.transition = 'none';
             card.style.transform = 'translate(0,0) rotate(0)';
             card.style.opacity = '1';
         }
-
-        muteBtn.onclick = () => {
-            isMuted = !isMuted;
-            muteBtn.style.color = isMuted ? '#cbd5e1' : '#6366f1';
-        };
 
         const mc = new Hammer(card);
         mc.get('pan').set({ direction: Hammer.DIRECTION_ALL });
@@ -168,36 +182,44 @@
         mc.on("panmove", (e) => {
             card.style.transition = 'none';
             card.style.transform = `translate(${e.deltaX}px, ${e.deltaY}px) rotate(${e.deltaX/20}deg)`;
+            
+            if (e.deltaY < -60) { showFeedback('die', '#ef4444'); }
+            else if (e.deltaX < -60) { showFeedback('der', '#3b82f6'); }
+            else if (e.deltaX > 60) { showFeedback('das', '#10b981'); }
+            else { feedbackTag.style.opacity = '0'; }
         });
 
+        function showFeedback(text, color) {
+            feedbackTag.innerText = text;
+            feedbackTag.style.color = color;
+            feedbackTag.style.opacity = '1';
+        }
+
         mc.on("panend", (e) => {
+            feedbackTag.style.opacity = '0';
             let answer = '';
             if (e.deltaX < -100) answer = 'der';
             else if (e.deltaY < -100) answer = 'die';
             else if (e.deltaX > 100) answer = 'das';
 
-            if (answer) {
-                if (answer === words[currentIdx].a) {
-                    if (!isMuted) { sndOk.currentTime = 0; sndOk.play().catch(()=>{}); }
-                    card.style.transition = 'all 0.3s cubic-bezier(0.45, 0, 0.55, 1)';
-                    card.style.opacity = '0';
-                    card.style.transform += ' scale(0.8)';
-                    setTimeout(() => {
-                        score++;
-                        if (score >= 50) {
-                            localStorage.setItem('stage2_score', 'gold');
-                            alert("恭喜通关！🥇词性规律满分！");
-                            location.href = 'index.html';
-                        } else {
-                            currentIdx++;
-                            updateCard();
-                        }
-                    }, 300);
-                } else {
-                    card.style.transition = 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-                    card.style.transform = 'translate(0,0) rotate(0)';
-                    showTip(words[currentIdx].t);
-                }
+            if (answer === words[currentIdx].a) {
+                if(!isMuted) sndOk.play().catch(()=>{});
+                card.style.transition = 'all 0.3s ease-out';
+                card.style.opacity = '0';
+                card.style.transform += ' scale(0.8)';
+                setTimeout(() => {
+                    currentIdx++;
+                    if (currentIdx >= 50) {
+                        alert("通关啦！所有的词性潜规则都难不倒你！");
+                        location.href = 'index.html';
+                    } else {
+                        updateCard();
+                    }
+                }, 200);
+            } else if (answer !== '') {
+                card.style.transition = 'transform 0.4s cubic-bezier(0.17, 0.67, 0.83, 0.67)';
+                card.style.transform = 'translate(0,0) rotate(0)';
+                showTip(words[currentIdx].t);
             } else {
                 card.style.transition = 'transform 0.3s';
                 card.style.transform = 'translate(0,0) rotate(0)';
@@ -213,6 +235,11 @@
         function hideTip() {
             document.getElementById('tips-overlay').classList.add('hidden');
             document.getElementById('tips-card').classList.remove('show');
+        }
+
+        document.getElementById('mute-toggle').onclick = function() {
+            isMuted = !isMuted;
+            this.classList.toggle('text-indigo-500', !isMuted);
         }
 
         window.onload = updateCard;
