@@ -3,122 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>德语 A1 闯关地图 | 刘老师德语</title>
+    <title>直击 A1 德语焦虑 | 刘老师德语</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@900&display=swap');
-        body { background: #f8fafc; font-family: 'Noto Sans SC', sans-serif; overflow-x: hidden; }
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@700;900&display=swap');
+        body { background: #FFFFFF; font-family: 'Noto Sans SC', sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        .map-container { position: relative; padding: 60px 20px; min-height: 100vh; }
-        
-        /* 贝塞尔曲线路径模拟 */
-        .path-svg {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 0; pointer-events: none; opacity: 0.1;
-        }
+        /* 还原截图中的错位布局 */
+        .level-row { display: flex; align-items: center; width: 100%; margin-bottom: 4rem; }
+        .level-row.left { justify-content: flex-start; padding-left: 10%; }
+        .level-row.right { justify-content: flex-end; padding-right: 10%; flex-direction: row-reverse; }
 
-        .level-node {
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative; z-index: 10;
+        /* 还原截图中的圆圈样式 */
+        .node-circle {
+            width: 90px; height: 90px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            border: 6px solid #FFFFFF; box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            transition: all 0.2s; cursor: pointer;
         }
-        .level-node:active { transform: scale(0.9); }
-        
-        .locked { filter: grayscale(1); opacity: 0.6; cursor: not-allowed; }
-        .locked .node-circle { background: #cbd5e1 !important; border-color: #94a3b8 !important; }
+        .node-circle:active { transform: scale(0.9); }
+        .node-blue { background: #3B82F6; }
+        .node-gray { background: #E2E8F0; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
 
-        /* 气泡浮动动画 */
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+        .level-info { margin: 0 1.5rem; }
+        .level-row.right .level-info { text-align: right; }
+
+        .tag { 
+            display: inline-block; background: #0F172A; color: white; 
+            padding: 4px 16px; border-radius: 100px; font-size: 10px; 
+            font-weight: 900; letter-spacing: 0.2em;
         }
-        .float-anim { animation: float 3s ease-in-out infinite; }
     </style>
 </head>
-<body>
-
-    <div class="map-container max-w-md mx-auto flex flex-col items-center">
+<body class="flex justify-center bg-white min-h-screen">
+    <div class="max-w-[440px] w-full px-8 py-16 flex flex-col items-center">
         
-        <div class="text-center mb-16 px-4">
-            <h1 class="text-4xl font-black text-slate-900 tracking-tighter leading-tight">直击 A1 德语焦虑</h1>
-            <h2 class="text-2xl font-black text-slate-400 mt-1">清零负担</h2>
-            <div class="mt-4 inline-block px-4 py-1 bg-slate-900 text-white text-xs font-bold rounded-full tracking-widest">
-                跟着刘老师，稳过 A1
-            </div>
+        <div class="text-center mb-20">
+            <h1 class="text-[36px] font-black text-[#0F172A] leading-tight mb-1">直击 A1 德语焦虑</h1>
+            <h2 class="text-2xl font-black text-[#94A3B8] mb-6">清零负担</h2>
+            <div class="tag uppercase">跟着刘老师，稳过 A1</div>
         </div>
 
-        <div id="map-levels" class="w-full space-y-24 relative">
+        <div class="w-full space-y-12">
+            
+            <div class="level-row left">
+                <div onclick="location.href='01-bubble.html'" class="node-circle node-blue">
+                    <span class="text-white text-3xl font-black italic">01</span>
+                </div>
+                <div class="level-info">
+                    <div class="text-[10px] font-black text-slate-300 uppercase tracking-widest">Level 1</div>
+                    <div class="text-xl font-black text-slate-800">名词词性捕手</div>
+                </div>
             </div>
 
-        <div class="mt-32 mb-10 text-center">
-            <p class="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-2">Developed by @刘老师德语</p>
-            <div class="flex items-center justify-center gap-2 text-slate-400 font-bold">
-                <span class="text-xs">咨询微信:</span>
-                <span class="text-sm text-slate-600">gehtalles</span>
+            <div class="level-row right">
+                <div id="btn-2" onclick="checkLock(2)" class="node-circle node-gray">
+                    <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" /></svg>
+                </div>
+                <div class="level-info">
+                    <div class="text-[10px] font-black text-slate-300 uppercase tracking-widest">Level 2</div>
+                    <div class="text-lg font-black text-[#94A3B8]">词性潜规则：一眼识破<br>der/die/das</div>
+                </div>
             </div>
-            <button onclick="resetProgress()" class="mt-8 text-[10px] text-slate-300 underline font-bold uppercase tracking-widest">Reset Progress</button>
+
+            <div class="level-row left">
+                <div class="node-circle node-gray opacity-50">
+                    <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" /></svg>
+                </div>
+                <div class="level-info">
+                    <div class="text-[10px] font-black text-slate-300 uppercase tracking-widest">Level 3</div>
+                    <div class="text-xl font-black text-slate-200">动词变位迷宫</div>
+                </div>
+            </div>
+
         </div>
+
+        <div class="mt-auto pt-20 text-center">
+            <div class="flex items-center justify-center gap-2 mb-1">
+                <span class="text-[10px] font-black text-slate-300 uppercase tracking-widest">咨询微信:</span>
+                <span class="text-sm font-black text-slate-600">gehtalles</span>
+            </div>
+            <button onclick="localStorage.clear(); location.reload();" class="text-[9px] font-black text-slate-200 uppercase tracking-[0.4em]">Reset Progress</button>
+        </div>
+
     </div>
 
     <script>
-        // 核心数据配置
-        const LEVELS = [
-            { id: 1, name: "名词词性捕手", path: "01-bubble.html", color: "from-blue-400 to-blue-600" },
-            { id: 2, name: "词性潜规则：一眼识破 der/die/das", path: "02-classify.html", color: "from-rose-400 to-rose-600" },
-            { id: 3, name: "动词变位迷宫", path: "#", color: "from-amber-400 to-amber-600" },
-            { id: 4, name: "句型构造工坊", path: "#", color: "from-emerald-400 to-emerald-600" }
-        ];
+        // 检测第二关是否已解锁
+        window.onload = () => {
+            if(localStorage.getItem('unlocked_2') === 'true') {
+                const circle = document.getElementById('btn-2');
+                circle.classList.remove('node-gray');
+                circle.classList.add('bg-gradient-to-br', 'from-rose-400', 'to-rose-600');
+                circle.innerHTML = '<span class="text-white text-3xl font-black italic">02</span>';
+                circle.onclick = () => location.href = '02-classify.html';
+            }
+        };
 
-        function renderMap() {
-            const container = document.getElementById('map-levels');
-            const unlockedLevel = parseInt(localStorage.getItem('unlockedLevel') || '1');
-            
-            container.innerHTML = LEVELS.map((level, index) => {
-                const isLocked = level.id > unlockedLevel;
-                const isEven = index % 2 !== 0; // 奇偶排布形成 S 型
-                const alignClass = isEven ? 'flex-row-reverse text-right' : 'flex-row text-left';
-                const offsetClass = isEven ? 'pr-8' : 'pl-8';
-
-                return `
-                    <div class="flex items-center ${alignClass} w-full px-4">
-                        <div onclick="${isLocked ? `checkLock(${level.id})` : `location.href='${level.path}'`}" 
-                             class="level-node ${isLocked ? 'locked' : 'float-anim'} cursor-pointer">
-                            <div class="node-circle w-20 h-20 rounded-full bg-gradient-to-br ${level.color} shadow-xl border-4 border-white flex items-center justify-center">
-                                ${isLocked ? 
-                                    '<svg class="w-8 h-8 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 00-2 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>' : 
-                                    `<span class="text-white text-2xl font-black italic">${level.id < 10 ? '0'+level.id : level.id}</span>`
-                                }
-                            </div>
-                        </div>
-                        <div class="flex-1 ${offsetClass} py-2">
-                            <div class="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Level ${level.id}</div>
-                            <div class="text-lg font-black ${isLocked ? 'text-slate-400' : 'text-slate-800'} leading-tight">
-                                ${level.name}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // 解锁逻辑
         function checkLock(id) {
-            const code = prompt("请输入解锁码解锁后续关卡：");
+            const code = prompt("请输入暗号（8888）解锁第二关：");
             if (code === '8888') {
-                localStorage.setItem('unlockedLevel', id);
-                renderMap();
-            } else {
-                alert("解锁码不正确，请联系刘老师获取。");
-            }
-        }
-
-        function resetProgress() {
-            if(confirm("确定要重置所有闯关进度吗？")) {
-                localStorage.clear();
+                localStorage.setItem('unlocked_2', 'true');
                 location.reload();
+            } else if (code !== null) {
+                alert("暗号不对哦，快去私信刘老师吧！");
             }
         }
-
-        renderMap();
     </script>
 </body>
 </html>
