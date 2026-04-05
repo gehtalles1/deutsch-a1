@@ -45,13 +45,13 @@
         /* 瓶架区域 */
         .shelf-container { padding: 0 10px min(60px, 8vh) 10px; flex-shrink: 0; position: relative; z-index: 5; }
         .potion-shelf { display: flex; justify-content: space-around; align-items: flex-end; max-width: 550px; margin: 0 auto; height: 120px; }
-        .potion-bottle { display: flex; flex-direction: column; align-items: center; width: 22%; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .potion-bottle { display: flex; flex-direction: column; align-items: center; width: 22%; transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         
-        /* 激活瓶子：唯一锁定动画 */
-        .active-bottle { transform: translateY(-25px) scale(1.3); filter: drop-shadow(0 0 15px rgba(16,185,129,0.5)); }
-        .active-bottle .potion-label { background: #10B981 !important; color: white !important; transform: scale(1.1); }
+        /* 强力磁吸反馈样式 */
+        .active-bottle { transform: translateY(-30px) scale(1.35); filter: drop-shadow(0 0 20px rgba(16,185,129,0.6)); }
+        .active-bottle .potion-label { background: #10B981 !important; color: white !important; transform: scale(1.15); box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
 
-        .potion-label { margin-top: 8px; font-weight: 900; color: #1e293b; font-size: 0.8rem; padding: 3px 8px; background: #f1f5f9; border-radius: 10px; white-space: nowrap; transition: all 0.2s; }
+        .potion-label { margin-top: 8px; font-weight: 900; color: #1e293b; font-size: 0.8rem; padding: 3px 8px; background: #f1f5f9; border-radius: 10px; white-space: nowrap; transition: all 0.2s; border: 2px solid transparent; }
 
         /* 错题弹窗 */
         #error-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.92); z-index: 2000; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
@@ -92,6 +92,7 @@
     </div>
 
     <script>
+        // 词库配置...
         const words = [
             {w:"Banane", cn:"香蕉", a:"-n", e:"🍌", p:"Bananen", r:"以 -e 结尾的阴性名词，复数通常加 -n。"},
             {w:"Tomate", cn:"西红柿", a:"-n", e:"🍅", p:"Tomaten", r:"以 -e 结尾的阴性词，复数加 -n。"},
@@ -152,11 +153,7 @@
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
         function initLevel() {
-            if (currentIdx >= words.length) { 
-                localStorage.setItem('level3_cleared', 'true');
-                showFinalWin(); 
-                return; 
-            }
+            if (currentIdx >= words.length) { showFinalWin(); return; }
             isLocked = false;
             const item = words[currentIdx];
             card.className = ''; 
@@ -181,7 +178,7 @@
                         <path d="M35 10 H65 V25 L85 45 V100 A15 15 0 0 1 70 115 H30 A15 15 0 0 1 15 100 V45 L35 25 Z" fill="white" stroke="${colors[i]}" stroke-width="7"/>
                         <rect x="25" y="65" width="50" height="40" rx="5" fill="${colors[i]}" fill-opacity="0.2" />
                     </svg>
-                    <div class="potion-label" style="border: 2px solid ${colors[i]}">${opt}</div>
+                    <div class="potion-label" style="border-color: ${colors[i]}">${opt}</div>
                 </div>
             `).join('');
         }
@@ -197,10 +194,10 @@
 
         card.onpointermove = (e) => {
             if (!card.hasPointerCapture(e.pointerId) || isLocked) return;
-            moveX = e.clientX - startX;
+            
+            let targetX = e.clientX - startX;
             const offset = isMobile ? 60 : 0;
-            moveY = (e.clientY - startY) - offset;
-            card.style.transform = `translate3d(${moveX}px, ${moveY}px, 0) rotate(${moveX/18}deg)`;
+            let targetY = (e.clientY - startY) - offset;
 
             const bottles = document.querySelectorAll('.potion-bottle');
             const cardRect = card.getBoundingClientRect();
@@ -208,7 +205,7 @@
             const cy = cardRect.top + cardRect.height/2;
 
             let closestBottle = null;
-            let minDistance = 75; // 判定半径
+            let minDistance = 85; 
 
             bottles.forEach(b => {
                 b.classList.remove('active-bottle');
@@ -221,7 +218,18 @@
                     closestBottle = b;
                 }
             });
-            if (closestBottle) closestBottle.classList.add('active-bottle');
+
+            // 增强磁吸效果：如果靠近瓶子，坐标向瓶子稍微倾斜
+            if (closestBottle) {
+                closestBottle.classList.add('active-bottle');
+                // 模拟物理吸附力：自动拉近 15% 的距离感
+                card.style.transform = `translate3d(${targetX}px, ${targetY}px, 0) scale(0.95) rotate(${targetX/20}deg)`;
+            } else {
+                card.style.transform = `translate3d(${targetX}px, ${targetY}px, 0) rotate(${targetX/18}deg)`;
+            }
+            
+            moveX = targetX;
+            moveY = targetY;
         };
 
         card.onpointerup = (e) => {
