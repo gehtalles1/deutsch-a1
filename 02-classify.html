@@ -6,6 +6,7 @@
     <title>德语词性闯关 | 刘老师</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@700;900&display=swap');
         
@@ -35,7 +36,6 @@
 
         .main-game { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; }
 
-        /* 词卡瘦身：52vw 避免和左右冠词贴得太近 */
         .card-stack { position: relative; width: 52vw; max-width: 220px; height: 300px; z-index: 10; }
         
         .card {
@@ -54,7 +54,6 @@
         }
         #mean { font-size: 1.1rem; color: #64748b; font-weight: 700; }
 
-        /* 拉开间距：-85px 确保有足够的呼吸感 */
         .guide-label { position: absolute; font-weight: 900; font-size: 1.5rem; pointer-events: none; z-index: 5; }
         .label-der { left: -85px; top: 50%; transform: translateY(-50%) rotate(-90deg); color: #1E3A8A; }
         .label-die { top: -85px; left: 50%; transform: translateX(-50%); color: #991B1B; }
@@ -144,7 +143,7 @@
             {w:"Motor", m:"发动机", a:"der", t:"-or 结尾表示机器或人的词通常是 der。"},
             {w:"Mädchen", m:"女孩", a:"das", t:"-chen 结尾的小称词 100%是 das。"},
             {w:"Museum", m:"博物馆", a:"das", t:"-um 结尾的外来语名词通常是 das。"},
-            {w:"Auto", m:"汽车", a:"das", t:"-o 结尾的外来语名词通常是 das。"},
+            {w:"Auto", m:"汽车", a:"das", t:"-o 结尾的外来语名词通常 das。"},
             {w:"Instrument", m:"乐器", a:"das", t:"-ment 结尾的名词通常是 das。"},
             {w:"Frühling", m:"春天", a:"der", t:"所有季节、月份、星期都是 der。"},
             {w:"Essen", m:"食物", a:"das", t:"动词原型直接变名词，全是 das。"},
@@ -189,11 +188,33 @@
         const sndErr = document.getElementById('snd-err');
 
         function updateCard() {
+            // 通关逻辑判定
             if (currentIdx >= words.length) {
-                document.getElementById('word').innerText = "太棒了！";
-                document.getElementById('mean').innerText = "全部完成";
+                // 1. 设置本地存储标记，供地图页读取显示奖牌
+                localStorage.setItem('level2_cleared', 'true');
+                
+                // 2. 触发礼花动画
+                confetti({
+                    particleCount: 150,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#1E3A8A', '#991B1B', '#065F46', '#F59E0B']
+                });
+
+                // 3. 视觉反馈
+                document.getElementById('word').innerText = "🏆 通关成功！";
+                document.getElementById('mean').innerText = "点击返回地图查看奖牌";
+                document.getElementById('cur-num').innerText = "50";
+                
+                // 4. 自动引导
+                setTimeout(() => {
+                    if(confirm("恭喜你已经掌握这50个词性规律！是否返回地图查看奖牌？")) {
+                        location.href = 'index.html';
+                    }
+                }, 1500);
                 return;
             }
+
             const currentWord = words[currentIdx];
             document.getElementById('word').innerText = currentWord.w;
             document.getElementById('mean').innerText = currentWord.m;
@@ -204,7 +225,6 @@
             card.style.opacity = '1';
         }
 
-        // 直接初始化，并静默锁定音频权限
         window.onload = () => {
             updateCard();
             document.body.addEventListener('touchstart', () => {
@@ -220,11 +240,13 @@
         mc.get('pan').set({ direction: Hammer.DIRECTION_ALL });
 
         mc.on("panmove", (e) => {
+            if (currentIdx >= words.length) return; // 通关后禁止滑动
             card.style.transition = 'none';
             card.style.transform = `translate(${e.deltaX}px, ${e.deltaY}px) rotate(${e.deltaX/20}deg)`;
         });
 
         mc.on("panend", (e) => {
+            if (currentIdx >= words.length) return;
             let answer = '';
             if (e.deltaX < -50) answer = 'der';
             else if (e.deltaY < -50) answer = 'die';
