@@ -13,6 +13,13 @@
         .premium-card:active { transform: translateY(2px); border-bottom-width: 1px; }
         .duo-btn { background: #58CC02; border-bottom: 4px solid #46A302; color: white; border-radius: 18px; font-weight: 900; }
         .locked-state { opacity: 0.45; filter: grayscale(0.85); pointer-events: none; }
+        
+        /* 奖牌弹出动画 */
+        .medal-pop { animation: medalPop 0.5s cubic-bezier(0.17, 0.89, 0.32, 1.49); }
+        @keyframes medalPop {
+            0% { transform: scale(0) rotate(-45deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0); opacity: 1; }
+        }
     </style>
 </head>
 <body class="py-16 px-6">
@@ -42,7 +49,7 @@
                         <h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">名词词性捕手</h3>
                         <p class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">der / die / das</p>
                     </div>
-                    <div id="m1" class="absolute -top-3 -right-3 text-5xl drop-shadow-md"></div>
+                    <div id="m1" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div>
                 </div>
 
                 <div id="lvl2" onclick="go(2)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm">
@@ -51,6 +58,7 @@
                         <h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">词性规律一眼破</h3>
                         <p class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">der / die / das</p>
                     </div>
+                    <div id="m2" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div>
                 </div>
             </div>
         </main>
@@ -67,7 +75,8 @@
     <script>
         function checkStatus() {
             const unlocked = localStorage.getItem('isUnlocked') === 'true';
-            const s1Score = localStorage.getItem('stage1_score'); 
+            
+            // 激活码解锁逻辑
             if (unlocked) {
                 document.getElementById('auth-group').style.display = 'none';
                 const slogan = document.getElementById('slogan');
@@ -76,22 +85,40 @@
                 document.getElementById('lvl1').classList.remove('locked-state');
                 document.getElementById('lvl2').classList.remove('locked-state');
             }
+
+            // 第一关奖牌逻辑
+            const s1Score = localStorage.getItem('stage1_score'); 
             if (s1Score === 'gold') { document.getElementById('m1').innerText = "🥇"; }
             else if (s1Score === 'silver') { document.getElementById('m1').innerText = "🥈"; }
+
+            // 第二关奖牌逻辑 (根据 level2_cleared 判断)
+            const s2Cleared = localStorage.getItem('level2_cleared') === 'true';
+            if (s2Cleared) {
+                document.getElementById('m2').innerText = "🏅"; // 显示通关奖牌
+            }
         }
+
         function unlock() {
             if (document.getElementById('key-input').value === '8888') {
                 localStorage.setItem('isUnlocked', 'true');
                 checkStatus();
             } else { alert("请输入正确的激活码"); }
         }
+
         function go(n) { 
             if (localStorage.getItem('isUnlocked') === 'true') {
                 if (n === 1) window.location.href = '01-gender.html';
                 if (n === 2) window.location.href = '02-classify.html';
             } 
         }
-        function clearAll() { if (confirm("确定重置吗？")) { localStorage.clear(); location.reload(); } }
+
+        function clearAll() { 
+            if (confirm("确定重置所有闯关进度和奖牌吗？")) { 
+                localStorage.clear(); 
+                location.reload(); 
+            } 
+        }
+
         window.onload = checkStatus;
     </script>
 </body>
