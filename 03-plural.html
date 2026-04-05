@@ -10,7 +10,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@700;900&display=swap');
         body { background: #F8FAF9; font-family: 'Noto Sans SC', sans-serif; margin: 0; width: 100%; height: 100%; overflow: hidden; touch-action: none; display: flex; flex-direction: column; }
 
-        /* 返回键适配手机/电脑 */
+        /* 返回键 */
         .back-btn { position: fixed; left: 15px; top: max(20px, env(safe-area-inset-top)); width: 44px; height: 44px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); z-index: 500; cursor: pointer; border: 1px solid #f1f5f9; transition: transform 0.2s; }
         .back-btn:active { transform: scale(0.9); }
 
@@ -20,20 +20,20 @@
         .progress-bar-bg { width: min(220px, 50vw); height: 10px; background: #E2E8F0; border-radius: 5px; overflow: hidden; }
         #progress-inner { height: 100%; background: #10B981; width: 0%; transition: width 0.4s; }
 
-        /* 词卡区域 - 核心修复：增加相对定位和层级控制 */
+        /* 词卡区域 */
         .card-zone { flex-grow: 1; display: flex; align-items: center; justify-content: center; position: relative; width: 100%; z-index: 10; }
         
         #active-card {
-            width: 140px; height: 190px; background: white; border-radius: 28px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            width: 110px; height: 155px; background: white; border-radius: 22px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             border: 1px solid #f1f5f9; cursor: grab;
             position: absolute; 
-            z-index: 100; /* 初始层级高于瓶子 */
+            z-index: 100;
             touch-action: none; will-change: transform;
+            user-select: none;
         }
         
-        /* 成功缩放时的层级确保最高 */
         .success-zoom { 
             width: min(280px, 80vw) !important; height: min(340px, 60vh) !important; 
             background: #ECFDF5 !important; border: 3px solid #10B981 !important;
@@ -42,12 +42,16 @@
             transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
         }
 
-        /* 瓶子架子区域 - 降低默认层级 */
+        /* 瓶架区域 */
         .shelf-container { padding: 0 10px min(60px, 8vh) 10px; flex-shrink: 0; position: relative; z-index: 5; }
-        .potion-shelf { display: flex; justify-content: space-around; align-items: flex-end; max-width: 550px; margin: 0 auto; height: 110px; }
-        .potion-bottle { display: flex; flex-direction: column; align-items: center; width: 22%; transition: all 0.4s ease; }
-        .active-bottle { transform: translateY(-30px) scale(1.25); filter: drop-shadow(0 10px 20px rgba(16,185,129,0.3)); }
-        .potion-label { margin-top: 8px; font-weight: 900; color: #1e293b; font-size: 0.85rem; padding: 3px 6px; background: #f1f5f9; border-radius: 10px; white-space: nowrap; }
+        .potion-shelf { display: flex; justify-content: space-around; align-items: flex-end; max-width: 550px; margin: 0 auto; height: 120px; }
+        .potion-bottle { display: flex; flex-direction: column; align-items: center; width: 22%; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        /* 激活瓶子：唯一锁定动画 */
+        .active-bottle { transform: translateY(-25px) scale(1.3); filter: drop-shadow(0 0 15px rgba(16,185,129,0.5)); }
+        .active-bottle .potion-label { background: #10B981 !important; color: white !important; transform: scale(1.1); }
+
+        .potion-label { margin-top: 8px; font-weight: 900; color: #1e293b; font-size: 0.8rem; padding: 3px 8px; background: #f1f5f9; border-radius: 10px; white-space: nowrap; transition: all 0.2s; }
 
         /* 错题弹窗 */
         #error-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.92); z-index: 2000; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
@@ -68,9 +72,9 @@
 
     <div class="card-zone">
         <div id="active-card">
-            <div id="emoji" class="text-6xl"></div>
-            <div id="word" class="text-2xl font-black mt-2 text-slate-800 text-center px-2"></div>
-            <div id="cn" class="text-slate-400 font-bold"></div>
+            <div id="emoji" class="text-5xl"></div>
+            <div id="word" class="text-xl font-black mt-2 text-slate-800 text-center px-2"></div>
+            <div id="cn" class="text-slate-400 font-bold text-sm"></div>
         </div>
     </div>
 
@@ -88,7 +92,6 @@
     </div>
 
     <script>
-        // 词库保持不变
         const words = [
             {w:"Banane", cn:"香蕉", a:"-n", e:"🍌", p:"Bananen", r:"以 -e 结尾的阴性名词，复数通常加 -n。"},
             {w:"Tomate", cn:"西红柿", a:"-n", e:"🍅", p:"Tomaten", r:"以 -e 结尾的阴性词，复数加 -n。"},
@@ -146,9 +149,14 @@
         const card = document.getElementById('active-card');
         const shelf = document.getElementById('shelf');
         let moveX = 0, moveY = 0, startX = 0, startY = 0;
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
         function initLevel() {
-            if (currentIdx >= words.length) { showFinalWin(); return; }
+            if (currentIdx >= words.length) { 
+                localStorage.setItem('level3_cleared', 'true');
+                showFinalWin(); 
+                return; 
+            }
             isLocked = false;
             const item = words[currentIdx];
             card.className = ''; 
@@ -173,37 +181,47 @@
                         <path d="M35 10 H65 V25 L85 45 V100 A15 15 0 0 1 70 115 H30 A15 15 0 0 1 15 100 V45 L35 25 Z" fill="white" stroke="${colors[i]}" stroke-width="7"/>
                         <rect x="25" y="65" width="50" height="40" rx="5" fill="${colors[i]}" fill-opacity="0.2" />
                     </svg>
-                    <div class="potion-label">${opt}</div>
+                    <div class="potion-label" style="border: 2px solid ${colors[i]}">${opt}</div>
                 </div>
             `).join('');
         }
 
-        // 交互逻辑保持不变
         card.onpointerdown = (e) => {
             if (isLocked) return;
             card.style.transition = 'none';
+            const offset = isMobile ? 60 : 0;
             startX = e.clientX - moveX;
-            startY = e.clientY - moveY;
+            startY = e.clientY - (moveY + offset);
             card.setPointerCapture(e.pointerId);
         };
 
         card.onpointermove = (e) => {
             if (!card.hasPointerCapture(e.pointerId) || isLocked) return;
             moveX = e.clientX - startX;
-            moveY = e.clientY - startY;
-            card.style.transform = `translate3d(${moveX}px, ${moveY}px, 0) rotate(${moveX/12}deg)`;
+            const offset = isMobile ? 60 : 0;
+            moveY = (e.clientY - startY) - offset;
+            card.style.transform = `translate3d(${moveX}px, ${moveY}px, 0) rotate(${moveX/18}deg)`;
 
             const bottles = document.querySelectorAll('.potion-bottle');
             const cardRect = card.getBoundingClientRect();
             const cx = cardRect.left + cardRect.width/2;
             const cy = cardRect.top + cardRect.height/2;
 
+            let closestBottle = null;
+            let minDistance = 75; // 判定半径
+
             bottles.forEach(b => {
+                b.classList.remove('active-bottle');
                 const r = b.getBoundingClientRect();
-                const dist = Math.sqrt(Math.pow(cx-(r.left+r.width/2), 2) + Math.pow(cy-(r.top+r.height/2), 2));
-                if (dist < 110) b.classList.add('active-bottle');
-                else b.classList.remove('active-bottle');
+                const bx = r.left + r.width/2;
+                const by = r.top + r.height/2;
+                const dist = Math.sqrt(Math.pow(cx - bx, 2) + Math.pow(cy - by, 2));
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    closestBottle = b;
+                }
             });
+            if (closestBottle) closestBottle.classList.add('active-bottle');
         };
 
         card.onpointerup = (e) => {
@@ -229,7 +247,7 @@
             document.getElementById('word').innerText = words[currentIdx].p;
             currentIdx++;
             document.getElementById('progress-inner').style.width = `${(currentIdx / words.length) * 100}%`;
-            setTimeout(initLevel, 2200); 
+            setTimeout(initLevel, 2000); 
         }
 
         function onError() {
@@ -248,24 +266,12 @@
         }
 
         function showFinalWin() {
-            const duration = 5 * 1000;
-            const animationEnd = Date.now() + duration;
-            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
-            const randomInRange = (min, max) => Math.random() * (max - min) + min;
-
-            const interval = setInterval(function() {
-                const timeLeft = animationEnd - Date.now();
-                if (timeLeft <= 0) return clearInterval(interval);
-                const particleCount = 50 * (timeLeft / duration);
-                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
-                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
-            }, 250);
-
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
             card.innerHTML = `
-                <div class="text-7xl mb-4">🏆</div>
-                <div class="text-2xl font-black text-emerald-600">Super gemacht!</div>
+                <div class="text-6xl mb-4">🏆</div>
+                <div class="text-xl font-black text-emerald-600">Super gemacht!</div>
                 <div class="text-slate-500 font-bold mt-2">50个复数单词全掌握！</div>
-                <button onclick="location.reload()" class="mt-6 px-8 py-3 bg-emerald-500 text-white rounded-full font-black">再玩一次</button>
+                <button onclick="location.reload()" class="mt-6 px-8 py-3 bg-emerald-500 text-white rounded-full font-black text-sm">再玩一次</button>
             `;
             card.className = 'success-zoom';
             card.style.transform = 'translate3d(0,0,0)';
