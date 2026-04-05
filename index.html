@@ -69,6 +69,15 @@
                     </div>
                     <div id="m3" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div>
                 </div>
+
+                <div id="lvl4" onclick="go(4)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm border-orange-100">
+                    <div class="w-16 h-16 bg-[#F59E0B] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">4</div>
+                    <div>
+                        <h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">弱变化动词驯服记</h3>
+                        <p class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">Verbkonjugation</p>
+                    </div>
+                    <div id="m4" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div>
+                </div>
             </div>
         </main>
 
@@ -91,9 +100,10 @@
                 slogan.classList.replace('text-slate-500', 'text-sky-800');
                 slogan.classList.add('animate-pulse');
                 
-                // 解锁所有关卡
-                ['lvl1', 'lvl2', 'lvl3'].forEach(id => {
-                    document.getElementById(id).classList.remove('locked-state');
+                // 解锁所有关卡（包含 lvl4）
+                ['lvl1', 'lvl2', 'lvl3', 'lvl4'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.classList.remove('locked-state');
                 });
             }
 
@@ -110,7 +120,12 @@
 
             // 第三关
             if (localStorage.getItem('level3_cleared') === 'true') {
-                document.getElementById('m3').innerText = "🧪"; // 使用实验烧瓶奖牌，更符合关卡主题
+                document.getElementById('m3').innerText = "🧪";
+            }
+
+            // 第四关：动词驯服奖牌
+            if (localStorage.getItem('level4_cleared') === 'true') {
+                document.getElementById('m4').innerText = "⚔️"; // 大剑奖牌，象征成功驯服
             }
         }
 
@@ -126,6 +141,7 @@
                 if (n === 1) window.location.href = '01-gender.html';
                 if (n === 2) window.location.href = '02-classify.html';
                 if (n === 3) window.location.href = '03-plural.html';
+                if (n === 4) window.location.href = '04-verbs.html';
             } 
         }
 
