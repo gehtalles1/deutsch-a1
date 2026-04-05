@@ -22,9 +22,8 @@
         }
     </style>
 </head>
-<body class="py-16 px-6">
-    <div class="app-container max-w-[480px] mx-auto flex flex-col min-h-[90vh]">
-        <header class="text-center mb-16">
+<body class="pt-10 pb-16 px-6"> <div class="app-container max-w-[480px] mx-auto flex flex-col min-h-[90vh]">
+        <header class="text-center mb-10">
             <h1 class="text-4xl lg:text-5xl font-black text-slate-900 mb-5 tracking-tighter">直击 A1 德语焦虑</h1>
             <div class="flex items-center justify-center gap-5 text-slate-400 font-bold tracking-[0.3em] uppercase">
                 <div class="w-10 h-px bg-slate-200 rounded-full"></div>
@@ -34,15 +33,14 @@
         </header>
 
         <main class="flex-grow space-y-8">
-            <div id="dynamic-panel" class="p-4 text-center">
-                <p id="slogan" class="text-slate-500 font-bold mb-10 text-xl lg:text-2xl tracking-tight leading-relaxed">跟着刘老师，稳过 A1</p>
+            <div id="dynamic-panel" class="p-2 text-center">
                 <div id="auth-group" class="premium-card p-10 shadow-sm border-sky-100 bg-sky-50/50">
                     <input id="key-input" type="text" placeholder="••••" class="w-full py-5 text-center bg-slate-50 rounded-2xl mb-8 outline-none font-black text-3xl border-2 border-transparent focus:border-sky-400">
                     <button onclick="unlock()" class="w-full py-5 duo-btn text-xl shadow-lg shadow-green-100">立即开始闯关</button>
                 </div>
             </div>
 
-            <div class="pt-4 space-y-8">
+            <div class="space-y-8">
                 <div id="lvl1" onclick="go(1)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm">
                     <div class="w-16 h-16 bg-[#58CC02] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">1</div>
                     <div>
@@ -93,14 +91,8 @@
     <script>
         function checkStatus() {
             const unlocked = localStorage.getItem('isUnlocked') === 'true';
-            
             if (unlocked) {
                 document.getElementById('auth-group').style.display = 'none';
-                const slogan = document.getElementById('slogan');
-                slogan.classList.replace('text-slate-500', 'text-sky-800');
-                slogan.classList.add('animate-pulse');
-                
-                // 解锁所有关卡（包含 lvl4）
                 ['lvl1', 'lvl2', 'lvl3', 'lvl4'].forEach(id => {
                     const el = document.getElementById(id);
                     if(el) el.classList.remove('locked-state');
@@ -108,25 +100,12 @@
             }
 
             // 奖牌显示逻辑
-            // 第一关
             const s1Score = localStorage.getItem('stage1_score'); 
             if (s1Score === 'gold') { document.getElementById('m1').innerText = "🥇"; }
             else if (s1Score === 'silver') { document.getElementById('m1').innerText = "🥈"; }
-
-            // 第二关
-            if (localStorage.getItem('level2_cleared') === 'true') {
-                document.getElementById('m2').innerText = "🏅";
-            }
-
-            // 第三关
-            if (localStorage.getItem('level3_cleared') === 'true') {
-                document.getElementById('m3').innerText = "🧪";
-            }
-
-            // 第四关：动词驯服奖牌
-            if (localStorage.getItem('level4_cleared') === 'true') {
-                document.getElementById('m4').innerText = "⚔️"; // 大剑奖牌，象征成功驯服
-            }
+            if (localStorage.getItem('level2_cleared') === 'true') { document.getElementById('m2').innerText = "🏅"; }
+            if (localStorage.getItem('level3_cleared') === 'true') { document.getElementById('m3').innerText = "🧪"; }
+            if (localStorage.getItem('level4_cleared') === 'true') { document.getElementById('m4').innerText = "⚔️"; }
         }
 
         function unlock() {
@@ -138,18 +117,13 @@
 
         function go(n) { 
             if (localStorage.getItem('isUnlocked') === 'true') {
-                if (n === 1) window.location.href = '01-gender.html';
-                if (n === 2) window.location.href = '02-classify.html';
-                if (n === 3) window.location.href = '03-plural.html';
-                if (n === 4) window.location.href = '04-verbs.html';
+                const pages = {1: '01-gender.html', 2: '02-classify.html', 3: '03-plural.html', 4: '04-verbs.html'};
+                window.location.href = pages[n];
             } 
         }
 
         function clearAll() { 
-            if (confirm("确定重置所有闯关进度和奖牌吗？")) { 
-                localStorage.clear(); 
-                location.reload(); 
-            } 
+            if (confirm("确定重置进度吗？")) { localStorage.clear(); location.reload(); } 
         }
 
         window.onload = checkStatus;
