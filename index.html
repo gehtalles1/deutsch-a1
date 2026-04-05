@@ -56,9 +56,18 @@
                     <div class="w-16 h-16 bg-[#00D4FF] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">2</div>
                     <div>
                         <h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">词性规律一眼破</h3>
-                        <p class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">der / die / das</p>
+                        <p class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">规律分类练习</p>
                     </div>
                     <div id="m2" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div>
+                </div>
+
+                <div id="lvl3" onclick="go(3)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm border-purple-100">
+                    <div class="w-16 h-16 bg-[#A855F7] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">3</div>
+                    <div>
+                        <h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">复数实验室</h3>
+                        <p class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">Plural-Labor</p>
+                    </div>
+                    <div id="m3" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div>
                 </div>
             </div>
         </main>
@@ -76,25 +85,32 @@
         function checkStatus() {
             const unlocked = localStorage.getItem('isUnlocked') === 'true';
             
-            // 激活码解锁逻辑
             if (unlocked) {
                 document.getElementById('auth-group').style.display = 'none';
                 const slogan = document.getElementById('slogan');
                 slogan.classList.replace('text-slate-500', 'text-sky-800');
                 slogan.classList.add('animate-pulse');
-                document.getElementById('lvl1').classList.remove('locked-state');
-                document.getElementById('lvl2').classList.remove('locked-state');
+                
+                // 解锁所有关卡
+                ['lvl1', 'lvl2', 'lvl3'].forEach(id => {
+                    document.getElementById(id).classList.remove('locked-state');
+                });
             }
 
-            // 第一关奖牌逻辑
+            // 奖牌显示逻辑
+            // 第一关
             const s1Score = localStorage.getItem('stage1_score'); 
             if (s1Score === 'gold') { document.getElementById('m1').innerText = "🥇"; }
             else if (s1Score === 'silver') { document.getElementById('m1').innerText = "🥈"; }
 
-            // 第二关奖牌逻辑 (根据 level2_cleared 判断)
-            const s2Cleared = localStorage.getItem('level2_cleared') === 'true';
-            if (s2Cleared) {
-                document.getElementById('m2').innerText = "🏅"; // 显示通关奖牌
+            // 第二关
+            if (localStorage.getItem('level2_cleared') === 'true') {
+                document.getElementById('m2').innerText = "🏅";
+            }
+
+            // 第三关
+            if (localStorage.getItem('level3_cleared') === 'true') {
+                document.getElementById('m3').innerText = "🧪"; // 使用实验烧瓶奖牌，更符合关卡主题
             }
         }
 
@@ -109,6 +125,7 @@
             if (localStorage.getItem('isUnlocked') === 'true') {
                 if (n === 1) window.location.href = '01-gender.html';
                 if (n === 2) window.location.href = '02-classify.html';
+                if (n === 3) window.location.href = '03-plural.html';
             } 
         }
 
