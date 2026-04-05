@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>第四关：动词变位大爆发 | 刘老师德语课</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@700;900&display=swap');
+        body { background: #FFFFFF; font-family: 'Noto Sans SC', sans-serif; -webkit-tap-highlight-color: transparent; overflow: hidden; }
+        
+        /* 选项按钮：大厂级 Q 弹手感 */
+        .opt-btn { border-radius: 24px; font-weight: 900; font-size: 22px; transition: all 0.1s; border-bottom: 6px solid #E2E8F0; background: #F8FAFC; color: #475569; }
+        .opt-btn:active { transform: translateY(4px); border-bottom-width: 2px; }
+        .opt-btn.correct { background: #58CC02 !important; color: white; border-color: #46A302; }
+        .opt-btn.wrong { background: #FF4B4B !important; color: white; border-color: #D33131; }
+
+        /* 进度条平滑动画 */
+        .progress-fill { transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        
+        /* 弹出卡片入场动画 */
+        #formula-card { transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28); }
+        #formula-card.show { transform: translateY(0); }
+
+        /* 题目下划线及填入效果 */
+        .ending-placeholder { color: #3b82f6; border-bottom: 4px solid #3b82f6; padding-bottom: 2px; margin-left: 4px; transition: all 0.3s ease; }
+        .special-mode .ending-placeholder { color: #f59e0b; border-bottom-color: #f59e0b; }
+        .ending-placeholder.success-fill { color: #58CC02 !important; border-bottom: none !important; animation: pop 0.4s ease-out; }
+
+        @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+
+        /* 刘老师对话气泡 */
+        .teacher-bubble { position: relative; background: #f1f5f9; border-radius: 20px; padding: 12px 18px; margin-left: 12px; min-height: 48px; }
+        .teacher-bubble::after { content: ''; position: absolute; left: -8px; top: 15px; border-width: 8px 8px 8px 0; border-style: solid; border-color: transparent #f1f5f9 transparent transparent; }
+    </style>
+</head>
+<body class="flex justify-center p-6">
+    <div class="max-w-[440px] w-full h-screen flex flex-col">
+        
+        <div class="flex items-center gap-4 mt-4 mb-8">
+            <button onclick="window.history.back()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" /></svg>
+            </button>
+            <div class="flex-1">
+                <div class="flex justify-between items-end mb-1 px-1">
+                    <span id="num-indicator" class="text-[10px] font-black text-slate-400">0 / 50</span>
+                    <span id="mode-tag" class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Regular</span>
+                </div>
+                <div class="h-3 bg-slate-100 rounded-full overflow-hidden">
+                    <div id="bar" class="progress-fill h-full bg-blue-500" style="width: 0%"></div>
+                </div>
+            </div>
+            <button id="mute-btn" onclick="toggleMute()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-300 transition-all active:scale-90">
+                <svg id="icon-audio" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                </svg>
+            </button>
+        </div>
+
+        <div id="main-container" class="flex-grow flex flex-col justify-center text-center px-4">
+            <div id="subject" class="text-4xl font-black text-slate-900 mb-2">---</div>
+            <div id="infinitiv" class="text-sm text-slate-400 font-bold mb-8 uppercase italic">---</div>
+            <div class="text-6xl font-black text-slate-900 mb-20 tracking-tighter">
+                <span id="stem" class="opacity-80">---</span><span id="ending" class="ending-placeholder">&nbsp;&nbsp;&nbsp;</span>
+            </div>
+            <div id="options-grid" class="grid grid-cols-2 gap-5 mb-4"></div>
+        </div>
+
+        <div id="tips-overlay" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40"></div>
+        <div id="formula-card" class="fixed bottom-0 left-0 right-0 bg-white rounded-t-[40px] p-8 z-50 shadow-2xl max-w-[440px] mx-auto">
+            <div class="flex items-start mb-6 text-left">
+                <div class="w-12 h-12 bg-orange-500 rounded-full flex-shrink-0 flex items-center justify-center text-white border-2 border-white shadow-md font-black text-[10px]">刘老师</div>
+                <div class="teacher-bubble flex-1">
+                    <p id="teacher-msg" class="text-slate-700 text-[13px] font-bold leading-relaxed"></p>
+                </div>
+            </div>
+            <div class="bg-slate-50 p-6 rounded-3xl mb-6 text-center">
+                <div id="formula-text" class="text-2xl font-black tracking-tight text-slate-800"></div>
+            </div>
+            <button onclick="closeTip()" class="w-full py-5 bg-slate-900 text-white rounded-2xl font-black text-xl shadow-lg active:scale-95 transition-all">记住了，再试一次</button>
+        </div>
+    </div>
+
+    <audio id="snd-ok" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+    <audio id="snd-err" src="https://assets.mixkit.co/active_storage/sfx/1150/1150-preview.mp3"></audio>
+
+    <script>
+        // 1. A1 核心动词库
+        const verbDb = [
+            {w: "machen", m: "做", s: false}, {w: "lernen", m: "学习", s: false},
+            {w: "arbeiten", m: "工作", s: true}, {w: "antworten", m: "回答", s: true},
+            {w: "finden", m: "找到", s: true}, {w: "spielen", m: "玩", s: false},
+            {w: "kochen", m: "煮", s: false}, {w: "warten", m: "等待", s: true},
+            {w: "wohnen", m: "居住", s: false}, {w: "horen", m: "听", s: false},
+            {w: "schreiben", m: "写", s: false}, {w: "trinken", m: "喝", s: false},
+            {w: "singen", m: "唱歌", s: false}, {w: "tanzen", m: "跳舞", s: false},
+            {w: "surfen", m: "冲浪", s: false}, {w: "schwimmen", m: "游泳", s: false},
+            {w: "reisen", m: "旅行", s: false}, {w: "duschen", m: "洗澡", s: false},
+            {w: "kosten", m: "花费", s: true}, {w: "zeichnen", m: "绘画", s: true}
+        ];
+
+        const rules = [
+            { p: "ich", e: "-e", se: "-e" }, { p: "du", e: "-st", se: "-est" },
+            { p: "er/sie/es", e: "-t", se: "-et" }, { p: "wir", e: "-en", se: "-en" },
+            { p: "ihr", e: "-t", se: "-et" }, { p: "Sie/sie", e: "-en", se: "-en" }
+        ];
+
+        // 2. 刘老师随机语录
+        const teacherTips = {
+            regular: [
+                "别急别急，先看清楚人称，然后再找对应的词尾。多练几次就肌肉记忆啦！",
+                "哎呀，差一点点！注意这个动词的词干，再对一下人称表试试？",
+                "没关系，A1阶段弄混很正常。记住：ich 用 -e，du 用 -st...",
+                "嘘——！悄悄告诉你，看清楚主语是单数还是复数了吗？",
+                "语法不可怕，细心走天下！老师建议你再观察一下主语哦。"
+            ],
+            special: [
+                "注意哦！词干以 -d/-t 结尾，如果不加个 -e- 缓冲，发音舌头会打结的！",
+                "敲黑板！这是咱们讲过的“特殊照顾”名单，记得那个多出来的 -e 吗？",
+                "发现了没？词干末尾有个字母 t，所以咱们得给它一点点“生存空间”。",
+                "这个动词有点小脾气，必须加个 -e- 把它和词尾隔开，读音才顺滑！",
+                "别忘了咱们的“润滑剂” e 哦，词干 -d/-t 专用，记在心里了吗？"
+            ]
+        };
+
+        let questions = [], curIdx = 0, isLocked = false, isMuted = false;
+
+        function init() {
+            for(let i=0; i<50; i++) {
+                const v = verbDb[Math.floor(Math.random()*verbDb.length)];
+                const r = rules[Math.floor(Math.random()*rules.length)];
+                questions.push({
+                    sub: r.p, inf: `${v.w} (${v.m})`, stem: v.w.slice(0, -2),
+                    ans: v.s ? r.se : r.e,
+                    isSpec: v.s && (['du', 'er/sie/es', 'ihr'].includes(r.p))
+                });
+            }
+            render();
+        }
+
+        function render() {
+            const data = questions[curIdx];
+            document.getElementById('subject').innerText = data.sub;
+            document.getElementById('infinitiv').innerText = data.inf;
+            document.getElementById('stem').innerText = data.stem;
+            const endEl = document.getElementById('ending');
+            endEl.innerHTML = "&nbsp;&nbsp;&nbsp;"; endEl.className = "ending-placeholder";
+            
+            document.getElementById('num-indicator').innerText = `${curIdx + 1} / 50`;
+            document.getElementById('bar').style.width = `${((curIdx+1)/50)*100}%`;
+            
+            const tag = document.getElementById('mode-tag');
+            if(data.isSpec) {
+                tag.innerText = "Special Mode"; tag.className = "text-[10px] font-black text-orange-500 uppercase tracking-widest";
+                document.getElementById('bar').className = "progress-fill h-full bg-orange-500";
+            } else {
+                tag.innerText = "Regular"; tag.className = "text-[10px] font-black text-blue-500 uppercase tracking-widest";
+                document.getElementById('bar').className = "progress-fill h-full bg-blue-500";
+            }
+
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            let finalOpts = [data.ans];
+            const allEndings = ["-e", "-st", "-t", "-en", "-est", "-et"];
+            while(finalOpts.length < 4) {
+                let r = allEndings[Math.floor(Math.random()*allEndings.length)];
+                if(!finalOpts.includes(r)) finalOpts.push(r);
+            }
+            finalOpts.sort(() => Math.random() - 0.5).forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn py-7';
+                btn.innerText = opt;
+                btn.onclick = () => check(opt, btn);
+                grid.appendChild(btn);
+            });
+        }
+
+        function check(choice, btn) {
+            if(isLocked) return;
+            const data = questions[curIdx];
+            if(choice === data.ans) {
+                isLocked = true;
+                btn.classList.add('correct');
+                const endEl = document.getElementById('ending');
+                endEl.innerText = data.ans.replace('-', ''); 
+                endEl.classList.add('success-fill');
+                
+                confetti({ particleCount: 30, spread: 60, origin: { y: 0.75 }, colors: ['#58CC02', '#3b82f6'] });
+                if(!isMuted) document.getElementById('snd-ok').play().catch(()=>{});
+                setTimeout(next, 2000);
+            } else {
+                btn.classList.add('wrong');
+                if(!isMuted) document.getElementById('snd-err').play().catch(()=>{});
+                showTip();
+            }
+        }
+
+        function showTip() {
+            const data = questions[curIdx];
+            const msgEl = document.getElementById('teacher-msg');
+            const formula = document.getElementById('formula-text');
+            const pool = data.isSpec ? teacherTips.special : teacherTips.regular;
+            msgEl.innerText = pool[Math.floor(Math.random() * pool.length)];
+
+            if(data.isSpec) {
+                formula.innerHTML = `<span class="text-slate-400">${data.sub}</span> → <span class="text-orange-500">${data.stem}</span> + <span class="text-orange-500">e</span> + <span class="text-orange-500">${data.ans.replace('-e','').replace('-','')}</span>`;
+            } else {
+                formula.innerHTML = `<span class="text-slate-400">${data.sub}</span> → <span class="text-blue-500">${data.stem}</span> + <span class="text-blue-500">${data.ans.replace('-','')}</span>`;
+            }
+            document.getElementById('tips-overlay').classList.remove('hidden');
+            document.getElementById('formula-card').classList.add('show');
+        }
+
+        function closeTip() {
+            document.getElementById('tips-overlay').classList.add('hidden');
+            document.getElementById('formula-card').classList.remove('show');
+        }
+
+        function next() {
+            isLocked = false;
+            if(curIdx < 49) { curIdx++; render(); }
+            else { 
+                // 通关彩蛋：全屏大礼花
+                const duration = 3 * 1000;
+                const end = Date.now() + duration;
+                (function frame() {
+                    confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#58CC02', '#3b82f6'] });
+                    confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#58CC02', '#3b82f6'] });
+                    if (Date.now() < end) requestAnimationFrame(frame);
+                }());
+                setTimeout(() => { alert("50道大关突破！刘老师为你疯狂点赞！🎉"); location.reload(); }, 1500); 
+            }
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            const btn = document.getElementById('mute-btn');
+            const icon = document.getElementById('icon-audio');
+            if(isMuted) {
+                btn.classList.add('bg-rose-50', 'text-rose-500');
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />';
+            } else {
+                btn.classList.remove('bg-rose-50', 'text-rose-500');
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />';
+            }
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
