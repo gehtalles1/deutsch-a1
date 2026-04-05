@@ -12,8 +12,7 @@
 
         /* 返回键 */
         .back-btn { position: fixed; left: 15px; top: max(20px, env(safe-area-inset-top)); width: 44px; height: 44px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); z-index: 500; cursor: pointer; border: 1px solid #f1f5f9; transition: transform 0.2s; }
-        .back-btn:active { transform: scale(0.9); }
-
+        
         /* 顶部导航 */
         .header-box { margin-top: max(50px, env(safe-area-inset-top)); display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
         .progress-container { display: flex; align-items: center; gap: 12px; }
@@ -32,6 +31,7 @@
             z-index: 100;
             touch-action: none; will-change: transform;
             user-select: none;
+            transition: transform 0.05s linear; /* 极短过渡让吸附更丝滑 */
         }
         
         .success-zoom { 
@@ -47,9 +47,9 @@
         .potion-shelf { display: flex; justify-content: space-around; align-items: flex-end; max-width: 550px; margin: 0 auto; height: 120px; }
         .potion-bottle { display: flex; flex-direction: column; align-items: center; width: 22%; transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         
-        /* 强力磁吸反馈样式 */
-        .active-bottle { transform: translateY(-30px) scale(1.35); filter: drop-shadow(0 0 20px rgba(16,185,129,0.6)); }
-        .active-bottle .potion-label { background: #10B981 !important; color: white !important; transform: scale(1.15); box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
+        /* 强力磁吸状态 */
+        .active-bottle { transform: translateY(-35px) scale(1.4); filter: drop-shadow(0 0 25px rgba(16,185,129,0.7)); }
+        .active-bottle .potion-label { background: #10B981 !important; color: white !important; transform: scale(1.2); box-shadow: 0 4px 15px rgba(16,185,129,0.4); }
 
         .potion-label { margin-top: 8px; font-weight: 900; color: #1e293b; font-size: 0.8rem; padding: 3px 8px; background: #f1f5f9; border-radius: 10px; white-space: nowrap; transition: all 0.2s; border: 2px solid transparent; }
 
@@ -92,7 +92,6 @@
     </div>
 
     <script>
-        // 词库配置...
         const words = [
             {w:"Banane", cn:"香蕉", a:"-n", e:"🍌", p:"Bananen", r:"以 -e 结尾的阴性名词，复数通常加 -n。"},
             {w:"Tomate", cn:"西红柿", a:"-n", e:"🍅", p:"Tomaten", r:"以 -e 结尾的阴性词，复数加 -n。"},
@@ -157,6 +156,7 @@
             isLocked = false;
             const item = words[currentIdx];
             card.className = ''; 
+            card.style.transition = 'none';
             card.style.transform = 'translate3d(0,0,0)';
             moveX = 0; moveY = 0;
             
@@ -195,9 +195,9 @@
         card.onpointermove = (e) => {
             if (!card.hasPointerCapture(e.pointerId) || isLocked) return;
             
-            let targetX = e.clientX - startX;
+            let rawX = e.clientX - startX;
             const offset = isMobile ? 60 : 0;
-            let targetY = (e.clientY - startY) - offset;
+            let rawY = (e.clientY - startY) - offset;
 
             const bottles = document.querySelectorAll('.potion-bottle');
             const cardRect = card.getBoundingClientRect();
@@ -205,7 +205,7 @@
             const cy = cardRect.top + cardRect.height/2;
 
             let closestBottle = null;
-            let minDistance = 85; 
+            let minDistance = 100; // 扩大侦测范围，吸入感更主动
 
             bottles.forEach(b => {
                 b.classList.remove('active-bottle');
@@ -219,17 +219,28 @@
                 }
             });
 
-            // 增强磁吸效果：如果靠近瓶子，坐标向瓶子稍微倾斜
             if (closestBottle) {
                 closestBottle.classList.add('active-bottle');
-                // 模拟物理吸附力：自动拉近 15% 的距离感
-                card.style.transform = `translate3d(${targetX}px, ${targetY}px, 0) scale(0.95) rotate(${targetX/20}deg)`;
+                
+                // --- 强磁吸逻辑核心 ---
+                const r = closestBottle.getBoundingClientRect();
+                const zone = document.querySelector('.card-zone').getBoundingClientRect();
+                
+                // 计算瓶口在 .card-zone 坐标系下的位置
+                const snapX = (r.left + r.width/2) - (zone.left + zone.width/2);
+                const snapY = (r.top + r.height/3) - (zone.top + zone.height/2);
+
+                // 混合坐标：当距离越近，snap 坐标占的比重越大
+                const influence = Math.max(0, 1 - minDistance / 100); 
+                moveX = rawX * (1 - influence) + snapX * influence;
+                moveY = rawY * (1 - influence) + snapY * influence;
+
+                card.style.transform = `translate3d(${moveX}px, ${moveY}px, 0) scale(${1 - influence*0.1}) rotate(${moveX/20}deg)`;
             } else {
-                card.style.transform = `translate3d(${targetX}px, ${targetY}px, 0) rotate(${targetX/18}deg)`;
+                moveX = rawX;
+                moveY = rawY;
+                card.style.transform = `translate3d(${moveX}px, ${moveY}px, 0) rotate(${moveX/18}deg)`;
             }
-            
-            moveX = targetX;
-            moveY = targetY;
         };
 
         card.onpointerup = (e) => {
@@ -254,7 +265,6 @@
             document.getElementById('emoji').innerText = words[currentIdx].e.repeat(2);
             document.getElementById('word').innerText = words[currentIdx].p;
             currentIdx++;
-            document.getElementById('progress-inner').style.width = `${(currentIdx / words.length) * 100}%`;
             setTimeout(initLevel, 2000); 
         }
 
