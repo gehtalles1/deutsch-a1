@@ -24,21 +24,15 @@
         /* 贴士卡片动画 */
         #tips-card { transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28); }
         #tips-card.show { transform: translateY(0); }
-
-        /* 返回键悬停效果 */
-        .back-btn:active { background-color: #f1f5f9; transform: scale(0.95); }
     </style>
 </head>
 <body class="p-8 flex justify-center">
     <div class="max-w-[440px] w-full h-screen flex flex-col relative">
         
         <div class="flex items-center gap-4 mt-4 mb-10">
-            <button onclick="goBackToMap()" class="back-btn text-slate-400 w-12 h-12 flex items-center justify-center rounded-2xl border-2 border-slate-100 transition-all">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
-                </svg>
+            <button onclick="location.href='index.html'" class="text-slate-300 hover:text-slate-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" /></svg>
             </button>
-
             <div class="flex-1 flex flex-col gap-1.5">
                 <div class="flex justify-between items-end px-1">
                     <span id="num-indicator" class="text-[10px] font-black text-slate-400 uppercase tracking-widest">0 / 50</span>
@@ -46,7 +40,6 @@
                 </div>
                 <div class="progress-rail"><div id="bar" class="progress-fill" style="width: 0%"></div></div>
             </div>
-
             <button id="mute-btn" onclick="toggleMute()" class="text-slate-300 w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50">
                 <svg id="icon-audio" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
             </button>
@@ -78,14 +71,56 @@
     <audio id="snd-err" src="https://assets.mixkit.co/active_storage/sfx/1150/1150-preview.mp3"></audio>
 
     <script>
-        // 这里沿用您之前的 50 个单词数据库，为了节省篇幅，此处省略部分列表，实际使用时请确保列表完整
         const database = [
             {w:"Apfel", m:"苹果", a:"der", t:"阳性规律：大部分不以e结尾的水果是der。"},
             {w:"Banane", m:"香蕉", a:"die", t:"阴性规律：90%以 -e 结尾的名词是 die。"},
             {w:"Mädchen", m:"女孩", a:"das", t:"中性规律：所有以 -chen 结尾的词全是 das。"},
             {w:"Zeitung", m:"报纸", a:"die", t:"阴性规律：以 -ung 结尾的词 100% 是 die。"},
             {w:"Bäckerei", m:"面包店", a:"die", t:"阴性规律：以 -ei 结尾的词表示场所时通常是 die。"},
-            // ... 请在此处保留您之前代码中完整的 50 个单词 ...
+            {w:"Auto", m:"汽车", a:"das", t:"中性规律：大部分外来语技术词汇是 das。"},
+            {w:"Computer", m:"电脑", a:"der", t:"阳性规律：以 -er 结尾表示职业或工具的词多为 der。"},
+            {w:"Lehrerin", m:"女教师", a:"die", t:"阴性规律：以 -in 结尾的女性职业全是 die。"},
+            {w:"Freiheit", m:"自由", a:"die", t:"阴性规律：以 -heit 结尾的抽象名词全是 die。"},
+            {w:"Möglichkeit", m:"可能性", a:"die", t:"阴性规律：以 -keit 结尾的抽象名词全是 die。"},
+            {w:"Freundschaft", m:"友谊", a:"die", t:"阴性规律：以 -schaft 结尾的名词全是 die。"},
+            {w:"Universität", m:"大学", a:"die", t:"阴性规律：以 -tät 结尾的词全是 die。"},
+            {w:"Museum", m:"博物馆", a:"das", t:"中性规律：以 -um 结尾的外来语通常是 das。"},
+            {w:"Instrument", m:"乐器", a:"das", t:"中性规律：以 -ment 结尾的词通常是 das。"},
+            {w:"Optimismus", m:"乐观", a:"der", t:"阳性规律：以 -ismus 结尾的词 100% 是 der。"},
+            {w:"Frühling", m:"春天", a:"der", t:"阳性规律：所有季节、月份、星期都是 der。"},
+            {w:"Januar", m:"一月", a:"der", t:"阳性规律：所有月份都是 der。"},
+            {w:"Montag", m:"周一", a:"der", t:"阳性规律：所有星期天数都是 der。"},
+            {w:"Regen", m:"雨", a:"der", t:"阳性规律：大部分天气现象（雨、雪、雾）是 der。"},
+            {w:"Kind", m:"孩子", a:"das", t:"中性规律：指代幼小生物的词通常是 das。"},
+            {w:"Haus", m:"房子", a:"das", t:"基础词汇：Haus 是典型的中性名词。"},
+            {w:"Sonne", m:"太阳", a:"die", t:"阴性规律：以 -e 结尾的自然物多为 die。"},
+            {w:"Lampe", m:"灯", a:"die", t:"阴性规律：-e 结尾的家具物品多为 die。"},
+            {w:"Tisch", m:"桌子", a:"der", t:"基础词汇：常见单音节家具多为 der。"},
+            {w:"Büro", m:"办公室", a:"das", t:"中性规律：以 -o 结尾的外来语通常是 das。"},
+            {w:"Radio", m:"收音机", a:"das", t:"中性规律：-o 结尾的外来语多为 das。"},
+            {w:"König", m:"国王", a:"der", t:"阳性规律：以 -ig 结尾的名词通常是 der。"},
+            {w:"Honig", m:"蜂蜜", a:"der", t:"阳性规律：-ig 结尾的词通常是 der。"},
+            {w:"Teppich", m:"地毯", a:"der", t:"阳性规律：以 -ich 结尾的名词通常是 der。"},
+            {w:"Station", m:"站台", a:"die", t:"阴性规律：以 -ion 结尾的词 100% 是 die。"},
+            {w:"Diskussion", m:"讨论", a:"die", t:"阴性规律：-ion 结尾全是 die。"},
+            {w:"Bett", m:"床", a:"das", t:"基础词汇：单音节中性词。"},
+            {w:"Buch", m:"书", a:"das", t:"基础词汇：单音节中性词。"},
+            {w:"Tasche", m:"包", a:"die", t:"-e 结尾规律：die Tasche。"},
+            {w:"Küche", m:"厨房", a:"die", t:"-e 结尾规律：die Küche。"},
+            {w:"Zimmer", m:"房间", a:"das", t:"中性规律：以 -er 结尾的非生物词有时是 das。"},
+            {w:"Fenster", m:"窗户", a:"das", t:"中性规律：das Fenster。"},
+            {w:"Brot", m:"面包", a:"das", t:"基础词汇：das Brot。"},
+            {w:"Fleisch", m:"肉", a:"das", t:"基础词汇：das Fleisch。"},
+            {w:"Gemüse", m:"蔬菜", a:"das", t:"中性规律：带 Ge- 前缀的名词很多是 das。"},
+            {w:"Getränk", m:"饮料", a:"das", t:"中性规律：带 Ge- 前缀的名词很多是 das。"},
+            {w:"Taxi", m:"出租车", a:"das", t:"外来语规律：das Taxi。"},
+            {w:"Hobby", m:"爱好", a:"das", t:"外来语规律：das Hobby。"},
+            {w:"Kaffee", m:"咖啡", a:"der", t:"阳性规律：大部分无酒精饮料（除水）是 der。"},
+            {w:"Saft", m:"果汁", a:"der", t:"阳性规律：der Saft。"},
+            {w:"Wein", m:"葡萄酒", a:"der", t:"阳性规律：大部分酒精饮料是 der (除啤酒)。"},
+            {w:"Bier", m:"啤酒", a:"das", t:"例外提醒：酒类中 Bier 是 das。"},
+            {w:"Wasser", m:"水", a:"das", t:"基础词汇：das Wasser。"},
+            {w:"Milch", m:"牛奶", a:"die", t:"基础词汇：die Milch。"},
             {w:"Käse", m:"奶酪", a:"der", t:"例外提醒：-e 结尾但不属于 die 的少数词。"}
         ];
 
@@ -93,15 +128,7 @@
         let wrongCount = 0; 
         let isMuted = localStorage.getItem('isMuted') === 'true';
 
-        // 返回地图函数
-        function goBackToMap() {
-            // 如果是在通关中途退出，可以加一个确认，或者直接返回
-            if(confirm("确定要放弃本次练习返回地图吗？")) {
-                location.href = 'index.html';
-            }
-        }
-
-        // Fisher-Yates 随机洗牌算法
+        // 核心改动：Fisher-Yates 随机洗牌算法
         function shuffleDatabase() {
             for (let i = database.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -176,7 +203,7 @@
         }
 
         window.onload = () => {
-            shuffleDatabase(); 
+            shuffleDatabase(); // 页面加载时洗牌
             update();
         };
     </script>
