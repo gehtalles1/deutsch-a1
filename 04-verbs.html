@@ -39,7 +39,7 @@
     <div class="max-w-[440px] w-full h-screen flex flex-col">
         
         <div class="flex items-center gap-4 mt-4 mb-8">
-            <button onclick="window.history.back()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400">
+            <button onclick="window.location.href='index.html'" class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" /></svg>
             </button>
             <div class="flex-1">
@@ -111,7 +111,7 @@
             regular: [
                 "别急别急，先看清楚人称，然后再找对应的词尾。多练几次就肌肉记忆啦！",
                 "哎呀，差一点点！注意这个动词的词干，再对一下人称表试试？",
-                "没关系，A1阶段弄混很正常。记住：ich 用 -e，du 用 -st...",
+                "没关系，A1阶段弄混很正常. 记住：ich 用 -e，du 用 -st...",
                 "嘘——！悄悄告诉你，看清楚主语是单数还是复数了吗？",
                 "语法不可怕，细心走天下！老师建议你再观察一下主语哦。"
             ],
@@ -219,9 +219,15 @@
 
         function next() {
             isLocked = false;
-            if(curIdx < 49) { curIdx++; render(); }
+            if(curIdx < 49) { 
+                curIdx++; 
+                render(); 
+            }
             else { 
-                // 通关彩蛋：全屏大礼花
+                // 通关核心逻辑：存入勋章标记
+                localStorage.setItem('level4_cleared', 'true');
+
+                // 全屏大礼花
                 const duration = 3 * 1000;
                 const end = Date.now() + duration;
                 (function frame() {
@@ -229,7 +235,11 @@
                     confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#58CC02', '#3b82f6'] });
                     if (Date.now() < end) requestAnimationFrame(frame);
                 }());
-                setTimeout(() => { alert("50道大关突破！刘老师为你疯狂点赞！🎉"); location.reload(); }, 1500); 
+
+                setTimeout(() => { 
+                    alert("50道大关突破！刘老师为你疯狂点赞！🎉"); 
+                    window.location.href = 'index.html'; 
+                }, 1500); 
             }
         }
 
