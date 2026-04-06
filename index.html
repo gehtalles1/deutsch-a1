@@ -22,7 +22,8 @@
         }
     </style>
 </head>
-<body class="pt-10 pb-16 px-6"> <div class="app-container max-w-[480px] mx-auto flex flex-col min-h-[90vh]">
+<body class="pt-10 pb-16 px-6"> 
+    <div class="app-container max-w-[480px] mx-auto flex flex-col min-h-[90vh]">
         <header class="text-center mb-10">
             <h1 class="text-4xl lg:text-5xl font-black text-slate-900 mb-5 tracking-tighter">直击 A1 德语焦虑</h1>
             <div class="flex items-center justify-center gap-5 text-slate-400 font-bold tracking-[0.3em] uppercase">
@@ -76,6 +77,15 @@
                     </div>
                     <div id="m4" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div>
                 </div>
+
+                <div id="lvl5" onclick="go(5)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm border-rose-100">
+                    <div class="w-16 h-16 bg-[#F43F5E] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">5</div>
+                    <div>
+                        <h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">强变化动词急救包</h3>
+                        <p class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">Starke Verben</p>
+                    </div>
+                    <div id="m5" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div>
+                </div>
             </div>
         </main>
 
@@ -93,7 +103,8 @@
             const unlocked = localStorage.getItem('isUnlocked') === 'true';
             if (unlocked) {
                 document.getElementById('auth-group').style.display = 'none';
-                ['lvl1', 'lvl2', 'lvl3', 'lvl4'].forEach(id => {
+                // 更新解锁列表，加入 lvl5
+                ['lvl1', 'lvl2', 'lvl3', 'lvl4', 'lvl5'].forEach(id => {
                     const el = document.getElementById(id);
                     if(el) el.classList.remove('locked-state');
                 });
@@ -103,9 +114,12 @@
             const s1Score = localStorage.getItem('stage1_score'); 
             if (s1Score === 'gold') { document.getElementById('m1').innerText = "🥇"; }
             else if (s1Score === 'silver') { document.getElementById('m1').innerText = "🥈"; }
+            
             if (localStorage.getItem('level2_cleared') === 'true') { document.getElementById('m2').innerText = "🏅"; }
             if (localStorage.getItem('level3_cleared') === 'true') { document.getElementById('m3').innerText = "🧪"; }
             if (localStorage.getItem('level4_cleared') === 'true') { document.getElementById('m4').innerText = "⚔️"; }
+            // 第五关奖牌逻辑
+            if (localStorage.getItem('level5_cleared') === 'true') { document.getElementById('m5').innerText = "🚑"; }
         }
 
         function unlock() {
@@ -117,7 +131,14 @@
 
         function go(n) { 
             if (localStorage.getItem('isUnlocked') === 'true') {
-                const pages = {1: '01-gender.html', 2: '02-classify.html', 3: '03-plural.html', 4: '04-verbs.html'};
+                // 更新页面路径映射，加入第五关
+                const pages = {
+                    1: '01-gender.html', 
+                    2: '02-classify.html', 
+                    3: '03-plural.html', 
+                    4: '04-verbs.html',
+                    5: '05-starke-verben.html'
+                };
                 window.location.href = pages[n];
             } 
         }
