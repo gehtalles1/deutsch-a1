@@ -42,8 +42,8 @@
     </nav>
 
     <div id="main-card" class="bg-white w-full max-w-[400px] p-8 pb-14 rounded-[32px] border-x border-t border-slate-100 border-b-[6px] border-slate-200 text-center relative mb-8">
-        <div id="hint-tag" class="absolute -top-6 left-1/2 -translate-x-1/2 w-[85%] px-4 py-3 bg-rose-500 text-white text-xs font-black rounded-2xl shadow-xl opacity-0 transition-all duration-300 leading-tight">
-            口诀激活
+        <div id="hint-tag" class="absolute -top-10 left-1/2 -translate-x-1/2 w-[90%] px-4 py-3 bg-rose-500 text-white text-xs font-bold rounded-2xl shadow-xl opacity-0 transition-all duration-300 leading-relaxed">
+            老师的叮嘱
         </div>
         <div class="mb-10 mt-4">
             <h2 id="verb-display" class="text-5xl font-black text-slate-800 mb-2 tracking-tighter">fahren</h2>
@@ -60,9 +60,9 @@
     <div id="options-grid" class="grid grid-cols-2 gap-4 w-full max-w-[400px]"></div>
 
     <div id="success-overlay" class="fixed inset-0 bg-white/95 flex flex-col items-center justify-center p-10 text-center">
-        <div class="mb-6 text-7xl">🚑</div>
-        <h2 class="text-4xl font-black text-slate-900 mb-4 tracking-tighter">急救成功！</h2>
-        <p class="text-slate-500 font-bold mb-12 leading-relaxed">现在的你，稳拿强变化动词的分数！</p>
+        <div class="mb-6 text-7xl">🏆</div>
+        <h2 class="text-4xl font-black text-slate-900 mb-4 tracking-tighter">太棒了！</h2>
+        <p class="text-slate-500 font-bold mb-12 leading-relaxed">强变化动词已被你收入囊中，<br>德语语感又进了一步！</p>
         <button onclick="location.href='index.html'" class="w-full max-w-[240px] py-5 bg-[#58CC02] border-b-[4px] border-[#46A302] text-white font-black rounded-2xl shadow-xl active:translate-y-1 transition-all">
             收下勋章并返回
         </button>
@@ -70,19 +70,19 @@
 
     <script>
         const rawVerbs = [
-            { v: 'fahren', m: '乘车/行驶', a: {Du: 'fährst', Er: 'fährt', Sie: 'fährt', Es: 'fährt'}, o: ['fährst', 'fährt', 'fahrt', 'fahre'], k: '⚠️ 变音警报：a 变 ä' },
-            { v: 'essen', m: '吃', a: {Du: 'isst', Er: 'isst', Sie: 'isst', Es: 'isst'}, o: ['isst', 'esst', 'est', 'essen'], k: '🍔 口诀：e 变 i' },
-            { v: 'geben', m: '给', a: {Du: 'gibst', Er: 'gibt', Sie: 'gibt', Es: 'gibt'}, o: ['gibst', 'gebst', 'gibt', 'gebt'], k: '🎁 变化：e 变 i' },
-            { v: 'nehmen', m: '拿/服用', a: {Du: 'nimmst', Er: 'nimmt', Sie: 'nimmt', Es: 'nimmt'}, o: ['nimmst', 'nimmt', 'nehmst', 'nehmt'], k: '💊 叮嘱：双写 mm，e 变 i' },
-            { v: 'lesen', m: '读', a: {Du: 'liest', Er: 'liest', Sie: 'liest', Es: 'liest'}, o: ['liest', 'lest', 'liesest', 'lesen'], k: '📚 长音：e 变 ie' },
-            { v: 'sprechen', m: '说/讲', a: {Du: 'sprichst', Er: 'spricht', Sie: 'spricht', Es: 'spricht'}, o: ['sprichst', 'spricht', 'sprecht', 'spreche'], k: '🗣️ 说话：e 变 i' },
-            { v: 'helfen', m: '帮助', a: {Du: 'hilfst', Er: 'hilft', Sie: 'hilft', Es: 'hilft'}, o: ['hilfst', 'hilft', 'helft', 'helfe'], k: '🤝 信号：e 变 i' },
-            { v: 'sehen', m: '看', a: {Du: 'siehst', Er: 'sieht', Sie: 'sieht', Es: 'sieht'}, o: ['siehst', 'sieht', 'seht', 'sehe'], k: '👀 注意：e 变 ie' },
-            { v: 'waschen', m: '洗', a: {Du: 'wäschst', Er: 'wäscht', Sie: 'wäscht', Es: 'wäscht'}, o: ['wäschst', 'wäscht', 'waschst', 'wascht'], k: '🧼 洗刷：a 变 ä' },
-            { v: 'laufen', m: '跑', a: {Du: 'läufst', Er: 'läuft', Sie: 'läuft', Es: 'läuft'}, o: ['läufst', 'läuft', 'lauft', 'laufst'], k: '🏃 跑跑：au 变 äu' },
-            { v: 'backen', m: '烘焙', a: {Du: 'bäckst', Er: 'bäckt', Sie: 'bäckt', Es: 'bäckt'}, o: ['bäckst', 'bäckt', 'backt', 'backst'], k: '🥐 香喷：a 变 ä' },
-            { v: 'schlafen', m: '睡觉', a: {Du: 'schläfst', Er: 'schläft', Sie: 'schläft', Es: 'schläft'}, o: ['schläfst', 'schläft', 'schlaft', 'schlafst'], k: '😴 梦话：a 变 ä' },
-            { v: 'tragen', m: '穿/戴/背', a: {Du: 'trägst', Er: 'trägt', Sie: 'trägt', Es: 'trägt'}, o: ['trägst', 'trägt', 'tragt', 'tragst'], k: '🎒 背起：a 变 ä' }
+            { v: 'fahren', m: '乘车/行驶', a: {Du: 'fährst', Er: 'fährt', Sie: 'fährt', Es: 'fährt'}, o: ['fährst', 'fährt', 'fahrt', 'fahre'], k: '💡 记住：a遇到du/er/sie/es要“长胡子”变ä，千万别忘了这两点！' },
+            { v: 'essen', m: '吃', a: {Du: 'isst', Er: 'isst', Sie: 'isst', Es: 'isst'}, o: ['isst', 'esst', 'est', 'essen'], k: '🍔 老师叮嘱：这个词太“饿”了，把e直接啃掉变成了i，且du和er长得一样！' },
+            { v: 'geben', m: '给', a: {Du: 'gibst', Er: 'gibt', Sie: 'gibt', Es: 'gibt'}, o: ['gibst', 'gebst', 'gibt', 'gebt'], k: '🎁 敲黑板：要把东西“给”出去，e得先换成i。这是德语最基础的变音！' },
+            { v: 'nehmen', m: '拿/服用', a: {Du: 'nimmst', Er: 'nimmt', Sie: 'nimmt', Es: 'nimmt'}, o: ['nimmst', 'nimmt', 'nehmst', 'nehmt'], k: '💊 变身术：这是大魔王词！e变i，h消失了，还要双写mm！看仔细咯！' },
+            { v: 'lesen', m: '读', a: {Du: 'liest', Er: 'liest', Sie: 'liest', Es: 'liest'}, o: ['liest', 'lest', 'liesest', 'lesen'], k: '📚 读书要读细：e要变成ie，拉长音。注意du和er也是共用一个变位！' },
+            { v: 'sprechen', m: '说/讲', a: {Du: 'sprichst', Er: 'spricht', Sie: 'spricht', Es: 'spricht'}, o: ['sprichst', 'spricht', 'sprecht', 'spreche'], k: '🗣️ 开口说：e变i。别把它跟变ie的读混了，这个是短音i！' },
+            { v: 'helfen', m: '帮助', a: {Du: 'hilfst', Er: 'hilft', Sie: 'hilft', Es: 'hilft'}, o: ['hilfst', 'hilft', 'helft', 'helfe'], k: '🤝 互助：伸手帮一把，e就变成了i。记住du和er都要变！' },
+            { v: 'sehen', m: '看', a: {Du: 'siehst', Er: 'sieht', Sie: 'sieht', Es: 'sieht'}, o: ['siehst', 'sieht', 'seht', 'sehe'], k: '👀 注意：看东西得看清楚，e要变成ie。记得保留那个h哦！' },
+            { v: 'waschen', m: '洗', a: {Du: 'wäschst', Er: 'wäscht', Sie: 'wäscht', Es: 'wäscht'}, o: ['wäschst', 'wäscht', 'waschst', 'wascht'], k: '🧼 洗白白：a也要变ä。这在a类强变化动词里是标配规律。' },
+            { v: 'laufen', m: '跑', a: {Du: 'läufst', Er: 'läuft', Sie: 'läuft', Es: 'läuft'}, o: ['läufst', 'läuft', 'lauft', 'laufst'], k: '🏃 飞奔：au变成了äu。就像跑得太快，头上的帽子（变音符）都飞出来了！' },
+            { v: 'backen', m: '烘焙', a: {Du: 'bäckst', Er: 'bäckt', Sie: 'bäckt', Es: 'bäckt'}, o: ['bäckst', 'bäckt', 'backt', 'backst'], k: '🥐 变香了：做面包的时候a会变ä。小心du变位里的st和词干ck的组合！' },
+            { v: 'schlafen', m: '睡觉', a: {Du: 'schläfst', Er: 'schläft', Sie: 'schläft', Es: 'schläft'}, o: ['schläfst', 'schläft', 'schlaft', 'schlafst'], k: '😴 梦话：睡觉时a也会长出“两个小翅膀”变ä。在变音的世界里，a从不孤单。' },
+            { v: 'tragen', m: '穿/戴/背', a: {Du: 'trägst', Er: 'trägt', Sie: 'trägt', Es: 'trägt'}, o: ['trägst', 'trägt', 'tragt', 'tragst'], k: '🎒 背起：a变ä。不管是穿衣服还是背书包，规则都要背在身上！' }
         ];
 
         let gameDeck = [];
@@ -127,7 +127,7 @@
             document.getElementById('meaning-display').innerText = q.m;
             document.getElementById('pronoun').innerText = q.p;
             document.getElementById('answer-placeholder').innerText = '';
-            document.getElementById('answer-placeholder').classList.remove('text-rose-600');
+            document.getElementById('answer-placeholder').classList.remove('text-[#58CC02]');
             document.getElementById('hint-tag').classList.replace('opacity-100', 'opacity-0');
             const grid = document.getElementById('options-grid');
             grid.innerHTML = '';
@@ -147,11 +147,10 @@
                 canClick = false;
                 btn.classList.add('correct');
                 document.getElementById('answer-placeholder').innerText = q.a;
-                document.getElementById('answer-placeholder').classList.add('text-rose-600');
+                document.getElementById('answer-placeholder').classList.add('text-[#58CC02]');
                 
                 playTone(880, 0.4);
                 
-                // 点击位置的小烟花
                 confetti({
                     particleCount: 20,
                     spread: 40,
@@ -159,7 +158,6 @@
                     colors: ['#58CC02', '#A8FF6D', '#FFFFFF']
                 });
 
-                // 修改点：对题后停留 3000 毫秒（3秒）
                 setTimeout(() => {
                     currentIdx++; updateUI();
                     if (currentIdx < 40) loadQuestion();
