@@ -42,7 +42,7 @@
     </nav>
 
     <div id="main-card" class="bg-white w-full max-w-[400px] p-8 pb-14 rounded-[32px] border-x border-t border-slate-100 border-b-[6px] border-slate-200 text-center relative mb-8">
-        <div id="hint-tag" class="absolute -top-6 left-1/2 -translate-x-1/2 w-[85%] px-4 py-3 bg-rose-500 text-white text-xs font-black rounded-2xl shadow-xl opacity-0 transition-all duration-300leading-tight">
+        <div id="hint-tag" class="absolute -top-6 left-1/2 -translate-x-1/2 w-[85%] px-4 py-3 bg-rose-500 text-white text-xs font-black rounded-2xl shadow-xl opacity-0 transition-all duration-300 leading-tight">
             口诀激活
         </div>
         <div class="mb-10 mt-4">
@@ -102,14 +102,12 @@
         let currentIdx = 0, isMuted = false, canClick = true;
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-        // 升级版合成音效：模拟钢琴提示音
         function playTone(freq, duration) {
             if (isMuted) return;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
-            osc.type = 'triangle'; // 三角波，声音更圆润
+            osc.type = 'triangle';
             osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            // 包络：快速开始，指数衰减
             gain.gain.setValueAtTime(0.01, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.2, audioCtx.currentTime + 0.05);
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
@@ -151,27 +149,25 @@
                 document.getElementById('answer-placeholder').innerText = q.a;
                 document.getElementById('answer-placeholder').classList.add('text-rose-600');
                 
-                // 1. 播放质感“叮”声 (钢琴 A5)
                 playTone(880, 0.4);
                 
-                // 2. 点击小烟花 (从鼠标位置爆破)
+                // 点击位置的小烟花
                 confetti({
                     particleCount: 20,
                     spread: 40,
                     origin: { x: e.clientX / window.innerWidth, y: e.clientY / window.innerHeight },
-                    colors: ['#58CC02', '#A8FF6D', '#FFFFFF'],
-                    disableForReducedMotion: true
+                    colors: ['#58CC02', '#A8FF6D', '#FFFFFF']
                 });
 
+                // 修改点：对题后停留 3000 毫秒（3秒）
                 setTimeout(() => {
                     currentIdx++; updateUI();
                     if (currentIdx < 40) loadQuestion();
                     else finishGame();
-                }, 1200); 
+                }, 3000); 
             } else {
                 btn.classList.add('wrong');
-                playTone(146.83, 0.3); // 锯齿波错误音
-                if (navigator.vibrate) navigator.vibrate(100);
+                playTone(146.83, 0.3);
                 document.getElementById('main-card').classList.add('shake-effect');
                 setTimeout(() => document.getElementById('main-card').classList.remove('shake-effect'), 400);
                 const tag = document.getElementById('hint-tag');
@@ -187,9 +183,7 @@
 
         function finishGame() {
             localStorage.setItem('level5_cleared', 'true');
-            // 3. 通关大烟花
             confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-            // 显示高颜值成功遮罩
             document.getElementById('success-overlay').classList.add('active');
         }
 
