@@ -9,50 +9,46 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
         body { background-color: #F8FAFC; font-family: 'Noto Sans SC', sans-serif; color: #1E293B; overflow: hidden; touch-action: manipulation; }
-        .option-btn { background: white; border-radius: 20px; border: 1px solid #E2E8F0; border-bottom: 4px solid #E2E8F0; transition: all 0.1s; cursor: pointer; }
+        .option-btn { background: white; border-radius: 20px; border: 1px solid #E2E8F0; border-bottom: 4px solid #E2E8F0; transition: all 0.1s; cursor: pointer; position: relative; }
         .option-btn:active:not(.disabled) { transform: translateY(2px); border-bottom-width: 1px; }
         .option-btn.correct { background: #58CC02 !important; border-color: #46A302 !important; color: white !important; transform: scale(1.05); }
         .option-btn.wrong { background: #F43F5E !important; border-color: #BE123C !important; color: white !important; }
         .progress-fill { transition: width 0.4s cubic-bezier(0.17, 0.89, 0.32, 1.49); }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
         .shake-effect { animation: shake 0.2s ease-in-out 0s 2; }
-        #success-overlay { backdrop-filter: blur(8px); visibility: hidden; opacity: 0; transition: all 0.5s; }
+        #success-overlay { backdrop-filter: blur(8px); visibility: hidden; opacity: 0; transition: all 0.5s; z-index: 100; }
         #success-overlay.active { visibility: visible; opacity: 1; }
-        /* 确保填空处与左侧代词高度完全一致 */
         .sentence-container { display: flex; align-items: baseline; justify-content: center; gap: 0.75rem; min-height: 4rem; }
     </style>
 </head>
-<body class="flex flex-col items-center justify-center min-h-screen px-6">
+<body class="flex flex-col items-center justify-start min-h-screen pt-12 px-6">
 
-    <nav class="fixed top-0 w-full max-w-[480px] p-6 flex justify-between items-center z-10">
-        <button onclick="location.href='index.html'" class="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-sm border border-slate-100 active:scale-90">
-            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg>
+    <nav class="w-full max-w-[440px] flex items-center gap-4 mb-10 z-10">
+        <button onclick="location.href='index.html'" class="shrink-0 active:scale-90 transition-transform">
+            <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg>
         </button>
-        <button id="mute-btn" onclick="toggleMute()" class="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-sm border border-slate-100">
-            <span id="mute-icon" class="text-lg">🔊</span>
+        <div class="flex-grow">
+            <div class="flex justify-between items-end mb-1.5 px-1">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">急救进度</span>
+                <span id="score-text" class="text-xs font-bold text-[#58CC02] tracking-tighter">0/40</span>
+            </div>
+            <div class="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-50">
+                <div id="progress-bar" class="h-full bg-[#58CC02] progress-fill" style="width: 0%"></div>
+            </div>
+        </div>
+        <button id="mute-btn" onclick="toggleMute()" class="shrink-0 w-10 h-10 flex items-center justify-center bg-white rounded-xl shadow-sm border border-slate-100 active:bg-slate-50">
+            <span id="mute-icon" class="text-xl">🔊</span>
         </button>
     </nav>
 
-    <div class="w-full max-w-[400px] mb-8">
-        <div class="flex justify-between items-end mb-3 px-1">
-            <span class="text-xs font-[900] text-slate-400 tracking-widest italic">急救进度</span>
-            <span id="score-text" class="text-2xl font-black text-[#58CC02]">0/40</span>
-        </div>
-        <div class="h-3.5 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-50">
-            <div id="progress-bar" class="h-full bg-[#58CC02] progress-fill" style="width: 0%"></div>
-        </div>
-    </div>
-
-    <div id="main-card" class="bg-white w-full max-w-[400px] p-8 pb-14 rounded-[32px] border-x border-t border-slate-100 border-b-[6px] border-slate-200 text-center relative mb-6">
-        <div id="hint-tag" class="absolute -top-8 left-1/2 -translate-x-1/2 w-[85%] px-4 py-3 bg-rose-500 text-white text-sm font-black rounded-2xl shadow-2xl opacity-0 transition-all duration-300 leading-tight">
+    <div id="main-card" class="bg-white w-full max-w-[400px] p-8 pb-14 rounded-[32px] border-x border-t border-slate-100 border-b-[6px] border-slate-200 text-center relative mb-8">
+        <div id="hint-tag" class="absolute -top-6 left-1/2 -translate-x-1/2 w-[85%] px-4 py-3 bg-rose-500 text-white text-xs font-black rounded-2xl shadow-xl opacity-0 transition-all duration-300leading-tight">
             口诀激活
         </div>
-        
         <div class="mb-10 mt-4">
             <h2 id="verb-display" class="text-5xl font-black text-slate-800 mb-2 tracking-tighter">fahren</h2>
             <p id="meaning-display" class="text-slate-400 font-bold italic">乘车，行驶</p>
         </div>
-        
         <div class="sentence-container">
             <span id="pronoun" class="text-5xl font-black text-rose-600 leading-none">Sie</span>
             <div class="relative min-w-[160px] border-b-4 border-slate-100">
@@ -63,9 +59,10 @@
 
     <div id="options-grid" class="grid grid-cols-2 gap-4 w-full max-w-[400px]"></div>
 
-    <div id="success-overlay" class="fixed inset-0 z-50 bg-white/95 flex flex-col items-center justify-center p-10 text-center">
+    <div id="success-overlay" class="fixed inset-0 bg-white/95 flex flex-col items-center justify-center p-10 text-center">
         <div class="mb-6 text-7xl">🚑</div>
         <h2 class="text-4xl font-black text-slate-900 mb-4 tracking-tighter">急救成功！</h2>
+        <p class="text-slate-500 font-bold mb-12 leading-relaxed">现在的你，稳拿强变化动词的分数！</p>
         <button onclick="location.href='index.html'" class="w-full max-w-[240px] py-5 bg-[#58CC02] border-b-[4px] border-[#46A302] text-white font-black rounded-2xl shadow-xl active:translate-y-1 transition-all">
             收下勋章并返回
         </button>
@@ -73,19 +70,19 @@
 
     <script>
         const rawVerbs = [
-            { v: 'fahren', m: '乘车/行驶', a: {Du: 'fährst', Er: 'fährt', Sie: 'fährt', Es: 'fährt'}, o: ['fährst', 'fährt', 'fahrt', 'fahre'], k: '⚠️ 变音警报：a 变 ä，音往下拉！' },
-            { v: 'essen', m: '吃', a: {Du: 'isst', Er: 'isst', Sie: 'isst', Es: 'isst'}, o: ['isst', 'esst', 'est', 'essen'], k: '🍔 吃饭口诀：e 变 i，嘴巴缩小！' },
-            { v: 'geben', m: '给', a: {Du: 'gibst', Er: 'gibt', Sie: 'gibt', Es: 'gibt'}, o: ['gibst', 'gebst', 'gibt', 'gebt'], k: '🎁 给出惊喜：e 变 i，不要写错！' },
-            { v: 'nehmen', m: '拿/服用', a: {Du: 'nimmst', Er: 'nimmt', Sie: 'nimmt', Es: 'nimmt'}, o: ['nimmst', 'nimmt', 'nehmst', 'nehmt'], k: '💊 拿药叮嘱：双写 mm，e 变 i！' },
-            { v: 'lesen', m: '读', a: {Du: 'liest', Er: 'liest', Sie: 'liest', Es: 'liest'}, o: ['liest', 'lest', 'liesest', 'lesen'], k: '📚 阅读时刻：e 变 ie，拉长音！' },
-            { v: 'sprechen', m: '说/讲', a: {Du: 'sprichst', Er: 'spricht', Sie: 'spricht', Es: 'spricht'}, o: ['sprichst', 'spricht', 'sprecht', 'spreche'], k: '🗣️ 说话注意：e 变 i，词干要变！' },
-            { v: 'helfen', m: '帮助', a: {Du: 'hilfst', Er: 'hilft', Sie: 'hilft', Es: 'hilft'}, o: ['hilfst', 'hilft', 'helft', 'helfe'], k: '🤝 求助信号：e 变 i，才是强变化！' },
-            { v: 'sehen', m: '看', a: {Du: 'siehst', Er: 'sieht', Sie: 'sieht', Es: 'sieht'}, o: ['siehst', 'sieht', 'seht', 'sehe'], k: '👀 仔细看好：e 变 ie，别漏了 e！' },
-            { v: 'waschen', m: '洗', a: {Du: 'wäschst', Er: 'wäscht', Sie: 'wäscht', Es: 'wäscht'}, o: ['wäschst', 'wäscht', 'waschst', 'wascht'], k: '🧼 洗刷刷：a 变 ä，记得加两点！' },
-            { v: 'laufen', m: '跑', a: {Du: 'läufst', Er: 'läuft', Sie: 'läuft', Es: 'läuft'}, o: ['läufst', 'läuft', 'lauft', 'laufst'], k: '🏃 奔跑快报：au 变 äu，发音变了！' },
-            { v: 'backen', m: '烘焙', a: {Du: 'bäckst', Er: 'bäckt', Sie: 'bäckt', Es: 'bäckt'}, o: ['bäckst', 'bäckt', 'backt', 'backst'], k: '🥐 香喷喷：a 变 ä，烤箱熟了！' },
-            { v: 'schlafen', m: '睡觉', a: {Du: 'schläfst', Er: 'schläft', Sie: 'schläft', Es: 'schläft'}, o: ['schläfst', 'schläft', 'schlaft', 'schlafst'], k: '😴 晚安口诀：a 变 ä，梦里要变音！' },
-            { v: 'tragen', m: '穿/戴/背', a: {Du: 'trägst', Er: 'trägt', Sie: 'trägt', Es: 'trägt'}, o: ['trägst', 'trägt', 'tragt', 'tragst'], k: '🎒 背书包：a 变 ä，向上提一点！' }
+            { v: 'fahren', m: '乘车/行驶', a: {Du: 'fährst', Er: 'fährt', Sie: 'fährt', Es: 'fährt'}, o: ['fährst', 'fährt', 'fahrt', 'fahre'], k: '⚠️ 变音警报：a 变 ä' },
+            { v: 'essen', m: '吃', a: {Du: 'isst', Er: 'isst', Sie: 'isst', Es: 'isst'}, o: ['isst', 'esst', 'est', 'essen'], k: '🍔 口诀：e 变 i' },
+            { v: 'geben', m: '给', a: {Du: 'gibst', Er: 'gibt', Sie: 'gibt', Es: 'gibt'}, o: ['gibst', 'gebst', 'gibt', 'gebt'], k: '🎁 变化：e 变 i' },
+            { v: 'nehmen', m: '拿/服用', a: {Du: 'nimmst', Er: 'nimmt', Sie: 'nimmt', Es: 'nimmt'}, o: ['nimmst', 'nimmt', 'nehmst', 'nehmt'], k: '💊 叮嘱：双写 mm，e 变 i' },
+            { v: 'lesen', m: '读', a: {Du: 'liest', Er: 'liest', Sie: 'liest', Es: 'liest'}, o: ['liest', 'lest', 'liesest', 'lesen'], k: '📚 长音：e 变 ie' },
+            { v: 'sprechen', m: '说/讲', a: {Du: 'sprichst', Er: 'spricht', Sie: 'spricht', Es: 'spricht'}, o: ['sprichst', 'spricht', 'sprecht', 'spreche'], k: '🗣️ 说话：e 变 i' },
+            { v: 'helfen', m: '帮助', a: {Du: 'hilfst', Er: 'hilft', Sie: 'hilft', Es: 'hilft'}, o: ['hilfst', 'hilft', 'helft', 'helfe'], k: '🤝 信号：e 变 i' },
+            { v: 'sehen', m: '看', a: {Du: 'siehst', Er: 'sieht', Sie: 'sieht', Es: 'sieht'}, o: ['siehst', 'sieht', 'seht', 'sehe'], k: '👀 注意：e 变 ie' },
+            { v: 'waschen', m: '洗', a: {Du: 'wäschst', Er: 'wäscht', Sie: 'wäscht', Es: 'wäscht'}, o: ['wäschst', 'wäscht', 'waschst', 'wascht'], k: '🧼 洗刷：a 变 ä' },
+            { v: 'laufen', m: '跑', a: {Du: 'läufst', Er: 'läuft', Sie: 'läuft', Es: 'läuft'}, o: ['läufst', 'läuft', 'lauft', 'laufst'], k: '🏃 跑跑：au 变 äu' },
+            { v: 'backen', m: '烘焙', a: {Du: 'bäckst', Er: 'bäckt', Sie: 'bäckt', Es: 'bäckt'}, o: ['bäckst', 'bäckt', 'backt', 'backst'], k: '🥐 香喷：a 变 ä' },
+            { v: 'schlafen', m: '睡觉', a: {Du: 'schläfst', Er: 'schläft', Sie: 'schläft', Es: 'schläft'}, o: ['schläfst', 'schläft', 'schlaft', 'schlafst'], k: '😴 梦话：a 变 ä' },
+            { v: 'tragen', m: '穿/戴/背', a: {Du: 'trägst', Er: 'trägt', Sie: 'trägt', Es: 'trägt'}, o: ['trägst', 'trägt', 'tragt', 'tragst'], k: '🎒 背起：a 变 ä' }
         ];
 
         let gameDeck = [];
@@ -94,7 +91,7 @@
             let lastVerb = "";
             while(gameDeck.length < 40) {
                 const verb = rawVerbs[Math.floor(Math.random() * rawVerbs.length)];
-                if(verb.v === lastVerb) continue; // 强制频繁切换动词
+                if(verb.v === lastVerb) continue;
                 lastVerb = verb.v;
                 const pKeys = Object.keys(verb.a);
                 const p = pKeys[Math.floor(Math.random() * pKeys.length)];
@@ -105,12 +102,17 @@
         let currentIdx = 0, isMuted = false, canClick = true;
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-        function playTone(freq, type, duration) {
+        // 升级版合成音效：模拟钢琴提示音
+        function playTone(freq, duration) {
             if (isMuted) return;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
-            osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            osc.type = 'triangle'; // 三角波，声音更圆润
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            // 包络：快速开始，指数衰减
+            gain.gain.setValueAtTime(0.01, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.2, audioCtx.currentTime + 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
             osc.connect(gain); gain.connect(audioCtx.destination);
             osc.start(); osc.stop(audioCtx.currentTime + duration);
         }
@@ -129,37 +131,46 @@
             document.getElementById('answer-placeholder').innerText = '';
             document.getElementById('answer-placeholder').classList.remove('text-rose-600');
             document.getElementById('hint-tag').classList.replace('opacity-100', 'opacity-0');
-            
             const grid = document.getElementById('options-grid');
             grid.innerHTML = '';
             [...q.o].sort(() => Math.random() - 0.5).forEach(opt => {
                 const btn = document.createElement('button');
                 btn.className = 'option-btn py-6 text-2xl font-black text-slate-700';
                 btn.innerText = opt;
-                btn.onclick = () => checkAnswer(opt, btn);
+                btn.onclick = (e) => checkAnswer(opt, btn, e);
                 grid.appendChild(btn);
             });
         }
 
-        function checkAnswer(userVal, btn) {
+        function checkAnswer(userVal, btn, e) {
             if(!canClick) return;
             const q = gameDeck[currentIdx];
             if (userVal === q.a) {
                 canClick = false;
                 btn.classList.add('correct');
-                // 让正确答案跳入横线，并设置与左侧代词一致的视觉效果
-                const placeholder = document.getElementById('answer-placeholder');
-                placeholder.innerText = q.a;
-                placeholder.classList.add('text-rose-600'); // 可选：让整句话颜色统一更吸睛
-                playTone(880, 'sine', 0.2);
+                document.getElementById('answer-placeholder').innerText = q.a;
+                document.getElementById('answer-placeholder').classList.add('text-rose-600');
+                
+                // 1. 播放质感“叮”声 (钢琴 A5)
+                playTone(880, 0.4);
+                
+                // 2. 点击小烟花 (从鼠标位置爆破)
+                confetti({
+                    particleCount: 20,
+                    spread: 40,
+                    origin: { x: e.clientX / window.innerWidth, y: e.clientY / window.innerHeight },
+                    colors: ['#58CC02', '#A8FF6D', '#FFFFFF'],
+                    disableForReducedMotion: true
+                });
+
                 setTimeout(() => {
                     currentIdx++; updateUI();
                     if (currentIdx < 40) loadQuestion();
                     else finishGame();
-                }, 3000); 
+                }, 1200); 
             } else {
                 btn.classList.add('wrong');
-                playTone(110, 'sawtooth', 0.3);
+                playTone(146.83, 0.3); // 锯齿波错误音
                 if (navigator.vibrate) navigator.vibrate(100);
                 document.getElementById('main-card').classList.add('shake-effect');
                 setTimeout(() => document.getElementById('main-card').classList.remove('shake-effect'), 400);
@@ -175,8 +186,10 @@
         }
 
         function finishGame() {
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
             localStorage.setItem('level5_cleared', 'true');
+            // 3. 通关大烟花
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            // 显示高颜值成功遮罩
             document.getElementById('success-overlay').classList.add('active');
         }
 
