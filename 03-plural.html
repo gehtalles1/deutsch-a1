@@ -125,7 +125,7 @@
             {w:"Taxi", cn:"出租车", a:"-s", e:"🚕", p:"Taxis", r:"以 -i 结尾的名词复数加 -s。"},
             {w:"Foto", cn:"照片", a:"-s", e:"📷", p:"Fotos", r:"以 -o 结尾的名词复数加 -s。"},
             {w:"Lehrer", cn:"老师", a:"无变化", e:"👨‍🏫", p:"Lehrer", r:"-er, -el, -en 结尾的阳性词复数不变化。"},
-            {w:"Schüler", cn:"学生", a:"👨‍🎓", p:"Schüler", r:"-er 结尾的阳性词复数不变化。"},
+            {w:"Schüler", cn:"学生", a:"无变化", e:"👨‍🎓", p:"Schüler", r:"-er 结尾的阳性词复数不变化。"},
             {w:"Fenster", cn:"窗户", a:"无变化", e:"🪟", p:"Fenster", r:"-er 结尾的中性词复数不变化。"},
             {w:"Computer", cn:"电脑", a:"无变化", e:"💻", p:"Computer", r:"-er 结尾的阳性外来词复数不变化。"},
             {w:"Löffel", cn:"勺子", a:"无变化", e:"🥄", p:"Löffel", r:"-el 结尾的阳性词复数不变化。"},
@@ -150,11 +150,14 @@
             card.className = ''; 
             card.style.transition = 'none';
             card.style.transform = 'translate3d(0,0,0)';
+            card.innerHTML = `
+                <div id="emoji" class="text-5xl">${item.e}</div>
+                <div id="word" class="text-xl font-black mt-2 text-slate-800">${item.w}</div>
+                <div id="cn" class="text-slate-400 font-bold text-sm">${item.cn}</div>
+            `;
+            
             moveX = 0; moveY = 0;
             
-            document.getElementById('emoji').innerText = item.e;
-            document.getElementById('word').innerText = item.w;
-            document.getElementById('cn').innerText = item.cn;
             document.getElementById('cur-num').innerText = currentIdx + 1;
             document.getElementById('total-num').innerText = words.length;
             document.getElementById('progress-inner').style.width = `${(currentIdx / words.length) * 100}%`;
@@ -246,6 +249,7 @@
             card.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
             card.classList.add('success-zoom');
             
+            // 成功后展示复数形式
             document.getElementById('emoji').innerText = words[currentIdx].e.repeat(2);
             document.getElementById('word').innerText = words[currentIdx].p;
             currentIdx++;
@@ -264,13 +268,12 @@
             document.getElementById('error-overlay').style.display = 'none';
             isLocked = false;
             moveX = 0; moveY = 0;
+            card.style.transition = 'transform 0.5s';
             card.style.transform = 'translate3d(0,0,0)';
         }
 
         function showFinalWin() {
-            // --- 核心修改：写入通关记录 ---
             localStorage.setItem('level3_cleared', 'true');
-
             confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
             card.innerHTML = `
                 <div class="text-6xl mb-4">🏆</div>
