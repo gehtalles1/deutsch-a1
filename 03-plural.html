@@ -3,54 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>复数实验室 | 刘老师定制版</title>
+    <title>复数实验室 | 精调版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@700;900&display=swap');
         body { background: #F8FAF9; font-family: 'Noto Sans SC', sans-serif; margin: 0; width: 100%; height: 100%; overflow: hidden; touch-action: none; display: flex; flex-direction: column; }
 
-        /* 返回键 */
-        .back-btn { position: fixed; left: 15px; top: max(20px, env(safe-area-inset-top)); width: 44px; height: 44px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); z-index: 500; cursor: pointer; border: 1px solid #f1f5f9; transition: transform 0.2s; }
+        .back-btn { position: fixed; left: 15px; top: max(20px, env(safe-area-inset-top)); width: 44px; height: 44px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); z-index: 500; cursor: pointer; border: 1px solid #f1f5f9; }
         
-        /* 顶部导航 - 确保消音键好点 */
         .header-box { margin-top: max(50px, env(safe-area-inset-top)); display: flex; flex-direction: column; align-items: center; flex-shrink: 0; position: relative; z-index: 600; }
         .nav-row { display: flex; align-items: center; gap: 15px; width: 100%; justify-content: center; padding: 0 20px; }
-        .progress-bar-bg { width: min(200px, 45vw); height: 12px; background: #E2E8F0; border-radius: 6px; overflow: hidden; border: 1px solid #edf2f7; }
+        .progress-bar-bg { width: min(200px, 45vw); height: 10px; background: #E2E8F0; border-radius: 5px; overflow: hidden; }
         #progress-inner { height: 100%; background: #10B981; width: 0%; transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        #mute-btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); cursor: pointer; font-size: 1.2rem; border: 1px solid #f1f5f9; }
+        #mute-btn { width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; background: white; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); cursor: pointer; font-size: 1.1rem; }
 
-        /* 词卡区域 */
         .card-zone { flex-grow: 1; display: flex; align-items: center; justify-content: center; position: relative; width: 100%; z-index: 10; }
+        
         #active-card {
-            width: 115px; height: 160px; background: white; border-radius: 24px;
+            width: 110px; height: 155px; background: white; border-radius: 22px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.08);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             border: 1px solid #f1f5f9; cursor: grab;
             position: absolute; z-index: 100;
             touch-action: none; will-change: transform;
-            user-select: none;
         }
         
+        /* 关键：优化对题后的放大比例，防止遮挡 */
         .success-zoom { 
-            width: min(280px, 80vw) !important; height: min(340px, 60vh) !important; 
+            width: 220px !important; height: 300px !important; 
             background: #ECFDF5 !important; border: 3px solid #10B981 !important;
-            box-shadow: 0 25px 60px rgba(16, 185, 129, 0.3) !important;
+            box-shadow: 0 20px 50px rgba(16, 185, 129, 0.25) !important;
             z-index: 1000 !important; 
+            transform: translate3d(0, 15px, 0) !important; /* 向下偏移一点，避开进度条 */
             transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
         }
 
-        /* 瓶架区域 */
-        .shelf-container { padding: 0 10px min(60px, 8vh) 10px; flex-shrink: 0; position: relative; z-index: 5; }
-        .potion-shelf { display: flex; justify-content: space-around; align-items: flex-end; max-width: 550px; margin: 0 auto; height: 130px; }
+        .shelf-container { padding: 0 10px min(50px, 6vh) 10px; flex-shrink: 0; position: relative; z-index: 5; }
+        .potion-shelf { display: flex; justify-content: space-around; align-items: flex-end; max-width: 500px; margin: 0 auto; height: 120px; }
         .potion-bottle { display: flex; flex-direction: column; align-items: center; width: 22%; transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
         
-        .active-bottle { transform: translateY(-25px) scale(1.15); }
-        .active-bottle .potion-label { background: #10B981 !important; color: white !important; transform: scale(1.1); box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
+        .active-bottle { transform: translateY(-20px) scale(1.1); }
+        .active-bottle .potion-label { background: #10B981 !important; color: white !important; transform: scale(1.05); }
 
-        .potion-label { margin-top: 10px; font-weight: 900; color: #1e293b; font-size: 0.85rem; padding: 4px 10px; background: #f1f5f9; border-radius: 12px; white-space: nowrap; transition: all 0.2s; border: 2px solid transparent; }
+        .potion-label { margin-top: 8px; font-weight: 900; color: #1e293b; font-size: 0.8rem; padding: 3px 8px; background: #f1f5f9; border-radius: 10px; white-space: nowrap; border: 2px solid transparent; }
 
-        /* 错题弹窗 */
         #error-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.92); z-index: 2000; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
         .error-card { background: white; width: 90%; max-width: 340px; border-radius: 32px; padding: 30px; text-align: center; }
     </style>
@@ -70,7 +67,7 @@
     <div class="card-zone">
         <div id="active-card">
             <div id="emoji" class="text-5xl"></div>
-            <div id="word" class="text-xl font-black mt-2 text-slate-800 text-center px-2"></div>
+            <div id="word" class="text-xl font-black mt-2 text-slate-800"></div>
             <div id="cn" class="text-slate-400 font-bold text-sm"></div>
         </div>
     </div>
@@ -82,23 +79,65 @@
     <div id="error-overlay">
         <div class="error-card shadow-2xl">
             <div class="text-rose-500 font-black text-2xl mb-2 italic">Oje!</div>
-            <div id="err-plural" class="text-3xl font-black text-emerald-600 mb-4 tracking-tight"></div>
-            <div class="bg-slate-50 border-l-4 border-amber-400 p-4 rounded-xl text-left text-sm text-slate-600 mb-6 leading-relaxed" id="err-rule"></div>
-            <button onclick="closeError()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-lg shadow-lg active:scale-95 transition-transform">记住了</button>
+            <div id="err-plural" class="text-3xl font-black text-emerald-600 mb-4"></div>
+            <div class="bg-slate-50 border-l-4 border-amber-400 p-4 rounded-xl text-left text-sm text-slate-600 mb-6" id="err-rule"></div>
+            <button onclick="closeError()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-lg">记住了</button>
         </div>
     </div>
 
     <script>
+        // 恢复 50 个完整词库
         const words = [
-            {w:"Banane", cn:"香蕉", a:"-n", e:"🍌", p:"Bananen", r:"💡 老师的叮嘱：以 -e 结尾的阴性名词（die），复数加个 -n 就行，非常听话。"},
-            {w:"Tisch", cn:"桌子", a:"-e", e:"🪑", p:"Tische", r:"🪑 敲黑板：很多阳性名词（der）复数加 -e。想象一下桌子加长了。"},
-            {w:"Hand", cn:"手", a:"¨-e", e:"✋", p:"Hände", r:"✋ 这里的 a 变成了 ä，还要加 e。单音节阴性词通常都这么“调皮”。"},
-            {w:"Kind", cn:"孩子", a:"-er", e:"👶", p:"Kinder", r:"👶 记住这个！中性名词（das）复数经常变成 -er，比如孩子们。"},
-            {w:"Buch", cn:"书", a:"¨-er", e:"📖", p:"Bücher", r:"📚 书本变多了，u 要变音成 ü，结尾还要加 -er。"},
-            {w:"Auto", cn:"汽车", a:"-s", e:"🚗", p:"Autos", r:"🚗 外来语或者元音结尾的词（a, o, i），直接加 -s，最省事。"},
-            {w:"Lehrer", cn:"老师", a:"无变化", e:"👨‍🏫", p:"Lehrer", r:"👨‍🏫 这种 -er 结尾的阳性词最稳了，复数跟单数长得一模一样。"},
-            {w:"Apfel", cn:"苹果", a:"¨-", e:"🍎", p:"Äpfel", r:"🍎 苹果变多不加后缀，只给 a 戴上两颗小眼睛变 ä。"}
-            // 这里可以继续补全到 50 个
+            {w:"Banane", cn:"香蕉", a:"-n", e:"🍌", p:"Bananen", r:"以 -e 结尾的阴性名词，复数通常加 -n。"},
+            {w:"Tomate", cn:"西红柿", a:"-n", e:"🍅", p:"Tomaten", r:"以 -e 结尾的阴性词，复数加 -n。"},
+            {w:"Lampe", cn:"灯", a:"-n", e:"💡", p:"Lampen", r:"大部分以 -e 结尾的物品名词复数加 -n。"},
+            {w:"Tasche", cn:"包", a:"-n", e:"👜", p:"Taschen", r:"阴性名词结尾为 -e，复数加 -n。"},
+            {w:"Schule", cn:"学校", a:"-n", e:"🏫", p:"Schulen", r:"阴性名词结尾为 -e，复数加 -n。"},
+            {w:"Straße", cn:"街道", a:"-n", e:"🛣️", p:"Straßen", r:"阴性名词结尾为 -e，复数加 -n。"},
+            {w:"Blume", cn:"花", a:"-n", e:"🌸", p:"Blumen", r:"阴性名词结尾为 -e，复数加 -n。"},
+            {w:"Tisch", cn:"桌子", a:"-e", e:"🪑", p:"Tische", r:"多数阳性名词复数在结尾加 -e。"},
+            {w:"Beruf", cn:"职业", a:"-e", e:"💼", p:"Berufe", r:"很多阳性名词复数加 -e。"},
+            {w:"Tag", cn:"天", a:"-e", e:"📅", p:"Tage", r:"阳性名词单音节词常加 -e。"},
+            {w:"Schuh", cn:"鞋", a:"-e", e:"👟", p:"Schuhe", r:"阳性名词，复数加 -e。"},
+            {w:"Hund", cn:"狗", a:"-e", e:"🐕", p:"Hunde", r:"阳性名词，复数加 -e。"},
+            {w:"Brief", cn:"信件", a:"-e", e:"✉️", p:"Briefe", r:"阳性名词，复数加 -e。"},
+            {w:"Film", cn:"电影", a:"-e", e:"🎬", p:"Filme", r:"阳性名词，复数加 -e。"},
+            {w:"Hand", cn:"手", a:"¨-e", e:"✋", p:"Hände", r:"单音节阴性名词复数常变音加 -e。"},
+            {w:"Stadt", cn:"城市", a:"¨-e", e:"🏙️", p:"Städte", r:"阴性词单音节，复数变音加 -e。"},
+            {w:"Nacht", cn:"夜晚", a:"¨-e", e:"🌙", p:"Nächte", r:"阴性词单音节，复数变音加 -e。"},
+            {w:"Wurst", cn:"香肠", a:"¨-e", e:"🌭", p:"Würste", r:"阴性词单音节，复数变音加 -e。"},
+            {w:"Stuhl", cn:"椅子", a:"¨-e", e:"🪑", p:"Stühle", r:"阳性单音节词，复数也常变音加 -e。"},
+            {w:"Zug", cn:"火车", a:"¨-e", e:"🚆", p:"Züge", r:"阳性词单音节，复数变音加 -e。"},
+            {w:"Baum", cn:"树", a:"¨-e", e:"🌳", p:"Bäume", r:"阳性词单音节，复数变音加 -e。"},
+            {w:"Kind", cn:"孩子", a:"-er", e:"👶", p:"Kinder", r:"许多常见中性名词复数结尾为 -er。"},
+            {w:"Bild", cn:"图片", a:"-er", e:"🖼️", p:"Bilder", r:"中性词单音节，复数加 -er。"},
+            {w:"Lied", cn:"歌曲", a:"-er", e:"🎵", p:"Lieder", r:"中性词单音节，复数加 -er。"},
+            {w:"Kleid", cn:"连衣裙", a:"-er", e:"👗", p:"Kleider", r:"中性词单音节，复数加 -er。"},
+            {w:"Ei", cn:"鸡蛋", a:"-er", e:"🥚", p:"Eier", r:"中性词单音节，复数加 -er。"},
+            {w:"Buch", cn:"书", a:"¨-er", e:"📖", p:"Bücher", r:"中性词单音节，复数变音加 -er。"},
+            {w:"Haus", cn:"房子", a:"¨-er", e:"🏠", p:"Häuser", r:"中性词单音节，复数变音加 -er。"},
+            {w:"Glas", cn:"玻璃杯", a:"¨-er", e:"🥛", p:"Gläser", r:"中性词单音节，复数变音加 -er。"},
+            {w:"Mund", cn:"嘴", a:"¨-er", e:"👄", p:"Münder", r:"阳性词中少数单音节词变音加 -er。"},
+            {w:"Wald", cn:"森林", a:"¨-er", e:"🌲", p:"Wälder", r:"阳性单音节词变音加 -er。"},
+            {w:"Fahrrad", cn:"自行车", a:"¨-er", e:"🚲", p:"Fahrräder", r:"复合词以 -rad 结尾，变音加 -er。"},
+            {w:"Auto", cn:"汽车", a:"-s", e:"🚗", p:"Autos", r:"外来语或元音结尾单词通常加 -s。"},
+            {w:"Handy", cn:"手机", a:"-s", e:"📱", p:"Handys", r:"外来语复数通常加 -s。"},
+            {w:"Kino", cn:"电影院", a:"-s", e:"🍿", p:"Kinos", r:"以 -o 结尾的名词复数加 -s。"},
+            {w:"Sofa", cn:"沙发", a:"-s", e:"🛋️", p:"Sofas", r:"以 -a 结尾的名词复数加 -s。"},
+            {w:"Taxi", cn:"出租车", a:"-s", e:"🚕", p:"Taxis", r:"以 -i 结尾的名词复数加 -s。"},
+            {w:"Foto", cn:"照片", a:"-s", e:"📷", p:"Fotos", r:"以 -o 结尾的名词复数加 -s。"},
+            {w:"Lehrer", cn:"老师", a:"无变化", e:"👨‍🏫", p:"Lehrer", r:"-er, -el, -en 结尾的阳性词复数不变化。"},
+            {w:"Schüler", cn:"学生", a:"无变化", e:"👨‍🎓", p:"Schüler", r:"-er 结尾的阳性词复数不变化。"},
+            {w:"Fenster", cn:"窗户", a:"无变化", e:"🪟", p:"Fenster", r:"-er 结尾的中性词复数不变化。"},
+            {w:"Computer", cn:"电脑", a:"无变化", e:"💻", p:"Computer", r:"-er 结尾的阳性外来词复数不变化。"},
+            {w:"Löffel", cn:"勺子", a:"无变化", e:"🥄", p:"Löffel", r:"-el 结尾的阳性词复数不变化。"},
+            {w:"Zimmer", cn:"房间", a:"无变化", e:"🏨", p:"Zimmer", r:"-er 结尾的中性词复数不变化。"},
+            {w:"Apfel", cn:"苹果", a:"¨-", e:"🍎", p:"Äpfel", r:"部分单音节阳性名词复数会发生变音。"},
+            {w:"Vater", cn:"父亲", a:"¨-", e:"👨", p:"Väter", r:"部分以 -er 结尾的阳性词复数仅变音。"},
+            {w:"Mutter", cn:"母亲", a:"¨-", e:"👩", p:"Mütter", r:"阴性词 Mutter 和 Tochter 复数仅变音。"},
+            {w:"Tochter", cn:"女儿", a:"¨-", e:"👧", p:"Töchter", r:"阴性词 Mutter 和 Tochter 复数仅变音。"},
+            {w:"Bruder", cn:"兄弟", a:"¨-", e:"👦", p:"Brüder", r:"阳性词 Bruder 复数仅变音。"},
+            {w:"Garten", cn:"花园", a:"¨-", e:"🏡", p:"Gärten", r:"阳性词 Garten 复数仅变音。"}
         ].sort(() => Math.random() - 0.5);
 
         let currentIdx = 0, isLocked = false, isMuted = false;
@@ -138,11 +177,9 @@
             `).join('');
         }
 
-        // 消音逻辑
         document.getElementById('mute-btn').onclick = function() {
             isMuted = !isMuted;
             this.innerText = isMuted ? "🔇" : "🔊";
-            this.style.background = isMuted ? "#F1F5F9" : "white";
         };
 
         card.onpointerdown = (e) => {
@@ -155,7 +192,6 @@
 
         card.onpointermove = (e) => {
             if (!card.hasPointerCapture(e.pointerId) || isLocked) return;
-            
             let rawX = e.clientX - startX;
             let rawY = e.clientY - startY;
 
@@ -211,11 +247,11 @@
             if(!isMuted) new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3').play().catch(()=>{});
             card.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
             card.classList.add('success-zoom');
-            card.style.transform = 'translate3d(0,0,0)';
+            
             document.getElementById('emoji').innerText = words[currentIdx].e.repeat(2);
             document.getElementById('word').innerText = words[currentIdx].p;
             currentIdx++;
-            setTimeout(initLevel, 3000); // 3秒记忆正确答案
+            setTimeout(initLevel, 2500); 
         }
 
         function onError() {
@@ -230,7 +266,6 @@
             document.getElementById('error-overlay').style.display = 'none';
             isLocked = false;
             moveX = 0; moveY = 0;
-            card.style.transition = 'transform 0.4s ease-out';
             card.style.transform = 'translate3d(0,0,0)';
         }
 
@@ -239,11 +274,10 @@
             card.innerHTML = `
                 <div class="text-6xl mb-4">🏆</div>
                 <div class="text-xl font-black text-emerald-600">Super gemacht!</div>
-                <div class="text-slate-500 font-bold mt-2">恭喜通关复数实验室！</div>
-                <button onclick="location.reload()" class="mt-6 px-8 py-3 bg-emerald-500 text-white rounded-full font-black text-sm shadow-lg">再来一轮</button>
+                <div class="text-slate-500 font-bold mt-2">50个单词全掌握！</div>
+                <button onclick="location.reload()" class="mt-6 px-8 py-3 bg-emerald-500 text-white rounded-full font-black text-sm">再玩一轮</button>
             `;
             card.className = 'success-zoom';
-            card.style.transform = 'translate3d(0,0,0)';
         }
 
         initLevel();
