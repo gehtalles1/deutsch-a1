@@ -8,36 +8,46 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
-        body { background-color: #F8FAFC; font-family: 'Noto Sans SC', sans-serif; color: #1E293B; overflow: hidden; touch-action: manipulation; }
+        body { background-color: #F8FAFC; font-family: 'Noto Sans SC', sans-serif; color: #1E293B; overflow-x: hidden; touch-action: manipulation; }
         
         .nav-bar { width: 100%; max-width: 440px; display: flex; align-items: center; padding: 20px 0; }
         .back-btn { width: 40px; height: 40px; border-radius: 14px; background: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 0 #E2E8F0; cursor: pointer; }
 
-        .main-content { margin-top: 5vh; }
+        .main-content { margin-top: 3vh; width: 100%; display: flex; flex-direction: column; align-items: center; }
 
-        /* 句子卡片：强制单行 */
+        /* 句子卡片优化：允许换行，增加行高 */
         .sentence-card { 
-            width: 100%; max-width: 500px; 
-            min-height: 160px;
-            padding: 0 20px;
+            width: 92%; max-width: 500px; 
+            min-height: 180px;
+            padding: 30px 24px;
             background: white; 
             border-radius: 40px; 
             box-shadow: 0 20px 45px -12px rgba(0,0,0,0.04); 
-            display: flex; 
-            justify-content: center; align-items: center; 
-            gap: 8px; 
-            font-size: 1.4rem; /* 基础字体略微缩小 */
+            display: block; /* 改为块级，让内部元素自然流动 */
+            text-align: center;
+            line-height: 2.2; /* 增加行间距，防止折行后重叠 */
+            font-size: 1.5rem; 
             font-weight: 800; 
             border: 1px solid #F1F5F9;
-            white-space: nowrap; /* 禁止折行 */
-            overflow-x: auto; /* 万一太长可以滑动，但尽量通过缩小解决 */
+            word-break: break-word;
         }
 
-        .slot { min-width: 80px; border-bottom: 4px solid #E2E8F0; height: 45px; display: inline-flex; align-items: center; justify-content: center; transition: all 0.3s; margin: 0 4px; }
+        /* 插槽优化：确保在行内自然排布 */
+        .slot { 
+            display: inline-flex;
+            vertical-align: middle;
+            min-width: 90px; 
+            height: 44px;
+            border-bottom: 4px solid #E2E8F0; 
+            margin: 0 6px;
+            align-items: center; 
+            justify-content: center; 
+            transition: all 0.3s; 
+        }
         .slot.active { background: #FFFBEB; border-color: #FBBF24; border-radius: 10px 10px 0 0; }
-        .slot.filled { background: #F59E0B !important; color: white !important; border: none !important; border-radius: 10px; transform: scale(1.05); padding: 0 10px; }
+        .slot.filled { background: #F59E0B !important; color: white !important; border: none !important; border-radius: 12px; transform: scale(1.05); padding: 0 12px; height: 40px; line-height: 40px; }
 
-        .option-grid { display: grid; grid-template-cols: repeat(2, 1fr); gap: 14px; width: 100%; margin-top: 35px; max-width: 440px; }
+        .option-grid { display: grid; grid-template-cols: repeat(2, 1fr); gap: 14px; width: 100%; margin-top: 30px; max-width: 440px; padding: 0 20px; }
         .option-item { 
             background: #FFFFFF; border-radius: 20px; border: 2px solid #F1F5F9; 
             border-bottom: 5px solid #E2E8F0; padding: 16px 0;
@@ -78,12 +88,13 @@
         </div>
     </div>
 
-    <div class="main-content w-full flex flex-col items-center">
-        <div id="hint-bubble" class="mb-6 text-amber-700 font-black text-sm bg-amber-100 px-6 py-2.5 rounded-full shadow-sm">
+    <div class="main-content">
+        <div id="hint-bubble" class="mb-6 text-amber-700 font-black text-sm bg-amber-100 px-6 py-2.5 rounded-full shadow-sm text-center">
             意愿表达：谁想做什么？
         </div>
 
-        <div id="sentence-box" class="sentence-card"></div>
+        <div id="sentence-box" class="sentence-card">
+            </div>
 
         <div id="options-grid" class="option-grid"></div>
     </div>
@@ -102,8 +113,8 @@
     </div>
 
     <script>
+        // 题目数据保持不变
         const quiz = [
-            // 1-10 混合基础
             { type: 1, s: 'du', c: 'mir bitte', a1: 'Kannst', a2: 'helfen', o1: ['Kannst', 'Kann', 'Könnt', 'Können'], o2: ['helfen', 'hilfst', 'hilft', 'geholfen'], h: '你能帮帮我吗？', e1: 'du 对应变位是 Kannst。', e2: '句尾必须是原形 helfen。' },
             { type: 0, s: 'Ich', c: 'heute Pizza', a1: 'will', a2: 'essen', o1: ['will', 'wollt', 'wollen', 'willst'], o2: ['essen', 'isst', 'esst', 'gegessen'], h: '我想吃披萨', e1: 'Ich 对应 will。', e2: '句尾原形：essen。' },
             { type: 1, s: 'ihr', c: 'morgen', a1: 'Wollt', a2: 'kommen', o1: ['Wollt', 'Wollen', 'Willst', 'Will'], o2: ['kommen', 'kommt', 'kommst', 'gekommen'], h: '你们明天想来吗？', e1: 'ihr 对应 Wollt。', e2: '句尾原形：kommen。' },
@@ -114,8 +125,6 @@
             { type: 0, s: 'Man', c: 'hier nicht', a1: 'darf', a2: 'rauchen', o1: ['darf', 'dürfen', 'darfst', 'dürft'], o2: ['rauchen', 'raucht', 'geraucht', 'rauchst'], h: '这里禁止吸烟', e1: 'Man 对应 darf。', e2: '句尾原形：rauchen。' },
             { type: 1, s: 'ich', c: 'das Fenster', a1: 'Soll', a2: 'öffnen', o1: ['Soll', 'Sollst', 'Sollen', 'Sollt'], o2: ['öffnen', 'öffnet', 'geöffnet', 'öffnest'], h: '我应该开窗吗？', e1: 'Ich 对应 Soll。', e2: '句尾原形：öffnen。' },
             { type: 0, s: 'Wir', c: 'nach Berlin', a1: 'möchten', a2: 'reisen', o1: ['möchten', 'möchte', 'möchtet', 'möchtest'], o2: ['reisen', 'reist', 'gereist', 'reist'], h: '我们想去柏林', e1: 'Wir 对应 möchten。', e2: '句尾原形：reisen。' },
-
-            // 11-20 强化训练
             { type: 1, s: 'er', c: 'Deutsch', a1: 'Kann', a2: 'sprechen', o1: ['Kann', 'Kannst', 'Können', 'Könnt'], o2: ['sprechen', 'spricht', 'sprecht', 'gesprochen'], h: '他会说德语吗？', e1: 'er 对应 Kann。', e2: '句尾原形：sprechen。' },
             { type: 0, s: 'Kinder', c: 'Gemüse', a1: 'sollen', a2: 'essen', o1: ['sollen', 'sollt', 'soll', 'sollst'], o2: ['essen', 'isst', 'gegessen', 'esst'], h: '孩子们应该吃蔬菜', e1: '复数用 sollen。', e2: '句尾原形：essen。' },
             { type: 1, s: 'du', c: 'morgen', a1: 'Musst', a2: 'arbeiten', o1: ['Musst', 'Muss', 'Müsst', 'Müssen'], o2: ['arbeiten', 'arbeitest', 'arbeitet', 'gearbeitet'], h: '你明天必须工作吗？', e1: 'du 对应 Musst。', e2: '句尾原形：arbeiten。' },
@@ -126,8 +135,6 @@
             { type: 1, s: 'du', c: 'Kaffee', a1: 'Möchtest', a2: 'trinken', o1: ['Möchtest', 'Möchte', 'Möchten', 'Möchtet'], o2: ['trinken', 'trinkt', 'getrunken', 'trinkst'], h: '你想喝咖啡吗？', e1: 'du 对应 Möchtest。', e2: '句尾原形：trinken。' },
             { type: 0, s: 'Wir', c: 'leise', a1: 'müssen', a2: 'sein', o1: ['müssen', 'muss', 'musst', 'müsst'], o2: ['sein', 'sind', 'ist', 'bin'], h: '我们必须保持安静', e1: 'Wir 对应 müssen。', e2: 'sein 的原形就是 sein。' },
             { type: 1, s: 'ich', c: 'dir', a1: 'Soll', a2: 'helfen', o1: ['Soll', 'Sollst', 'Sollen', 'Sollt'], o2: ['helfen', 'hilfst', 'hilft', 'geholfen'], h: '我应该帮你吗？', e1: 'Ich 对应 Soll。', e2: '句尾原形：helfen。' },
-
-            // 21-30 终极考验
             { type: 0, s: 'Mein Vater', c: 'gut', a1: 'kann', a2: 'kochen', o1: ['kann', 'kannst', 'können', 'könnt'], o2: ['kochen', 'kocht', 'gekocht', 'kochst'], h: '我父亲很擅长做饭', e1: '父亲是单三 er，用 kann。', e2: '句尾原形：kochen。' },
             { type: 1, s: 'ihr', c: 'Pizza', a1: 'Wollt', a2: 'bestellen', o1: ['Wollt', 'Wollen', 'Willst', 'Will'], o2: ['bestellen', 'bestellt', 'bestellst', 'bestellt'], h: '你们想订披萨吗？', e1: 'ihr 对应 Wollt。', e2: '句尾原形：bestellen。' },
             { type: 0, s: 'Du', c: 'viel Wasser', a1: 'sollst', a2: 'trinken', o1: ['sollst', 'soll', 'sollen', 'sollt'], o2: ['trinken', 'trinkt', 'getrunken', 'trinkst'], h: '你应该多喝水', e1: 'Du 对应 sollst。', e2: '句尾原形：trinken。' },
@@ -174,14 +181,23 @@
             const box = document.getElementById('sentence-box');
             box.innerHTML = '';
 
-            // 根据句子长度微调字体
-            const fullTextLen = q.s.length + q.c.length + 15; 
-            box.style.fontSize = fullTextLen > 30 ? '1.1rem' : '1.4rem';
-
+            // 如果是陈述句 (type 0)
             if (q.type === 0) {
-                box.innerHTML = `<span>${q.s}</span><div id="slot1" class="slot active"></div><span>${q.c}</span><div id="slot2" class="slot"></div><span>.</span>`;
-            } else {
-                box.innerHTML = `<div id="slot1" class="slot active"></div><span>${q.s}</span><span>${q.c}</span><div id="slot2" class="slot"></div><span>?</span>`;
+                box.innerHTML = `
+                    <span>${q.s}</span>
+                    <div id="slot1" class="slot active"></div>
+                    <span>${q.c}</span>
+                    <div id="slot2" class="slot"></div>
+                    <span>.</span>
+                `;
+            } else { // 如果是疑问句 (type 1)
+                box.innerHTML = `
+                    <div id="slot1" class="slot active"></div>
+                    <span>${q.s}</span>
+                    <span>${q.c}</span>
+                    <div id="slot2" class="slot"></div>
+                    <span>?</span>
+                `;
             }
 
             renderOptions(q.o1, q.a1);
@@ -206,16 +222,20 @@
                 btn.classList.add('correct');
                 if (step === 1) {
                     const s1 = document.getElementById('slot1');
-                    s1.innerText = val; s1.className = "slot filled";
+                    s1.innerText = val; 
+                    s1.classList.remove('active');
+                    s1.classList.add('filled');
                     setTimeout(() => {
                         step = 2;
                         document.getElementById('slot2').classList.add('active');
                         renderOptions(q.o2, q.a2);
                     }, 500);
                 } else {
-                    document.getElementById('slot2').innerText = val;
-                    document.getElementById('slot2').className = "slot filled";
-                    setTimeout(next, 3000);
+                    const s2 = document.getElementById('slot2');
+                    s2.innerText = val;
+                    s2.classList.remove('active');
+                    s2.classList.add('filled');
+                    setTimeout(next, 2000);
                 }
             } else {
                 playSound(200, 'sawtooth');
