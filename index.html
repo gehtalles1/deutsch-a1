@@ -9,7 +9,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
         body { background-color: #F8FAFC; font-family: 'Noto Sans SC', sans-serif; color: #1E293B; -webkit-tap-highlight-color: transparent; }
         @media (min-width: 1024px) { .app-container { transform: scale(1.1); transform-origin: top; } }
-        .premium-card { background: #FFFFFF; border: 1px solid #E2E8F0; border-bottom: 4px solid #E2E8F0; border-radius: 28px; transition: all 0.2s cubic-bezier(0, 0, 0.2, 1); cursor: pointer; }
+        .premium-card { background: #FFFFFF; border: 1px solid #E2E8F0; border-bottom: 4px solid #E2E8F0; border-radius: 28px; transition: all 0.2s cubic-bezier(0, 0, 0, 0.2, 1); cursor: pointer; }
         .premium-card:active { transform: translateY(2px); border-bottom-width: 1px; }
         .duo-btn { background: #58CC02; border-bottom: 4px solid #46A302; color: white; border-radius: 18px; font-weight: 900; }
         .locked-state { opacity: 0.45; filter: grayscale(0.85); pointer-events: none; }
@@ -95,6 +95,15 @@
                     </div>
                     <div id="m6" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div>
                 </div>
+
+                <div id="lvl7" onclick="go(7)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm border-amber-100">
+                    <div class="w-16 h-16 bg-[#D97706] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">7</div>
+                    <div>
+                        <h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">情态动词掌控术</h3>
+                        <p class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">Modalverben</p>
+                    </div>
+                    <div id="m7" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div>
+                </div>
             </div>
         </main>
 
@@ -112,7 +121,8 @@
             const unlocked = localStorage.getItem('isUnlocked') === 'true';
             if (unlocked) {
                 document.getElementById('auth-group').style.display = 'none';
-                ['lvl1', 'lvl2', 'lvl3', 'lvl4', 'lvl5', 'lvl6'].forEach(id => {
+                // 更新解锁列表，加入 lvl7
+                ['lvl1', 'lvl2', 'lvl3', 'lvl4', 'lvl5', 'lvl6', 'lvl7'].forEach(id => {
                     const el = document.getElementById(id);
                     if(el) el.classList.remove('locked-state');
                 });
@@ -127,6 +137,8 @@
             if (localStorage.getItem('level4_cleared') === 'true') { document.getElementById('m4').innerText = "⚔️"; }
             if (localStorage.getItem('level5_cleared') === 'true') { document.getElementById('m5').innerText = "🚑"; }
             if (localStorage.getItem('level6_cleared') === 'true') { document.getElementById('m6').innerText = "🧩"; }
+            // 第七关奖牌显示逻辑
+            if (localStorage.getItem('level7_cleared') === 'true') { document.getElementById('m7').innerText = "👑"; }
         }
 
         function unlock() {
@@ -144,7 +156,8 @@
                     3: '03-plural.html', 
                     4: '04-verbs.html',
                     5: '05-starke-verben.html',
-                    6: '06-trennbare-verben.html' 
+                    6: '06-trennbare-verben.html',
+                    7: '07-modalverben.html' // 对应第七关文件名
                 };
                 window.location.href = pages[n];
             } 
