@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>07-情态动词掌控术</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        body { background-color: #F8FAFC; font-family: 'Noto Sans SC', sans-serif; color: #1E293B; overflow: hidden; touch-action: manipulation; }
+        
+        .nav-bar { width: 100%; max-width: 440px; display: flex; align-items: center; padding: 20px 0; }
+        .back-btn { width: 40px; height: 40px; border-radius: 14px; background: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 0 #E2E8F0; cursor: pointer; }
+
+        .main-content { margin-top: 5vh; }
+
+        /* 句子卡片：强制单行 */
+        .sentence-card { 
+            width: 100%; max-width: 500px; 
+            min-height: 160px;
+            padding: 0 20px;
+            background: white; 
+            border-radius: 40px; 
+            box-shadow: 0 20px 45px -12px rgba(0,0,0,0.04); 
+            display: flex; 
+            justify-content: center; align-items: center; 
+            gap: 8px; 
+            font-size: 1.4rem; /* 基础字体略微缩小 */
+            font-weight: 800; 
+            border: 1px solid #F1F5F9;
+            white-space: nowrap; /* 禁止折行 */
+            overflow-x: auto; /* 万一太长可以滑动，但尽量通过缩小解决 */
+        }
+
+        .slot { min-width: 80px; border-bottom: 4px solid #E2E8F0; height: 45px; display: inline-flex; align-items: center; justify-content: center; transition: all 0.3s; margin: 0 4px; }
+        .slot.active { background: #FFFBEB; border-color: #FBBF24; border-radius: 10px 10px 0 0; }
+        .slot.filled { background: #F59E0B !important; color: white !important; border: none !important; border-radius: 10px; transform: scale(1.05); padding: 0 10px; }
+
+        .option-grid { display: grid; grid-template-cols: repeat(2, 1fr); gap: 14px; width: 100%; margin-top: 35px; max-width: 440px; }
+        .option-item { 
+            background: #FFFFFF; border-radius: 20px; border: 2px solid #F1F5F9; 
+            border-bottom: 5px solid #E2E8F0; padding: 16px 0;
+            font-size: 1.2rem; font-weight: 900; color: #475569; 
+            transition: all 0.1s;
+        }
+        .option-item:active { transform: translateY(3px); border-bottom-width: 2px; }
+        .option-item.correct { background: #F59E0B; border-color: #D97706; color: white; }
+
+        #error-toast {
+            position: fixed; bottom: -120px; left: 50%; transform: translateX(-50%);
+            background: #1E293B; color: white; padding: 18px 24px; border-radius: 24px;
+            font-weight: 700; transition: all 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28); z-index: 50; width: 85%; text-align: center;
+        }
+        #error-toast.show { bottom: 30px; }
+
+        #congrats-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.9); display: none; 
+            flex-direction: column; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center min-h-screen px-4">
+
+    <div class="nav-bar">
+        <div class="back-btn" onclick="location.href='index.html'">
+            <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg>
+        </div>
+        <div class="flex-grow mx-4">
+            <div class="h-3 bg-white rounded-full overflow-hidden shadow-inner border border-slate-100">
+                <div id="progress" class="h-full bg-amber-500 w-0 transition-all duration-500"></div>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <span id="counter" class="font-black text-amber-600 italic">0/30</span>
+            <span id="mute-btn" onclick="toggleMute()" class="text-xl cursor-pointer">🔊</span>
+        </div>
+    </div>
+
+    <div class="main-content w-full flex flex-col items-center">
+        <div id="hint-bubble" class="mb-6 text-amber-700 font-black text-sm bg-amber-100 px-6 py-2.5 rounded-full shadow-sm">
+            意愿表达：谁想做什么？
+        </div>
+
+        <div id="sentence-box" class="sentence-card"></div>
+
+        <div id="options-grid" class="option-grid"></div>
+    </div>
+
+    <div id="error-toast"></div>
+
+    <div id="congrats-modal">
+        <div class="bg-white p-10 rounded-[45px] text-center max-w-[340px] w-[90%] shadow-2xl">
+            <div class="text-8xl mb-6">👑</div>
+            <h2 class="text-3xl font-black text-slate-900 mb-2">情态动词之王！</h2>
+            <p class="text-slate-500 font-bold mb-8 italic">"30道难关全数击破，你太棒了！"</p>
+            <button onclick="location.href='index.html'" class="w-full py-5 bg-amber-500 text-white rounded-3xl font-black text-xl shadow-[0_8px_0_#b45309] active:translate-y-1 active:shadow-none transition-all">
+                返回地图
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const quiz = [
+            // 1-10 混合基础
+            { type: 1, s: 'du', c: 'mir bitte', a1: 'Kannst', a2: 'helfen', o1: ['Kannst', 'Kann', 'Könnt', 'Können'], o2: ['helfen', 'hilfst', 'hilft', 'geholfen'], h: '你能帮帮我吗？', e1: 'du 对应变位是 Kannst。', e2: '句尾必须是原形 helfen。' },
+            { type: 0, s: 'Ich', c: 'heute Pizza', a1: 'will', a2: 'essen', o1: ['will', 'wollt', 'wollen', 'willst'], o2: ['essen', 'isst', 'esst', 'gegessen'], h: '我想吃披萨', e1: 'Ich 对应 will。', e2: '句尾原形：essen。' },
+            { type: 1, s: 'ihr', c: 'morgen', a1: 'Wollt', a2: 'kommen', o1: ['Wollt', 'Wollen', 'Willst', 'Will'], o2: ['kommen', 'kommt', 'kommst', 'gekommen'], h: '你们明天想来吗？', e1: 'ihr 对应 Wollt。', e2: '句尾原形：kommen。' },
+            { type: 0, s: 'Er', c: 'sehr gut', a1: 'kann', a2: 'schwimmen', o1: ['kann', 'kannst', 'können', 'könnt'], o2: ['schwimmen', 'schwimmt', 'schwimmst', 'geschwommen'], h: '他很会游泳', e1: 'Er 对应 kann。', e2: '句尾原形：schwimmen。' },
+            { type: 1, s: 'wir', c: 'hier', a1: 'Dürfen', a2: 'parken', o1: ['Dürfen', 'Darfst', 'Darf', 'Dürft'], o2: ['parken', 'parkt', 'geparkt', 'parkst'], h: '我们可以在这停车吗？', e1: 'Wir 对应 Dürfen。', e2: '句尾原形：parken。' },
+            { type: 0, s: 'Du', c: 'jetzt', a1: 'musst', a2: 'gehen', o1: ['musst', 'muss', 'müssen', 'müsst'], o2: ['gehen', 'geht', 'gehst', 'gegangen'], h: '你现在必须走', e1: 'Du 对应 musst。', e2: '句尾原形：gehen。' },
+            { type: 1, s: 'Sie', c: 'einen Tee', a1: 'Möchten', a2: 'trinken', o1: ['Möchten', 'Möchte', 'Möchtest', 'Möchtet'], o2: ['trinken', 'trinkt', 'getrunken', 'trinkst'], h: '您想喝杯茶吗？', e1: 'Sie 对应 Möchten。', e2: '句尾原形：trinken。' },
+            { type: 0, s: 'Man', c: 'hier nicht', a1: 'darf', a2: 'rauchen', o1: ['darf', 'dürfen', 'darfst', 'dürft'], o2: ['rauchen', 'raucht', 'geraucht', 'rauchst'], h: '这里禁止吸烟', e1: 'Man 对应 darf。', e2: '句尾原形：rauchen。' },
+            { type: 1, s: 'ich', c: 'das Fenster', a1: 'Soll', a2: 'öffnen', o1: ['Soll', 'Sollst', 'Sollen', 'Sollt'], o2: ['öffnen', 'öffnet', 'geöffnet', 'öffnest'], h: '我应该开窗吗？', e1: 'Ich 对应 Soll。', e2: '句尾原形：öffnen。' },
+            { type: 0, s: 'Wir', c: 'nach Berlin', a1: 'möchten', a2: 'reisen', o1: ['möchten', 'möchte', 'möchtet', 'möchtest'], o2: ['reisen', 'reist', 'gereist', 'reist'], h: '我们想去柏林', e1: 'Wir 对应 möchten。', e2: '句尾原形：reisen。' },
+
+            // 11-20 强化训练
+            { type: 1, s: 'er', c: 'Deutsch', a1: 'Kann', a2: 'sprechen', o1: ['Kann', 'Kannst', 'Können', 'Könnt'], o2: ['sprechen', 'spricht', 'sprecht', 'gesprochen'], h: '他会说德语吗？', e1: 'er 对应 Kann。', e2: '句尾原形：sprechen。' },
+            { type: 0, s: 'Kinder', c: 'Gemüse', a1: 'sollen', a2: 'essen', o1: ['sollen', 'sollt', 'soll', 'sollst'], o2: ['essen', 'isst', 'gegessen', 'esst'], h: '孩子们应该吃蔬菜', e1: '复数用 sollen。', e2: '句尾原形：essen。' },
+            { type: 1, s: 'du', c: 'morgen', a1: 'Musst', a2: 'arbeiten', o1: ['Musst', 'Muss', 'Müsst', 'Müssen'], o2: ['arbeiten', 'arbeitest', 'arbeitet', 'gearbeitet'], h: '你明天必须工作吗？', e1: 'du 对应 Musst。', e2: '句尾原形：arbeiten。' },
+            { type: 0, s: 'Wer', c: 'Eis', a1: 'will', a2: 'essen', o1: ['will', 'wollt', 'wollen', 'willst'], o2: ['essen', 'isst', 'gegessen', 'esst'], h: '谁想吃冰淇淋？', e1: 'Wer 变位同 er。', e2: '句尾原形：essen。' },
+            { type: 0, s: 'Ihr', c: 'das Auto', a1: 'könnt', a2: 'waschen', o1: ['könnt', 'kannst', 'kann', 'können'], o2: ['waschen', 'wascht', 'gewaschen', 'wäscht'], h: '你们可以洗这辆车', e1: 'Ihr 对应 könnt。', e2: '句尾原形：waschen。' },
+            { type: 1, s: 'man', c: 'hier', a1: 'Darf', a2: 'schwimmen', o1: ['Darf', 'Dürfen', 'Darfst', 'Dürft'], o2: ['schwimmen', 'schwimmt', 'geschwommen', 'schwimmst'], h: '这里可以游泳吗？', e1: 'man 对应 Darf。', e2: '句尾原形：schwimmen。' },
+            { type: 0, s: 'Sie (she)', c: 'Klavier', a1: 'kann', a2: 'spielen', o1: ['kann', 'kannst', 'können', 'könnt'], o2: ['spielen', 'spielt', 'gespielt', 'spielst'], h: '她会弹钢琴', e1: '单数她 对应 kann。', e2: '句尾原形：spielen。' },
+            { type: 1, s: 'du', c: 'Kaffee', a1: 'Möchtest', a2: 'trinken', o1: ['Möchtest', 'Möchte', 'Möchten', 'Möchtet'], o2: ['trinken', 'trinkt', 'getrunken', 'trinkst'], h: '你想喝咖啡吗？', e1: 'du 对应 Möchtest。', e2: '句尾原形：trinken。' },
+            { type: 0, s: 'Wir', c: 'leise', a1: 'müssen', a2: 'sein', o1: ['müssen', 'muss', 'musst', 'müsst'], o2: ['sein', 'sind', 'ist', 'bin'], h: '我们必须保持安静', e1: 'Wir 对应 müssen。', e2: 'sein 的原形就是 sein。' },
+            { type: 1, s: 'ich', c: 'dir', a1: 'Soll', a2: 'helfen', o1: ['Soll', 'Sollst', 'Sollen', 'Sollt'], o2: ['helfen', 'hilfst', 'hilft', 'geholfen'], h: '我应该帮你吗？', e1: 'Ich 对应 Soll。', e2: '句尾原形：helfen。' },
+
+            // 21-30 终极考验
+            { type: 0, s: 'Mein Vater', c: 'gut', a1: 'kann', a2: 'kochen', o1: ['kann', 'kannst', 'können', 'könnt'], o2: ['kochen', 'kocht', 'gekocht', 'kochst'], h: '我父亲很擅长做饭', e1: '父亲是单三 er，用 kann。', e2: '句尾原形：kochen。' },
+            { type: 1, s: 'ihr', c: 'Pizza', a1: 'Wollt', a2: 'bestellen', o1: ['Wollt', 'Wollen', 'Willst', 'Will'], o2: ['bestellen', 'bestellt', 'bestellst', 'bestellt'], h: '你们想订披萨吗？', e1: 'ihr 对应 Wollt。', e2: '句尾原形：bestellen。' },
+            { type: 0, s: 'Du', c: 'viel Wasser', a1: 'sollst', a2: 'trinken', o1: ['sollst', 'soll', 'sollen', 'sollt'], o2: ['trinken', 'trinkt', 'getrunken', 'trinkst'], h: '你应该多喝水', e1: 'Du 对应 sollst。', e2: '句尾原形：trinken。' },
+            { type: 1, s: 'wir', c: 'Kino', a1: 'Wollen', a2: 'gehen', o1: ['Wollen', 'Wollt', 'Willst', 'Will'], o2: ['gehen', 'geht', 'gehst', 'gegangen'], h: '我们想去电影院吗？', e1: 'Wir 对应 Wollen。', e2: '句尾原形：gehen。' },
+            { type: 0, s: 'Ihr', c: 'jetzt', a1: 'müsst', a2: 'schlafen', o1: ['müsst', 'muss', 'musst', 'müssen'], o2: ['schlafen', 'schläft', 'geschlafen', 'schläfst'], h: '你们现在必须睡觉', e1: 'Ihr 对应 müsst。', e2: '句尾原形：schlafen。' },
+            { type: 1, s: 'ich', c: 'hier', a1: 'Darf', a2: 'sitzen', o1: ['Darf', 'Dürfen', 'Darfst', 'Dürft'], o2: ['sitzen', 'sitzt', 'gesessen', 'sitzt'], h: '我可以坐这吗？', e1: 'Ich 对应 Darf。', e2: '句尾原形：sitzen。' },
+            { type: 0, s: 'Sie (pl.)', c: 'Fußball', a1: 'wollen', a2: 'spielen', o1: ['wollen', 'wollt', 'will', 'willst'], o2: ['spielen', 'spielt', 'gespielt', 'spielst'], h: '他们想踢足球', e1: '复数 Sie 对应 wollen。', e2: '句尾原形：spielen。' },
+            { type: 1, s: 'du', c: 'morgen', a1: 'Kannst', a2: 'kommen', o1: ['Kannst', 'Kann', 'Könnt', 'Können'], o2: ['kommen', 'kommt', 'kommst', 'gekommen'], h: '你明天能来吗？', e1: 'du 对应 Kannst。', e2: '句尾原形：kommen。' },
+            { type: 0, s: 'Man', c: 'nicht', a1: 'soll', a2: 'lügen', o1: ['soll', 'sollen', 'sollst', 'sollt'], o2: ['lügen', 'lügt', 'gelogen', 'lügst'], h: '人不应该撒谎', e1: 'Man 视作单三 soll。', e2: '句尾原形：lügen。' },
+            { type: 1, s: 'ihr', c: 'mir', a1: 'Könnt', a2: 'helfen', o1: ['Könnt', 'Können', 'Kannst', 'Kann'], o2: ['helfen', 'hilft', 'hilft', 'geholfen'], h: '你们能帮我吗？', e1: 'ihr 对应 Könnt。', e2: '句尾原形：helfen。' }
+        ];
+
+        let idx = 0, step = 1, muted = false;
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(freq, type) {
+            if (muted) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type || 'sine';
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+        }
+
+        function toggleMute() {
+            muted = !muted;
+            document.getElementById('mute-btn').innerText = muted ? '🔇' : '🔊';
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('error-toast');
+            t.innerText = "💡 " + msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3500);
+        }
+
+        function loadQ() {
+            const q = quiz[idx];
+            step = 1;
+            document.getElementById('hint-bubble').innerText = q.h;
+            
+            const box = document.getElementById('sentence-box');
+            box.innerHTML = '';
+
+            // 根据句子长度微调字体
+            const fullTextLen = q.s.length + q.c.length + 15; 
+            box.style.fontSize = fullTextLen > 30 ? '1.1rem' : '1.4rem';
+
+            if (q.type === 0) {
+                box.innerHTML = `<span>${q.s}</span><div id="slot1" class="slot active"></div><span>${q.c}</span><div id="slot2" class="slot"></div><span>.</span>`;
+            } else {
+                box.innerHTML = `<div id="slot1" class="slot active"></div><span>${q.s}</span><span>${q.c}</span><div id="slot2" class="slot"></div><span>?</span>`;
+            }
+
+            renderOptions(q.o1, q.a1);
+        }
+
+        function renderOptions(opts, ans) {
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            [...opts].sort(() => Math.random() - 0.5).forEach(o => {
+                const btn = document.createElement('button');
+                btn.className = 'option-item';
+                btn.innerText = o;
+                btn.onclick = () => check(o, ans, btn);
+                grid.appendChild(btn);
+            });
+        }
+
+        function check(val, ans, btn) {
+            const q = quiz[idx];
+            if (val === ans) {
+                playSound(880, 'triangle');
+                btn.classList.add('correct');
+                if (step === 1) {
+                    const s1 = document.getElementById('slot1');
+                    s1.innerText = val; s1.className = "slot filled";
+                    setTimeout(() => {
+                        step = 2;
+                        document.getElementById('slot2').classList.add('active');
+                        renderOptions(q.o2, q.a2);
+                    }, 500);
+                } else {
+                    document.getElementById('slot2').innerText = val;
+                    document.getElementById('slot2').className = "slot filled";
+                    setTimeout(next, 3000);
+                }
+            } else {
+                playSound(200, 'sawtooth');
+                btn.classList.add('bg-rose-500', 'text-white', 'border-rose-700');
+                showToast(step === 1 ? q.e1 : q.e2);
+                setTimeout(() => btn.classList.remove('bg-rose-500', 'text-white', 'border-rose-700'), 600);
+            }
+        }
+
+        function next() {
+            idx++;
+            document.getElementById('progress').style.width = (idx / 30 * 100) + '%';
+            document.getElementById('counter').innerText = `${idx}/30`;
+            if (idx < quiz.length) loadQ(); else finish();
+        }
+
+        function finish() {
+            localStorage.setItem('level7_cleared', 'true');
+            confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 }, colors: ['#F59E0B', '#1E293B'] });
+            setTimeout(() => { document.getElementById('congrats-modal').style.display = 'flex'; }, 500);
+        }
+
+        loadQ();
+    </script>
+</body>
+</html>
