@@ -15,7 +15,7 @@
 
         .main-content { margin-top: 3vh; width: 100%; display: flex; flex-direction: column; align-items: center; }
 
-        /* 句子卡片优化：允许换行，增加行高 */
+        /* 句子卡片优化：允许换行，增加行高，解决手机端溢出 */
         .sentence-card { 
             width: 92%; max-width: 500px; 
             min-height: 180px;
@@ -23,9 +23,9 @@
             background: white; 
             border-radius: 40px; 
             box-shadow: 0 20px 45px -12px rgba(0,0,0,0.04); 
-            display: block; /* 改为块级，让内部元素自然流动 */
+            display: block; 
             text-align: center;
-            line-height: 2.2; /* 增加行间距，防止折行后重叠 */
+            line-height: 2.2; 
             font-size: 1.5rem; 
             font-weight: 800; 
             border: 1px solid #F1F5F9;
@@ -93,8 +93,7 @@
             意愿表达：谁想做什么？
         </div>
 
-        <div id="sentence-box" class="sentence-card">
-            </div>
+        <div id="sentence-box" class="sentence-card"></div>
 
         <div id="options-grid" class="option-grid"></div>
     </div>
@@ -113,7 +112,6 @@
     </div>
 
     <script>
-        // 题目数据保持不变
         const quiz = [
             { type: 1, s: 'du', c: 'mir bitte', a1: 'Kannst', a2: 'helfen', o1: ['Kannst', 'Kann', 'Könnt', 'Können'], o2: ['helfen', 'hilfst', 'hilft', 'geholfen'], h: '你能帮帮我吗？', e1: 'du 对应变位是 Kannst。', e2: '句尾必须是原形 helfen。' },
             { type: 0, s: 'Ich', c: 'heute Pizza', a1: 'will', a2: 'essen', o1: ['will', 'wollt', 'wollen', 'willst'], o2: ['essen', 'isst', 'esst', 'gegessen'], h: '我想吃披萨', e1: 'Ich 对应 will。', e2: '句尾原形：essen。' },
@@ -150,6 +148,14 @@
         let idx = 0, step = 1, muted = false;
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
+        // 洗牌算法：打乱题目顺序
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
         function playSound(freq, type) {
             if (muted) return;
             const osc = audioCtx.createOscillator();
@@ -181,7 +187,6 @@
             const box = document.getElementById('sentence-box');
             box.innerHTML = '';
 
-            // 如果是陈述句 (type 0)
             if (q.type === 0) {
                 box.innerHTML = `
                     <span>${q.s}</span>
@@ -190,7 +195,7 @@
                     <div id="slot2" class="slot"></div>
                     <span>.</span>
                 `;
-            } else { // 如果是疑问句 (type 1)
+            } else {
                 box.innerHTML = `
                     <div id="slot1" class="slot active"></div>
                     <span>${q.s}</span>
@@ -258,6 +263,8 @@
             setTimeout(() => { document.getElementById('congrats-modal').style.display = 'flex'; }, 500);
         }
 
+        // 初始化：先打乱题目，再加载第一题
+        shuffleArray(quiz);
         loadQ();
     </script>
 </body>
