@@ -180,7 +180,9 @@
         }
 
         function finishGame() {
+            // --- 核心修改：写入通关记录 ---
             localStorage.setItem('level5_cleared', 'true');
+
             confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
             document.getElementById('success-overlay').classList.add('active');
         }
