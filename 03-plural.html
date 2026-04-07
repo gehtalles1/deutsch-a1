@@ -29,13 +29,12 @@
             touch-action: none; will-change: transform;
         }
         
-        /* 关键：优化对题后的放大比例，防止遮挡 */
         .success-zoom { 
             width: 220px !important; height: 300px !important; 
             background: #ECFDF5 !important; border: 3px solid #10B981 !important;
             box-shadow: 0 20px 50px rgba(16, 185, 129, 0.25) !important;
             z-index: 1000 !important; 
-            transform: translate3d(0, 15px, 0) !important; /* 向下偏移一点，避开进度条 */
+            transform: translate3d(0, 15px, 0) !important; 
             transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
         }
 
@@ -86,7 +85,6 @@
     </div>
 
     <script>
-        // 恢复 50 个完整词库
         const words = [
             {w:"Banane", cn:"香蕉", a:"-n", e:"🍌", p:"Bananen", r:"以 -e 结尾的阴性名词，复数通常加 -n。"},
             {w:"Tomate", cn:"西红柿", a:"-n", e:"🍅", p:"Tomaten", r:"以 -e 结尾的阴性词，复数加 -n。"},
@@ -127,7 +125,7 @@
             {w:"Taxi", cn:"出租车", a:"-s", e:"🚕", p:"Taxis", r:"以 -i 结尾的名词复数加 -s。"},
             {w:"Foto", cn:"照片", a:"-s", e:"📷", p:"Fotos", r:"以 -o 结尾的名词复数加 -s。"},
             {w:"Lehrer", cn:"老师", a:"无变化", e:"👨‍🏫", p:"Lehrer", r:"-er, -el, -en 结尾的阳性词复数不变化。"},
-            {w:"Schüler", cn:"学生", a:"无变化", e:"👨‍🎓", p:"Schüler", r:"-er 结尾的阳性词复数不变化。"},
+            {w:"Schüler", cn:"学生", a:"👨‍🎓", p:"Schüler", r:"-er 结尾的阳性词复数不变化。"},
             {w:"Fenster", cn:"窗户", a:"无变化", e:"🪟", p:"Fenster", r:"-er 结尾的中性词复数不变化。"},
             {w:"Computer", cn:"电脑", a:"无变化", e:"💻", p:"Computer", r:"-er 结尾的阳性外来词复数不变化。"},
             {w:"Löffel", cn:"勺子", a:"无变化", e:"🥄", p:"Löffel", r:"-el 结尾的阳性词复数不变化。"},
@@ -270,6 +268,9 @@
         }
 
         function showFinalWin() {
+            // --- 核心修改：写入通关记录 ---
+            localStorage.setItem('level3_cleared', 'true');
+
             confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
             card.innerHTML = `
                 <div class="text-6xl mb-4">🏆</div>
