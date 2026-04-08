@@ -62,46 +62,46 @@
 
     <script>
         const rawQuests = [
-            {q: "[?] Sie bitte etwas langsamer?", v: "sprechen 说话", ans: "Sprechen", opts: ["Spreche", "Spricht", "Sprechen"], icon: "💬", tip: "您(Sie)形式变位始终与动词原形一致。注意句首字母大写！"},
-            {q: "Ich [?] heute lange.", v: "arbeiten 工作", ans: "arbeite", opts: ["arbeite", "arbeitest", "arbeitet"], icon: "⌨️", tip: "arbeiten 不是可分动词哦。Ich 形式词尾去 -en 加 -e。"},
-            {q: "[?] du heute Abend with uns Pizza?", v: "essen 吃", ans: "Isst", opts: ["Esse", "Isst", "Esst"], icon: "🍕", tip: "强变化动词：du 形式下 e 变 i。"},
-            {q: "Wann [?] der Deutschkurs [?]?", v: "anfangen 开始", ans: "fängt...an", opts: ["fängt...an", "fangt...an", "fangen...an"], icon: "🏫", tip: "anfangen 可分动词且单三下 a 变 ä。"},
-            {q: "Ich [?] jeden Tag meine Mutter [?].", v: "anrufen 打电话", ans: "rufe...an", opts: ["rufe...an", "ruft...an", "rufst...an"], icon: "📞", tip: "可分前缀 an 置于句末。"},
-            {q: "[?] ihr am Wochenende nach Berlin?", v: "fahren 去", ans: "Fahrt", opts: ["Fahre", "Fährst", "Fahrt"], icon: "🚄", tip: "fahren 的变音只针对 du 和 er/sie/es。"},
-            {q: "Das Kind [?] sehr gern Comics.", v: "lesen 读", ans: "liest", opts: ["lese", "liest", "lest"], icon: "📚", tip: "lesen：单三形式 e 变 ie。"},
-            {q: "Wo [?] deine Eltern zurzeit?", v: "wohnen 居住", ans: "wohnen", opts: ["wohne", "wohnst", "wohnen"], icon: "🏘️", tip: "复数主语，动词原形。"},
-            {q: "[?] du mir bei den Hausaufgaben?", v: "helfen 帮助", ans: "Hilfst", opts: ["Helfe", "Hilfst", "Helft"], icon: "🤝", tip: "helfen 强变化，du 形式 e 变 i。"},
-            {q: "Am Sonntag [?] mein Bruder oft lange.", v: "schlafen 睡觉", ans: "schläft", opts: ["schlafe", "schläfst", "schläft"], icon: "🛌", tip: "单三下 a 变 ä。"},
-            {q: "Was [?] du in deiner Freizeit?", v: "machen 做", ans: "machst", opts: ["mache", "machst", "macht"], icon: "🎨", tip: "基础变位词尾 -st。"},
-            {q: "[?] du mir die Tür [?]?", v: "aufmachen 打开", ans: "Machst...auf", opts: ["Machst...auf", "Macht...auf", "Mache...auf"], icon: "🚪", tip: "可分前缀 auf 移至句末。"},
-            {q: "Wie [?] das Wort auf Deutsch?", v: "heißen 叫作", ans: "heißt", opts: ["heiße", "heißt", "heißen"], icon: "🔤", tip: "ß结尾的词单二、单三词尾均加 -t。"},
-            {q: "[?] du heute Abend [?]?", v: "fernsehen 看电视", ans: "Siehst...fern", opts: ["Siehst...fern", "Sehe...fern", "Sieht...fern"], icon: "📺", tip: "强变化+可分：e变ie，fern置于句末。"},
-            {q: "Ich [?] morgen meine Oma.", v: "besuchen 拜访", ans: "besuche", opts: ["besuche", "besucht", "besuchst"], icon: "👵", tip: "besuchen 不可分。"},
-            {q: "[?] er gut Deutsch?", v: "können 能够", ans: "Kann", opts: ["Kann", "Kannst", "Könnt"], icon: "🇩🇪", tip: "情态动词单三元音变且无词尾。"},
-            {q: "Warum [?] du nicht mit?", v: "kommen 来", ans: "kommst", opts: ["komme", "kommst", "kommt"], icon: "🏃", tip: "基础变位。"},
-            {q: "Wir [?] am Abend oft Pizza.", v: "bestellen 点餐", ans: "bestellen", opts: ["bestelle", "bestellt", "bestellen"], icon: "📦", tip: "Wir 形式使用原形。"},
-            {q: "Er [?] jeden Morgen um 7 Uhr.", v: "laufen 跑步", ans: "läuft", opts: ["laufe", "läufst", "läuft"], icon: "🏃‍♂️", tip: "laufen 在单三下 a 变 äu。"},
-            {q: "[?] du schon die Antwort?", v: "wissen 知道", ans: "Weißt", opts: ["Weißt", "Weiß", "Wisst"], icon: "🧠", tip: "wissen 是特殊变位词。"},
-            {q: "Ich [?] jetzt nach Hause.", v: "gehen 走", ans: "gehe", opts: ["gehe", "gehst", "geht"], icon: "🏠", tip: "Ich 形式词尾 -e。"},
-            {q: "[?] du ein Eis?", v: "möchten 想要", ans: "Möchtest", opts: ["Möchte", "Möchtest", "Möchtet"], icon: "🍦", tip: "möchten 变位。"},
-            {q: "Ihr [?] sehr gut Deutsch.", v: "sprechen 说话", ans: "sprecht", opts: ["spreche", "sprichst", "sprecht"], icon: "🗣️", tip: "ihr 形式词尾 -t，不换元音。"},
-            {q: "[?] du das Fenster [?]?", v: "zumachen 关闭", ans: "Machst...zu", opts: ["Machst...zu", "Macht...zu", "Mache...zu"], icon: "🔒", tip: "zu 是可分前缀。"},
-            {q: "[?] er heute Abend?", v: "kommen 来", ans: "Kommt", opts: ["Komme", "Kommt", "Kommst"], icon: "🚶", tip: "单三变位。"},
-            {q: "Wir [?] viel Glück.", v: "brauchen 需要", ans: "brauchen", opts: ["brauche", "braucht", "brauchen"], icon: "🍀", tip: "复数原形。"},
-            {q: "Wer [?] das?", v: "sein 是", ans: "ist", opts: ["bin", "bist", "ist"], icon: "❓", tip: "Wer 引导通常按单三。"},
-            {q: "Ich [?] morgen Zeit.", v: "haben 有", ans: "habe", opts: ["habe", "hast", "hat"], icon: "⏰", tip: "基础变位。"},
-            {q: "[?] du einen Hund?", v: "haben 有", ans: "Hast", opts: ["Habe", "Hast", "Hat"], icon: "🐕", tip: "hast 略去字母 b。"},
-            {q: "Er [?] ein Buch.", v: "kaufen 买", ans: "kauft", opts: ["kaufe", "kaufst", "kauft"], icon: "📕", tip: "单三变位。"},
-            {q: "Wir [?] gern Musik.", v: "hören 听", ans: "hören", opts: ["höre", "hörst", "hören"], icon: "🎧", tip: "复数原形。"},
-            {q: "[?] du mir [?]?", v: "zuhören 倾听", ans: "Hörst...zu", opts: ["Hörst...zu", "Hört...zu", "Höre...zu"], icon: "👂", tip: "zuhören 是可分动词。"},
-            {q: "Morgen [?] wir zusammen [?].", v: "ausgehen 出去玩", ans: "gehen...aus", opts: ["gehen...aus", "geht...aus", "gehst...aus"], icon: "🎬", tip: "Wir 形式变位。"},
-            {q: "Meine Schwester [?] sehr gut.", v: "singen 唱歌", ans: "singt", opts: ["singe", "singt", "singst"], icon: "🎤", tip: "单三变位。"},
-            {q: "[?] ihr heute Fußball?", v: "spielen 玩", ans: "Spielt", opts: ["Spiele", "Spielst", "Spielt"], icon: "⚽", tip: "ihr 形式词尾 -t。"},
-            {q: "Wann [?] du [?]?", v: "aufstehen 起床", ans: "stehst...auf", opts: ["stehst...auf", "steht...auf", "stehe...auf"], icon: "⏰", tip: "可分动词。"},
-            {q: "Er [?] mir eine E-Mail.", v: "schreiben 写", ans: "schreibt", opts: ["schreibe", "schreibst", "schreibt"], icon: "📧", tip: "单三变位。"},
-            {q: "[?] du heute Hausaufgaben?", v: "making 做", ans: "Machst", opts: ["Mache", "Machst", "Macht"], icon: "📝", tip: "注意句首大写。"},
-            {q: "Wir [?] morgen nach Berlin.", v: "fliegen 飞", ans: "fliegen", opts: ["fliege", "fliegst", "fliegen"], icon: "✈️", tip: "复数原形。"},
-            {q: "Ich [?] Deutsch.", v: "lernen 学习", ans: "lerne", opts: ["lerne", "lernst", "lernt"], icon: "🎓", tip: "基础变位。"}
+            {q: "[?] Sie bitte etwas langsamer?", v: "sprechen 说话", ans: "Sprechen", opts: ["Spreche", "Spricht", "Sprechen"], icon: "💬", tip: "注意哦，您(Sie)形式变位始终和动词原形长得一模一样。另外，句首单词首字母要大写！"},
+            {q: "Ich [?] heute lange.", v: "arbeiten 工作", ans: "arbeite", opts: ["arbeite", "arbeitest", "arbeitet"], icon: "⌨️", tip: "记住规律：主语是 Ich，词尾通常直接去 -en 换成 -e 就好啦。"},
+            {q: "[?] du heute Abend mit uns Pizza?", v: "essen 吃", ans: "Isst", opts: ["Esse", "Isst", "Esst"], icon: "🍕", tip: "注意这个强变化动词！主语是 du 的时候，词干里的 e 要变成 i。"},
+            {q: "Wann [?] der Deutschkurs [?]?", v: "anfangen 开始", ans: "fängt...an", opts: ["fängt...an", "fangt...an", "fangen...an"], icon: "🏫", tip: "这是个可分动词，an 要甩到句末。而且单三形式下 a 要变音成 ä，别忘了！"},
+            {q: "Ich [?] jeden Tag meine Mutter [?].", v: "anrufen 打电话", ans: "rufe...an", opts: ["rufe...an", "ruft...an", "rufst...an"], icon: "📞", tip: "看到 anrufen 了吗？前缀 an 必须站到句子的最后排去。"},
+            {q: "[?] ihr am Wochenende nach Berlin?", v: "fahren 去", ans: "Fahrt", opts: ["Fahre", "Fährst", "Fahrt"], icon: "🚄", tip: "fahren 的变音只针对 du 和 er/sie/es，遇到 ihr 的时候老老实实加 -t 就可以。"},
+            {q: "Das Kind [?] sehr gern Comics.", v: "lesen 读", ans: "liest", opts: ["lese", "liest", "lest"], icon: "📚", tip: "lesen 是个顽皮的词，在单三形式（Das Kind）下，e 要变成 ie。"},
+            {q: "Wo [?] deine Eltern zurzeit?", v: "wohnen 居住", ans: "wohnen", opts: ["wohne", "wohnst", "wohnen"], icon: "🏘️", tip: "父母是两个人，属于“他们(sie)”，所以动词保持原形就好。"},
+            {q: "[?] du mir bei den Hausaufgaben?", v: "helfen 帮助", ans: "Hilfst", opts: ["Helfe", "Hilfst", "Helft"], icon: "🤝", tip: "helfen 也是强变化，du 形式下 e 会变成 i。帮帮我就用 Hilfst 吧！"},
+            {q: "Am Sonntag [?] mein Bruder oft lange.", v: "schlafen 睡觉", ans: "schläft", opts: ["schlafe", "schläfst", "schläft"], icon: "🛌", tip: "哥哥是单数第三人称，schlafen 这种词 a 要变 ä 才有德语味儿。"},
+            {q: "Was [?] du in deiner Freizeit?", v: "machen 做", ans: "machst", opts: ["mache", "machst", "macht"], icon: "🎨", tip: "最基础的变位：du 后面跟着的小尾巴通常就是 -st。"},
+            {q: "[?] du mir die Tür [?]?", v: "aufmachen 打开", ans: "Machst...auf", opts: ["Machst...auf", "Macht...auf", "Mache...auf"], icon: "🚪", tip: "可分前缀 auf 记得放句末，前面根据主语 du 进行基础变位。"},
+            {q: "Wie [?] das Wort auf Deutsch?", v: "heißen 叫作", ans: "heißt", opts: ["heiße", "heißt", "heißen"], icon: "🔤", tip: "遇到 ß 结尾的词，du 和 er/sie/es 的词尾都是只加 -t，因为发音已经够响亮了！"},
+            {q: "[?] du heute Abend [?]?", v: "fernsehen 看电视", ans: "Siehst...fern", opts: ["Siehst...fern", "Sehe...fern", "Sieht...fern"], icon: "📺", tip: "看电视最复杂了：它是可分的，又是强变化（e变ie），你做对了吗？"},
+            {q: "Ich [?] morgen meine Oma.", v: "besuchen 拜访", ans: "besuche", opts: ["besuche", "besucht", "besuchst"], icon: "👵", tip: "以 be- 开头的是不可分前缀，不用把前缀甩到后面去，直接按 Ich 变位。"},
+            {q: "[?] er gut Deutsch?", v: "können 能够", ans: "Kann", opts: ["Kann", "Kannst", "Könnt"], icon: "🇩🇪", tip: "情态动词是怪咖，单数第一和第三人称是一模一样的，而且没有词尾！"},
+            {q: "Warum [?] du nicht mit?", v: "kommen 来", ans: "kommst", opts: ["komme", "kommst", "kommt"], icon: "🏃", tip: "kommen 是乖孩子，主语是 du 时按标准规律加 -st 即可。"},
+            {q: "Wir [?] am Abend oft Pizza.", v: "bestellen 点餐", ans: "bestellen", opts: ["bestelle", "bestellt", "bestellen"], icon: "📦", tip: "主语是“我们(Wir)”，就像见到了老朋友，直接写动词原形。"},
+            {q: "Er [?] jeden Morgen um 7 Uhr.", v: "laufen 跑步", ans: "läuft", opts: ["laufe", "läufst", "läuft"], icon: "🏃‍♂️", tip: "laufen 跑得比较快，所以在单三下 a 会变音变成 äu。"},
+            {q: "[?] du schon die Antwort?", v: "wissen 知道", ans: "Weißt", opts: ["Weißt", "Weiß", "Wisst"], icon: "🧠", tip: "wissen 这个词非常特殊，它的单数形式元音会彻底改变，一定要死记硬背。"},
+            {q: "Ich [?] jetzt nach Hause.", v: "gehen 走", ans: "gehe", opts: ["gehe", "gehst", "geht"], icon: "🏠", tip: "Ich 和 -e 是绝配，记住了吗？"},
+            {q: "[?] du ein Eis?", v: "möchten 想要", ans: "Möchtest", opts: ["Möchte", "Möchtest", "Möchtet"], icon: "🍦", tip: "möchten 表达愿望，主语是 du 时，中间多加个 e 发音更顺口。"},
+            {q: "Ihr [?] sehr gut Deutsch.", v: "sprechen 说话", ans: "sprecht", opts: ["spreche", "sprichst", "sprecht"], icon: "🗣️", tip: "记住：只有 du 和 er/sie/es 会换元音。你们(ihr)只需要加个 -t。"},
+            {q: "[?] du das Fenster [?]?", v: "zumachen 关闭", ans: "Machst...zu", opts: ["Machst...zu", "Macht...zu", "Mache...zu"], icon: "🔒", tip: "把门关上是 zumachen，前缀 zu 要像影子一样跟到句子最后。"},
+            {q: "[?] er heute Abend?", v: "kommen 来", ans: "Kommt", opts: ["Komme", "Kommt", "Kommst"], icon: "🚶", tip: "他(er)的形式，动词词干后面稳稳地接一个 -t。"},
+            {q: "Wir [?] viel Glück.", v: "brauchen 需要", ans: "brauchen", opts: ["brauche", "braucht", "brauchen"], icon: "🍀", tip: "我们(Wir)后面永远跟着动词最原始的状态。"},
+            {q: "Wer [?] das?", v: "sein 是", ans: "ist", opts: ["bin", "bist", "ist"], icon: "❓", tip: "问“是谁”的时候，我们默认把 Wer 当作单数第三人称对待。"},
+            {q: "Ich [?] morgen Zeit.", v: "haben 有", ans: "habe", opts: ["habe", "hast", "hat"], icon: "⏰", tip: "haben 是最高频的词，Ich habe 是必须像条件反射一样说出来的。"},
+            {q: "[?] du einen Hund?", v: "haben 有", ans: "Hast", opts: ["Habe", "Hast", "Hat"], icon: "🐕", tip: "虽然 haben 是基础词，但在 du 形式下会略去字母 b，变成 hast。"},
+            {q: "Er [?] ein Buch.", v: "kaufen 买", ans: "kauft", opts: ["kaufe", "kaufst", "kauft"], icon: "📕", tip: "买东西(kaufen)很规矩，他(er)后面加 -t 就行。"},
+            {q: "Wir [?] gern Musik.", v: "hören 听", ans: "hören", opts: ["höre", "hörst", "hören"], icon: "🎧", tip: "一起听音乐吧，只要主语是 Wir，动词原封不动搬过来。"},
+            {q: "[?] du mir [?]?", v: "zuhören 倾听", ans: "Hörst...zu", opts: ["Hörst...zu", "Hört...zu", "Höre...zu"], icon: "👂", tip: "注意这个可分词，zu 放在后面，前面按 du 规则变位。"},
+            {q: "Morgen [?] wir zusammen [?].", v: "ausgehen 出去玩", ans: "gehen...aus", opts: ["gehen...aus", "geht...aus", "gehst...aus"], icon: "🎬", tip: "打算出门玩？主语是 wir 的话，动词还是用原形，前缀 aus 记得放最后。"},
+            {q: "Meine Schwester [?] sehr gut.", v: "singen 唱歌", ans: "singt", opts: ["singe", "singt", "singst"], icon: "🎤", tip: "她(Meine Schwester)在唱歌，单数第三人称变位加 -t。"},
+            {q: "[?] ihr heute Fußball?", v: "spielen 玩", ans: "Spielt", opts: ["Spiele", "Spielst", "Spielt"], icon: "⚽", tip: "你们(ihr)这一组的变位其实很简单，就是词干后面加个 -t 完事。"},
+            {q: "Wann [?] du [?]?", v: "aufstehen 起床", ans: "stehst...auf", opts: ["stehst...auf", "steht...auf", "stehe...auf"], icon: "⏰", tip: "几点起床？auf 是前缀，中间根据 du 填上 stehst。"},
+            {q: "Er [?] mir eine E-Mail.", v: "schreiben 写", ans: "schreibt", opts: ["schreibe", "schreibst", "schreibt"], icon: "📧", tip: "写邮件(schreiben)在单三形式下非常稳定，就是加个 -t。"},
+            {q: "[?] du heute Hausaufgaben?", v: "machen 做", ans: "Machst", opts: ["Mache", "Machst", "Macht"], icon: "📝", tip: "做作业是 machen。主语是 du，别忘了句首字母要大写！"},
+            {q: "Wir [?] morgen nach Berlin.", v: "fliegen 飞", ans: "fliegen", opts: ["fliege", "fliegst", "fliegen"], icon: "✈️", tip: "我们要飞去柏林啦！Wir 形式就是动词原形。"},
+            {q: "Ich [?] Deutsch.", v: "lernen 学习", ans: "lerne", opts: ["lerne", "lernst", "lernt"], icon: "🎓", tip: "祝贺你快通关了！Ich lerne 每天都要说一遍，加油！"}
         ];
 
         function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
@@ -156,9 +156,7 @@
         window.closeError = function() { document.getElementById('error-overlay').style.display = 'none'; isLocked = false; };
         
         function showWin() { 
-            // 关键逻辑：存储通关标记，点亮地图页的 ⚡ 奖牌
             localStorage.setItem('level8_cleared', 'true');
-            
             confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } }); 
             document.getElementById('active-card').innerHTML = `<div class="text-7xl mb-6">🏁</div><div class="text-2xl font-black">通关啦！太棒了！</div><button onclick="location.reload()" class="mt-8 px-8 py-3 bg-sky-500 text-white rounded-2xl font-black">再练一遍</button>`; 
         }
