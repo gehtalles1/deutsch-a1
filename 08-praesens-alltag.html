@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN" style="height: 100%; overflow: hidden;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>德语现在时通关</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@700;900&display=swap');
+        body { background: #0F172A; font-family: 'Noto Sans SC', sans-serif; margin: 0; width: 100%; height: 100%; overflow: hidden; touch-action: none; display: flex; flex-direction: column; align-items: center; color: white; }
+        .app-container { width: 100%; max-width: 600px; height: 100%; display: flex; flex-direction: column; padding: 0 20px; }
+        .nav-header { margin-top: max(25px, env(safe-area-inset-top)); display: flex; justify-content: space-between; align-items: flex-start; width: 100%; }
+        .icon-btn { width: 44px; height: 44px; background: rgba(255,255,255,0.08); backdrop-filter: blur(10px); border-radius: 15px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; }
+        .progress-container { flex-grow: 1; display: flex; flex-direction: column; align-items: center; }
+        .progress-bar-bg { width: 80%; max-width: 300px; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; margin-top: 15px; }
+        #progress-inner { height: 100%; background: #38BDF8; width: 0%; transition: width 0.4s ease; }
+        .cur-num-text { font-size: 1rem; font-weight: 900; color: white; margin-top: 10px; }
+        .card-zone { flex-grow: 1; display: flex; align-items: center; justify-content: center; width: 100%; padding: 10px 0; }
+        #active-card { width: 100%; min-height: 380px; background: linear-gradient(145deg, #1E293B, #0F172A); border-radius: 40px; border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 25px; position: relative; transition: all 0.5s; }
+        .scene-icon { font-size: 70px; margin-bottom: 15px; transition: all 0.5s; filter: grayscale(1) opacity(0.2); }
+        .lit-up .scene-icon { filter: grayscale(0) opacity(1) drop-shadow(0 0 20px #FDE047); transform: scale(1.05); }
+        .verb-hint-box { font-size: 20px; font-weight: 900; color: #38BDF8; background: rgba(56, 189, 248, 0.1); padding: 8px 24px; border-radius: 99px; border: 1px solid rgba(56, 189, 248, 0.2); margin-bottom: 20px; }
+        .sentence { font-size: clamp(1.2rem, 5vw, 1.6rem); font-weight: 900; line-height: 1.6; color: #94A3B8; text-align: center; word-wrap: break-word; max-width: 100%; }
+        .lit-up .sentence { color: white; }
+        .blank { display: inline-block; min-width: 80px; border-bottom: 3px solid #38BDF8; color: #38BDF8; margin: 0 4px; padding: 0 5px; }
+        .grid-container { padding-bottom: max(30px, 5vh); width: 100%; }
+        .cube-grid { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        .energy-cube { min-width: 100px; flex: 1; height: 85px; background: #1E293B; border-radius: 20px; display: flex; align-items: center; justify-content: center; border: 2px solid #334155; cursor: pointer; transition: all 0.2s; }
+        .cube-label { font-size: 1.1rem; font-weight: 900; color: #38BDF8; text-align: center; }
+        #error-overlay { display: none; position: fixed; inset: 0; background: rgba(2, 6, 23, 0.98); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
+        .error-card { background: #1E293B; width: 100%; max-width: 400px; border-radius: 30px; padding: 35px; border: 1px solid #38BDF8; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="nav-header">
+            <div class="icon-btn" onclick="window.history.back()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="progress-container">
+                <div class="progress-bar-bg"><div id="progress-inner"></div></div>
+                <div class="cur-num-text"><span id="cur-num">1</span> / 40</div>
+            </div>
+            <div class="icon-btn" onclick="toggleMute()"><span id="mute-icon">🔊</span></div>
+        </div>
+        <div class="card-zone">
+            <div id="active-card">
+                <div id="scene-icon" class="scene-icon">🏠</div>
+                <div id="v-hint" class="verb-hint-box"></div>
+                <div class="sentence" id="sentence"></div>
+            </div>
+        </div>
+        <div class="grid-container"><div class="cube-grid" id="cubes"></div></div>
+    </div>
+    <div id="error-overlay">
+        <div class="error-card text-left">
+            <div class="text-sky-400 font-black text-xl mb-4 italic">💡 老师的提醒：</div>
+            <div id="correct-ans" class="text-2xl font-black text-white mb-4"></div>
+            <div id="grammar-tip" class="text-slate-200 text-base leading-relaxed mb-8 bg-slate-800/50 p-4 rounded-xl border-l-4 border-sky-500"></div>
+            <button onclick="closeError()" class="w-full py-4 bg-sky-500 text-white rounded-2xl font-black text-lg">记住了，继续挑战</button>
+        </div>
+    </div>
+
+    <script>
+        const rawQuests = [
+            {q: "[?] Sie bitte etwas langsamer?", v: "sprechen 说话", ans: "Sprechen", opts: ["Spreche", "Spricht", "Sprechen"], icon: "💬", tip: "您(Sie)形式变位始终与动词原形一致。注意句首字母大写！"},
+            {q: "Ich [?] heute lange.", v: "arbeiten 工作", ans: "arbeite", opts: ["arbeite", "arbeitest", "arbeitet"], icon: "⌨️", tip: "arbeiten 不是可分动词哦。Ich 形式词尾去 -en 加 -e。"},
+            {q: "[?] du heute Abend mit uns Pizza?", v: "essen 吃", ans: "Isst", opts: ["Esse", "Isst", "Esst"], icon: "🍕", tip: "强变化动词：du 形式下 e 变 i。"},
+            {q: "Wann [?] der Deutschkurs [?]?", v: "anfangen 开始", ans: "fängt...an", opts: ["fängt...an", "fangt...an", "fangen...an"], icon: "🏫", tip: "anfangen 可分动词且单三下 a 变 ä。"},
+            {q: "Ich [?] jeden Tag meine Mutter [?].", v: "anrufen 打电话", ans: "rufe...an", opts: ["rufe...an", "ruft...an", "rufst...an"], icon: "📞", tip: "可分前缀 an 置于句末。"},
+            {q: "[?] ihr am Wochenende nach Berlin?", v: "fahren 去", ans: "Fahrt", opts: ["Fahre", "Fährst", "Fahrt"], icon: "🚄", tip: "fahren 的变音只针对 du 和 er/sie/es。"},
+            {q: "Das Kind [?] sehr gern Comics.", v: "lesen 读", ans: "liest", opts: ["lese", "liest", "lest"], icon: "📚", tip: "lesen：单三形式 e 变 ie。"},
+            {q: "Wo [?] deine Eltern zurzeit?", v: "wohnen 居住", ans: "wohnen", opts: ["wohne", "wohnst", "wohnen"], icon: "🏘️", tip: "复数主语，动词原形。"},
+            {q: "[?] du mir bei den Hausaufgaben?", v: "helfen 帮助", ans: "Hilfst", opts: ["Helfe", "Hilfst", "Helft"], icon: "🤝", tip: "helfen 强变化，du 形式 e 变 i。"},
+            {q: "Am Sonntag [?] mein Bruder oft lange.", v: "schlafen 睡觉", ans: "schläft", opts: ["schlafe", "schläfst", "schläft"], icon: "🛌", tip: "单三下 a 变 ä。"},
+            {q: "Was [?] du in deiner Freizeit?", v: "machen 做", ans: "machst", opts: ["mache", "machst", "macht"], icon: "🎨", tip: "基础变位词尾 -st。"},
+            {q: "[?] du mir die Tür [?]?", v: "aufmachen 打开", ans: "Machst...auf", opts: ["Machst...auf", "Macht...auf", "Mache...auf"], icon: "🚪", tip: "可分前缀 auf 移至句末。"},
+            {q: "Wie [?] das Wort auf Deutsch?", v: "heißen 叫作", ans: "heißt", opts: ["heiße", "heißt", "heißen"], icon: "🔤", tip: "ß结尾的词单二、单三词尾均加 -t。"},
+            {q: "[?] du heute Abend [?]?", v: "fernsehen 看电视", ans: "Siehst...fern", opts: ["Siehst...fern", "Sehe...fern", "Sieht...fern"], icon: "📺", tip: "强变化+可分：e变ie，fern置于句末。"},
+            {q: "Ich [?] morgen meine Oma.", v: "besuchen 拜访", ans: "besuche", opts: ["besuche", "besucht", "besuchst"], icon: "👵", tip: "besuchen 不可分。"},
+            {q: "[?] er gut Deutsch?", v: "können 能够", ans: "Kann", opts: ["Kann", "Kannst", "Könnt"], icon: "🇩🇪", tip: "情态动词单三元音变且无词尾。"},
+            {q: "Warum [?] du nicht mit?", v: "kommen 来", ans: "kommst", opts: ["komme", "kommst", "kommt"], icon: "🏃", tip: "基础变位。"},
+            {q: "Wir [?] am Abend oft Pizza.", v: "bestellen 点餐", ans: "bestellen", opts: ["bestelle", "bestellt", "bestellen"], icon: "📦", tip: "Wir 形式使用原形。"},
+            {q: "Er [?] jeden Morgen um 7 Uhr.", v: "laufen 跑步", ans: "läuft", opts: ["laufe", "läufst", "läuft"], icon: "🏃‍♂️", tip: "laufen 在单三下 a 变 äu。"},
+            {q: "[?] du schon die Antwort?", v: "wissen 知道", ans: "Weißt", opts: ["Weißt", "Weiß", "Wisst"], icon: "🧠", tip: "wissen 是特殊变位词。"},
+            {q: "Ich [?] jetzt nach Hause.", v: "gehen 走", ans: "gehe", opts: ["gehe", "gehst", "geht"], icon: "🏠", tip: "Ich 形式词尾 -e。"},
+            {q: "[?] du ein Eis?", v: "möchten 想要", ans: "Möchtest", opts: ["Möchte", "Möchtest", "Möchtet"], icon: "🍦", tip: "möchten 变位。"},
+            {q: "Ihr [?] sehr gut Deutsch.", v: "sprechen 说话", ans: "sprecht", opts: ["spreche", "sprichst", "sprecht"], icon: "🗣️", tip: "ihr 形式词尾 -t，不换元音。"},
+            {q: "[?] du das Fenster [?]?", v: "zumachen 关闭", ans: "Machst...zu", opts: ["Machst...zu", "Macht...zu", "Mache...zu"], icon: "🔒", tip: "zu 是可分前缀。"},
+            {q: "[?] er heute Abend?", v: "kommen 来", ans: "Kommt", opts: ["Komme", "Kommt", "Kommst"], icon: "🚶", tip: "单三变位。"},
+            {q: "Wir [?] viel Glück.", v: "brauchen 需要", ans: "brauchen", opts: ["brauche", "braucht", "brauchen"], icon: "🍀", tip: "复数原形。"},
+            {q: "Wer [?] das?", v: "sein 是", ans: "ist", opts: ["bin", "bist", "ist"], icon: "❓", tip: "Wer 引导通常按单三。"},
+            {q: "Ich [?] morgen Zeit.", v: "haben 有", ans: "habe", opts: ["habe", "hast", "hat"], icon: "⏰", tip: "基础变位。"},
+            {q: "[?] du einen Hund?", v: "haben 有", ans: "Hast", opts: ["Habe", "Hast", "Hat"], icon: "🐕", tip: "hast 略去字母 b。"},
+            {q: "Er [?] ein Buch.", v: "kaufen 买", ans: "kauft", opts: ["kaufe", "kaufst", "kauft"], icon: "📕", tip: "单三变位。"},
+            {q: "Wir [?] gern Musik.", v: "hören 听", ans: "hören", opts: ["höre", "hörst", "hören"], icon: "🎧", tip: "复数原形。"},
+            {q: "[?] du mir [?]?", v: "zuhören 倾听", ans: "Hörst...zu", opts: ["Hörst...zu", "Hört...zu", "Höre...zu"], icon: "👂", tip: "zuhören 是可分动词。"},
+            {q: "Morgen [?] wir zusammen [?].", v: "ausgehen 出去玩", ans: "gehen...aus", opts: ["gehen...aus", "geht...aus", "gehst...aus"], icon: "🎬", tip: "Wir 形式变位。"},
+            {q: "Meine Schwester [?] sehr gut.", v: "singen 唱歌", ans: "singt", opts: ["singe", "singt", "singst"], icon: "🎤", tip: "单三变位。"},
+            {q: "[?] ihr heute Fußball?", v: "spielen 玩", ans: "Spielt", opts: ["Spiele", "Spielst", "Spielt"], icon: "⚽", tip: "ihr 形式词尾 -t。"},
+            {q: "Wann [?] du [?]?", v: "aufstehen 起床", ans: "stehst...auf", opts: ["stehst...auf", "steht...auf", "stehe...auf"], icon: "⏰", tip: "可分动词。"},
+            {q: "Er [?] mir eine E-Mail.", v: "schreiben 写", ans: "schreibt", opts: ["schreibe", "schreibst", "schreibt"], icon: "📧", tip: "单三变位。"},
+            {q: "[?] du heute Hausaufgaben?", v: "machen 做", ans: "Machst", opts: ["Mache", "Machst", "Macht"], icon: "📝", tip: "注意句首大写。"},
+            {q: "Wir [?] morgen nach Berlin.", v: "fliegen 飞", ans: "fliegen", opts: ["fliege", "fliegst", "fliegen"], icon: "✈️", tip: "复数原形。"},
+            {q: "Ich [?] Deutsch.", v: "lernen 学习", ans: "lerne", opts: ["lerne", "lernst", "lernt"], icon: "🎓", tip: "基础变位。"}
+        ];
+
+        function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+        let questData = shuffle([...rawQuests]);
+        let curIdx = 0, isLocked = false, isMuted = false;
+        function toggleMute() { isMuted = !isMuted; document.getElementById('mute-icon').innerText = isMuted ? '🔇' : '🔊'; }
+
+        function initQuest() {
+            if (curIdx >= questData.length) { showWin(); return; }
+            isLocked = false; const data = questData[curIdx];
+            document.getElementById('active-card').classList.remove('lit-up');
+            document.getElementById('cur-num').innerText = curIdx + 1;
+            document.getElementById('progress-inner').style.width = `${((curIdx)/questData.length)*100}%`;
+            document.getElementById('scene-icon').innerText = data.icon;
+            document.getElementById('v-hint').innerText = data.v;
+            
+            let sHtml = data.q.split('[?]').join('<span class="blank">&nbsp;</span>');
+            document.getElementById('sentence').innerHTML = sHtml;
+
+            const cubesContainer = document.getElementById('cubes');
+            cubesContainer.innerHTML = shuffle([...data.opts]).map(o => {
+                const label = o.includes('...') ? o.split('...').join('<br>') : o;
+                return `<div class="energy-cube" onclick="checkAnswer('${o}', this)"><div class="cube-label">${label}</div></div>`;
+            }).join('');
+        }
+
+        window.checkAnswer = function(val, el) {
+            if (isLocked) return; isLocked = true; const data = questData[curIdx];
+            // 严格大小写匹配，不再一味转小写
+            const isCorrect = (val === data.ans);
+            
+            if (isCorrect) {
+                el.style.borderColor = "#22C55E"; document.getElementById('active-card').classList.add('lit-up');
+                const blanks = document.querySelectorAll('.blank');
+                if (data.ans.includes('...')) { 
+                    const pts = val.split('...'); 
+                    blanks[0].innerText = pts[0]; 
+                    if(blanks[1]) blanks[1].innerText = pts[1]; 
+                } else { 
+                    blanks[0].innerText = val; 
+                }
+                if (!isMuted) new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3').play().catch(()=>{});
+                setTimeout(() => { curIdx++; initQuest(); }, 2000);
+            } else {
+                el.style.borderColor = "#EF4444"; 
+                if (!isMuted) new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3').play().catch(()=>{});
+                document.getElementById('correct-ans').innerText = data.ans.replace('...', ' ... ');
+                document.getElementById('grammar-tip').innerText = data.tip; 
+                document.getElementById('error-overlay').style.display = 'flex';
+            }
+        };
+
+        window.closeError = function() { document.getElementById('error-overlay').style.display = 'none'; isLocked = false; };
+        function showWin() { confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } }); document.getElementById('active-card').innerHTML = `<div class="text-7xl mb-6">🏁</div><div class="text-2xl font-black">通关啦！太棒了！</div><button onclick="location.reload()" class="mt-8 px-8 py-3 bg-sky-500 text-white rounded-2xl font-black">再练一遍</button>`; }
+        initQuest();
+    </script>
+</body>
+</html>
