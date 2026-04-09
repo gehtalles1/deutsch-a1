@@ -43,10 +43,7 @@
             <div class="space-y-8">
                 <div id="lvl1" onclick="go(1)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm">
                     <div class="w-16 h-16 bg-[#58CC02] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">1</div>
-                    <div>
-                        <h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">名词词性捕手</h3>
-                        <p class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">der / die / das</p>
-                    </div>
+                    <div><h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">名词词性捕手</h3><p class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">der / die / das</p></div>
                     <div id="m1" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div>
                 </div>
 
@@ -59,20 +56,23 @@
 
                 <div id="lvl8" onclick="go(8)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm border-indigo-100">
                     <div class="w-16 h-16 bg-[#6366F1] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">8</div>
-                    <div>
-                        <h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">现在时全场景应用</h3>
-                        <p class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">Präsens-Mix</p>
-                    </div>
+                    <div><h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">现在时全场景应用</h3><p class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">Präsens-Mix</p></div>
                     <div id="m8" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div>
                 </div>
 
                 <div id="lvl9" onclick="go(9)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm border-amber-100">
                     <div class="w-16 h-16 bg-[#D97706] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">9</div>
-                    <div>
-                        <h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">现在完成时一网打尽</h3>
-                        <p class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">Perfekt Master</p>
-                    </div>
+                    <div><h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">现在完成时一网打尽</h3><p class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">Perfekt Master</p></div>
                     <div id="m9" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div>
+                </div>
+
+                <div id="lvl10" onclick="go(10)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm border-teal-100">
+                    <div class="w-16 h-16 bg-[#0D9488] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">10</div>
+                    <div>
+                        <h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">一格四格基础用法</h3>
+                        <p class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">Nom. & Akk. Basis</p>
+                    </div>
+                    <div id="m10" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div>
                 </div>
             </div>
         </main>
@@ -91,7 +91,7 @@
             const unlocked = localStorage.getItem('isUnlocked') === 'true';
             if (unlocked) {
                 document.getElementById('auth-group').style.display = 'none';
-                ['lvl1', 'lvl2', 'lvl3', 'lvl4', 'lvl5', 'lvl6', 'lvl7', 'lvl8', 'lvl9'].forEach(id => {
+                ['lvl1', 'lvl2', 'lvl3', 'lvl4', 'lvl5', 'lvl6', 'lvl7', 'lvl8', 'lvl9', 'lvl10'].forEach(id => {
                     const el = document.getElementById(id);
                     if(el) el.classList.remove('locked-state');
                 });
@@ -109,9 +109,10 @@
             if (localStorage.getItem('level6_cleared') === 'true') { document.getElementById('m6').innerText = "🧩"; }
             if (localStorage.getItem('level7_cleared') === 'true') { document.getElementById('m7').innerText = "👑"; }
             if (localStorage.getItem('level8_cleared') === 'true') { document.getElementById('m8').innerText = "⚡"; }
-            
-            // 第九关奖牌逻辑
             if (localStorage.getItem('level9_cleared') === 'true') { document.getElementById('m9').innerText = "🏅"; }
+            
+            // 第十关奖牌逻辑
+            if (localStorage.getItem('level10_cleared') === 'true') { document.getElementById('m10').innerText = "🎯"; }
         }
 
         function unlock() {
@@ -132,7 +133,8 @@
                     6: '06-trennbare-verben.html',
                     7: '07-modalverben.html',
                     8: '08-praesens-mix.html',
-                    9: '09-Perfekt-Master.html' // 关联第九关文件
+                    9: '09-Perfekt-Master.html',
+                    10: '10_Artikel_Check.html' // 关联第十关文件
                 };
                 window.location.href = pages[n];
             } 
