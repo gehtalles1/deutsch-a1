@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>德语1/4格冠词全能训练</title>
+    <title>德语冠词逻辑挑战版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
@@ -13,15 +13,14 @@
         .progress-rail { flex-grow: 1; margin: 0 15px; height: 8px; background: #D1D9E6; border-radius: 10px; overflow: hidden; }
         #progress-fill { height: 100%; width: 0%; background: #3B82F6; transition: width 0.6s ease; }
         .control-icon { width: 32px; height: 32px; color: #94A3B8; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .content-area { width: 100%; max-width: 430px; flex-grow: 1; display: flex; flex-direction: column; margin: 0 auto; padding: 10px 24px 40px; justify-content: space-between; }
-        #card-body { width: 100%; background: #FFFFFF; border-radius: 50px; box-shadow: 0 12px 30px rgba(0,0,0,0.02); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 30px; margin-bottom: 20px; }
-        .sentence-text { font-size: 1.4rem; font-weight: 700; text-align: center; line-height: 1.6; color: #1E293B; min-height: 60px; }
-        .slot { display: inline-block; min-width: 60px; border-bottom: 4px solid #3B82F6; color: #3B82F6; margin: 0 6px; padding: 0 4px; transition: 0.3s; }
+        .content-area { width: 100%; max-width: 430px; flex-grow: 1; display: flex; flex-direction: column; margin: 0 auto; padding: 10px 24px 60px; justify-content: space-between; }
+        #card-body { width: 100%; background: #FFFFFF; border-radius: 50px; box-shadow: 0 12px 30px rgba(0,0,0,0.02); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 30px; margin-bottom: 30px; }
+        .sentence-text { font-size: 1.4rem; font-weight: 700; text-align: center; line-height: 1.6; color: #1E293B; min-height: 80px; }
+        .slot { display: inline-block; min-width: 80px; border-bottom: 4px solid #3B82F6; color: #3B82F6; margin: 0 6px; padding: 0 4px; transition: 0.3s; }
         .slot.correct { color: #10B981; border-bottom-color: #10B981; }
-        /* 调整为3列布局以容纳更多选项 */
-        .btn-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; width: 100%; }
-        .option-box { height: 60px; background: #1E293B; border-radius: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .option-box span { font-size: 1.1rem; font-weight: 800; color: #FFFFFF; }
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; }
+        .option-box { height: 90px; background: #1E293B; border-radius: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .option-box span { font-size: 1.4rem; font-weight: 800; color: #FFFFFF; }
         .option-box.active { background: #3B82F6; }
         .modal-wrap { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 100; }
     </style>
@@ -38,7 +37,7 @@
 
     <div class="content-area">
         <div id="card-body">
-            <div id="img-icon" class="text-7xl mb-6"></div>
+            <div id="img-icon" class="text-8xl mb-8"></div>
             <div id="txt-display" class="sentence-text"></div>
         </div>
         <div class="btn-grid" id="opt-container"></div>
@@ -46,9 +45,9 @@
 
     <div id="feedback-modal" class="modal-wrap">
         <div class="bg-white rounded-[40px] p-8 w-[320px] text-center shadow-2xl">
-            <div class="text-5xl mb-4">💡 语法提醒</div>
+            <div class="text-5xl mb-4">💡</div>
             <p id="tip-text" class="text-slate-600 mb-8 text-sm text-left bg-blue-50 p-5 rounded-3xl leading-relaxed"></p>
-            <button onclick="closePop()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-lg">记住了</button>
+            <button onclick="closePop()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-lg">知道了</button>
         </div>
     </div>
 
@@ -71,43 +70,41 @@
         }
 
         const data = [
-            // --- 阳性 Maskulin (der/ein/den/einen) ---
-            {q: "Ich sehe [?] Mann dort.", a: "den", i: "👀", t: "Akk., 阳性特指: den"},
-            {q: "Er braucht [?] Kuli.", a: "einen", i: "🖊️", t: "Akk., 阳性泛指: einen"},
-            {q: "Wo ist [?] Bus?", a: "der", i: "🚌", t: "Nom., 阳性特指: der"},
-            {q: "Hast du [?] Euro?", a: "einen", i: "💶", t: "Akk., 阳性泛指: einen"},
-            {q: "Ich trinke [?] Saft.", a: "den", i: "🍹", t: "Akk., 阳性特指: den"},
-            {q: "Das ist [?] Hund.", a: "ein", i: "🐕", t: "Nom., 阳性泛指: ein"},
-            
-            // --- 中性 Neutrum (das/ein/das/ein) ---
-            {q: "Ich lese [?] Buch.", a: "ein", i: "📖", t: "Akk., 中性泛指: ein (中性1/4格同形)"},
-            {q: "[?] Kind spielt im Garten.", a: "Das", i: "👶", t: "Nom., 中性特指: Das"},
-            {q: "Siehst du [?] Haus dort?", a: "das", i: "🏠", t: "Akk., 中性特指: das"},
-            {q: "Das ist [?] Auto von Tim.", a: "das", i: "🚗", t: "Nom., 中性特指: das"},
-            {q: "Ich möchte [?] Eis essen.", a: "ein", i: "🍦", t: "Akk., 中性泛指: ein"},
-            {q: "[?] Mädchen lernt Deutsch.", a: "Das", i: "👧", t: "Nom., 中性特指: Das"},
-            {q: "Kaufst du [?] Brot?", a: "ein", i: "🍞", t: "Akk., 中性泛指: ein"},
-            {q: "Hier ist [?] Bild.", a: "ein", i: "🖼️", t: "Nom., 中性泛指: ein"},
-            
-            // --- 阴性 Feminin (die/eine/die/eine) ---
-            {q: "Ich kenne [?] Frau.", a: "die", i: "👩", t: "Akk., 阴性特指: die"},
-            {q: "Das ist [?] Lampe.", a: "eine", i: "💡", t: "Nom., 阴性泛指: eine"},
-            {q: "Ich suche [?] Tasche.", a: "die", i: "👜", t: "Akk., 阴性特指: die"},
-            {q: "Wo ist [?] Katze?", a: "die", i: "🐱", t: "Nom., 阴性特指: die"},
-            {q: "Er isst [?] Pizza.", a: "eine", i: "🍕", t: "Akk., 阴性泛指: eine"},
-            {q: "[?] Tür ist offen.", a: "Die", i: "🚪", t: "Nom., 阴性特指: Die"},
-            {q: "Haben Sie [?] Frage?", a: "eine", i: "❓", t: "Akk., 阴性泛指: eine"},
-            {q: "Das ist [?] Schule.", a: "eine", i: "🏫", t: "Nom., 阴性泛指: eine"},
+            // --- 阳性 ---
+            {q: "Ich sehe [?] Mann dort.", a: "den", p: ["der", "den", "ein", "einen"], i: "👀", t: "有'dort'暗示，指代那个人，阳性Akk特指用den。"},
+            {q: "Er braucht [?] neuen Kuli.", a: "einen", i: "🖊️", p: ["ein", "einen", "der", "den"], t: "有'neuen'暗示，指需要一个新的，阳性Akk泛指用einen。"},
+            {q: "Wo ist [?] Bus nach Berlin?", a: "der", i: "🚌", p: ["der", "den", "ein", "einen"], t: "特指'去柏林'的那班车，阳性Nom特指用der。"},
+            {q: "Hast du [?] Euro für mich?", a: "einen", i: "💶", p: ["ein", "einen", "der", "den"], t: "问对方有没有'一欧元'，阳性Akk泛指用einen。"},
+            {q: "Ich trinke [?] Saft von Tim.", a: "den", i: "🍹", p: ["der", "den", "ein", "einen"], t: "特指'Tim的'果汁，阳性Akk特指用den。"},
+            {q: "Das ist [?] Hund, keine Katze.", a: "ein", i: "🐕", p: ["ein", "einen", "der", "den"], t: "分类陈述，这是一只狗，阳性Nom泛指用ein。"},
+            {q: "Ich kenne [?] Weg zum Park.", a: "den", i: "🗺️", p: ["der", "den", "ein", "einen"], t: "特指'去公园的'路，阳性Akk特指用den。"},
+            {q: "Er kauft [?] billigen Rock.", a: "einen", i: "👗", p: ["ein", "einen", "das", "die"], t: "有形容词暗示，买一件便宜的，阳性Akk泛指einen。"},
+            {q: "Dort steht [?] Wagen von Papa.", a: "der", i: "🚗", p: ["der", "den", "ein", "einen"], t: "特指'爸爸的'车，阳性Nom特指用der。"},
+            {q: "Ich nehme [?] Tee hier.", a: "den", i: "🍵", p: ["der", "den", "das", "die"], t: "有'hier'暗示，指这里的茶，阳性Akk特指den。"},
 
-            // --- 混合逻辑挑战 ---
-            {q: "Ich habe [?] Fahrrad.", a: "ein", i: "🚲", t: "中性 das Fahrrad, Akk. 泛指用 ein"},
-            {q: "Dort steht [?] Baum.", a: "ein", i: "🌳", t: "阳性 der Baum, Nom. 泛指用 ein"},
-            {q: "Besuchst du [?] Oma?", a: "die", i: "👵", t: "阴性 die Oma, Akk. 特指用 die"},
-            {q: "Ich nehme [?] Tee.", a: "den", i: "🍵", t: "阳性 der Tee, Akk. 特指用 den"},
-            {q: "Das ist [?] Handy.", a: "ein", i: "📱", t: "中性 das Handy, Nom. 泛指用 ein"},
-            {q: "Ich schreibe [?] E-Mail.", a: "eine", i: "📧", t: "阴性 die E-Mail, Akk. 泛指用 eine"},
-            {q: "Er kauft [?] Tisch.", a: "den", i: "🪑", t: "阳性 der Tisch, Akk. 特指用 den"},
-            {q: "Wir hören [?] Musik.", a: "die", i: "🎵", t: "阴性 die Musik, Akk. 特指用 die"}
+            // --- 中性 ---
+            {q: "Ich lese [?] Buch von Goethe.", a: "das", i: "📖", p: ["das", "ein", "der", "die"], t: "特指'歌德写的'那本书，中性Akk特指das。"},
+            {q: "[?] Kind von Lisa ist süß.", a: "Das", i: "👶", p: ["Das", "Ein", "Der", "Die"], t: "特指'Lisa的'孩子，中性Nom特指Das。"},
+            {q: "Siehst du [?] Haus dort?", a: "das", i: "🏠", p: ["das", "ein", "der", "den"], t: "有'dort'指代，指那一栋房子，中性Akk特指das。"},
+            {q: "Hier ist [?] Foto von uns.", a: "ein", i: "🖼️", p: ["ein", "das", "der", "die"], t: "介绍时初次提到：这是一张照片，中性Nom泛指ein。"},
+            {q: "Ich möchte [?] kaltes Eis.", a: "ein", i: "🍦", p: ["ein", "das", "der", "die"], t: "模糊需求，想要一个冰激凌，中性Akk泛指ein。"},
+            {q: "Kaufst du [?] Brot für heute?", a: "ein", i: "🍞", p: ["ein", "das", "die", "einen"], t: "泛指买个面包，中性Akk泛指ein。"},
+            {q: "Ich habe [?] neues Handy.", a: "ein", i: "📱", p: ["ein", "das", "einen", "den"], t: "陈述拥有物，中性Akk泛指ein。"},
+            {q: "Das ist [?] Bild von Picasso.", a: "das", i: "🎨", p: ["das", "ein", "der", "die"], t: "特指'毕加索的'画，中性Nom特指das。"},
+            {q: "[?] Mädchen dort lernt viel.", a: "Das", i: "👧", p: ["Das", "Ein", "Die", "Der"], t: "有'dort'指代，中性Nom特指Das。"},
+            {q: "Haben Sie [?] Zimmer frei?", a: "ein", i: "🏨", p: ["ein", "das", "der", "den"], t: "问是否有'一个'空房间，中性Akk泛指ein。"},
+
+            // --- 阴性 ---
+            {q: "Ich kenne [?] Frau von Max.", a: "die", i: "👩", p: ["die", "eine", "der", "das"], t: "特指'Max的'太太，阴性Akk特指die。"},
+            {q: "Das ist [?] Lampe hier.", a: "die", i: "💡", p: ["die", "eine", "der", "das"], t: "有'hier'暗示特指这一盏，阴性Nom特指die。"},
+            {q: "Ich suche [?] Tasche von mir.", a: "die", i: "👜", p: ["die", "eine", "der", "den"], t: "特指'我的'包，阴性Akk特指die。"},
+            {q: "Wo ist [?] Katze von Oma?", a: "die", i: "🐱", p: ["die", "eine", "der", "das"], t: "特指'奶奶的'猫，阴性Nom特指die。"},
+            {q: "Er isst [?] große Pizza.", a: "eine", i: "🍕", p: ["eine", "die", "der", "das"], t: "泛指吃一个大披萨，阴性Akk泛指eine。"},
+            {q: "[?] Tür dort ist kaputt.", a: "Die", i: "🚪", p: ["Die", "Eine", "Der", "Das"], t: "有'dort'指代那一扇门，阴性Nom特指Die。"},
+            {q: "Haben Sie [?] Frage dazu?", a: "eine", i: "❓", p: ["eine", "die", "der", "das"], t: "泛指问'一个'问题，阴性Akk泛指eine。"},
+            {q: "Das ist [?] Schule in Berlin.", a: "eine", i: "🏫", p: ["eine", "die", "der", "den"], t: "泛指'柏林的一所学校'，阴性Nom泛指eine。"},
+            {q: "Ich schreibe [?] E-Mail an Tim.", a: "eine", i: "📧", p: ["eine", "die", "der", "den"], t: "泛指写'一封'邮件，阴性Akk泛指eine。"},
+            {q: "Wir hören [?] Musik von Mozart.", a: "die", i: "🎵", p: ["die", "eine", "das", "der"], t: "特指'莫扎特的'音乐，阴性Akk特指die。"}
         ];
 
         let idx = 0; let pool = []; let locked = false;
@@ -123,26 +120,21 @@
             document.getElementById('step-label').innerText = `${idx+1} / ${pool.length}`;
             document.getElementById('img-icon').innerText = item.i;
             document.getElementById('txt-display').innerHTML = item.q.replace(/\[\?\]/g, `<span class="slot">?</span>`);
-            
-            // 核心改变：全量选项，让学生在三个性中辨析
-            const allOpts = ["der", "die", "das", "den", "ein", "eine", "einen"];
-            document.getElementById('opt-container').innerHTML = allOpts.map(o => 
-                `<div class="option-box" onclick="check('${o}', this)"><span>${o}</span></div>`
-            ).join('');
+            const opts = [...item.p].sort(() => Math.random() - 0.5);
+            document.getElementById('opt-container').innerHTML = opts.map(o => `<div class="option-box" onclick="check('${o}', this)"><span>${o}</span></div>`).join('');
         }
 
         function check(val, el) {
             if(locked) return; locked = true;
             const item = pool[idx]; const slot = document.querySelector('.slot');
             slot.innerText = val; el.classList.add('active');
-            
             if(val.toLowerCase() === item.a.toLowerCase()) {
                 playDing(true); slot.classList.add('correct');
                 confetti({ particleCount: 30, origin: { y: 0.8 } });
                 setTimeout(() => { 
                     if(idx >= pool.length - 1) { 
                         localStorage.setItem('level10_cleared', 'true');
-                        alert("🎉 真棒！三性冠词挑战圆满通关！"); 
+                        alert("🎉 完成！这 30 道逻辑严密的题你全过关了！"); 
                         location.href='index.html'; 
                     } else { idx++; update(); } 
                 }, 1200);
