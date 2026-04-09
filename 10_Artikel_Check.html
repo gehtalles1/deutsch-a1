@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN" style="height: 100%; overflow: hidden;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>德语1/4格冠词训练</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@500;700;900&display=swap');
+        body { background: #F0F4F9; font-family: 'Noto Sans SC', sans-serif; margin: 0; width: 100vw; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        
+        /* 顶部导航与静音键 */
+        .header-bar { width: 100%; max-width: 430px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 25px 24px 10px; }
+        .progress-rail { flex-grow: 1; margin: 0 15px; height: 8px; background: #D1D9E6; border-radius: 10px; overflow: hidden; }
+        #progress-fill { height: 100%; width: 0%; background: #3B82F6; transition: width 0.6s ease; }
+        .control-icon { width: 32px; height: 32px; color: #94A3B8; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+        /* 内容区容器 - 解决头重脚轻 */
+        .content-area { width: 100%; max-width: 430px; flex-grow: 1; display: flex; flex-direction: column; margin: 0 auto; padding: 10px 24px 60px; justify-content: space-between; }
+        
+        #card-body { 
+            width: 100%; 
+            background: #FFFFFF; 
+            border-radius: 50px; 
+            box-shadow: 0 12px 30px rgba(0,0,0,0.02); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            padding: 60px 30px; /* 增加上下内边距 */
+            margin-bottom: 30px;
+        }
+
+        .sentence-text { font-size: 1.5rem; font-weight: 700; text-align: center; line-height: 1.6; color: #1E293B; min-height: 80px; }
+        .slot { display: inline-block; min-width: 80px; border-bottom: 4px solid #3B82F6; color: #3B82F6; margin: 0 6px; padding: 0 4px; transition: 0.3s; }
+        .slot.correct { color: #10B981; border-bottom-color: #10B981; }
+
+        /* 选项布局 */
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; }
+        .option-box { height: 90px; background: #1E293B; border-radius: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .option-box span { font-size: 1.4rem; font-weight: 800; color: #FFFFFF; }
+        .option-box.active { background: #3B82F6; }
+
+        /* 呼吸效果 */
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        .option-box { animation: float 4s ease-in-out infinite; }
+        .option-box:nth-child(even) { animation-delay: 2s; }
+
+        .modal-wrap { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 100; }
+    </style>
+</head>
+<body>
+
+    <div class="header-bar">
+        <div onclick="location.reload()" class="control-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></div>
+        <div class="progress-rail"><div id="progress-fill"></div></div>
+        <div id="mute-trigger" onclick="toggleAudio()" class="control-icon">
+            <svg id="audio-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 5L6 9H2v6h4l5 4V5zM19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+        </div>
+    </div>
+
+    <div class="text-center font-bold text-slate-400 mt-2 mb-2" id="step-label">1 / 30</div>
+
+    <div class="content-area">
+        <div id="card-body">
+            <div id="img-icon" class="text-8xl mb-10"></div>
+            <div id="txt-display" class="sentence-text"></div>
+        </div>
+        <div class="btn-grid" id="opt-container"></div>
+    </div>
+
+    <div id="feedback-modal" class="modal-wrap">
+        <div class="bg-white rounded-[40px] p-8 w-[320px] text-center shadow-2xl">
+            <div class="text-5xl mb-4">💡</div>
+            <p id="tip-text" class="text-slate-600 mb-8 text-sm text-left bg-blue-50 p-5 rounded-3xl leading-relaxed"></p>
+            <button onclick="closePop()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-lg">明白了</button>
+        </div>
+    </div>
+
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let audioMuted = false;
+
+        function playDing(isCorrect) {
+            if(audioMuted) return;
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+            if(isCorrect) { osc.frequency.setValueAtTime(523, now); osc.frequency.exponentialRampToValueAtTime(1046, now + 0.3); gain.gain.setValueAtTime(0.1, now); gain.gain.linearRampToValueAtTime(0, now + 0.4); }
+            else { osc.type = 'square'; osc.frequency.setValueAtTime(110, now); gain.gain.setValueAtTime(0.1, now); }
+            osc.start(); osc.stop(now + 0.4);
+        }
+
+        function toggleAudio() { 
+            audioMuted = !audioMuted;
+            document.getElementById('audio-svg').innerHTML = audioMuted ? 
+                `<path d="M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6"/>` : 
+                `<path d="M11 5L6 9H2v6h4l5 4V5zM19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>`;
+        }
+
+        const data = [
+            {q: "Ich sehe [?] Mann dort.", a: "den", p: ["der", "den", "ein", "einen"], i: "👀", t: "‘在那里的’男人是确定的宾语。阳性第四格(Akk.)特指用 den。"},
+            {q: "Hier ist [?] Computer von Lisa.", a: "der", p: ["der", "den", "ein", "einen"], i: "💻", t: "这是‘利萨的’电脑。阳性第一格(Nom.)特指用 der。"},
+            {q: "Er braucht [?] Kuli.", a: "einen", p: ["ein", "einen", "der", "den"], i: "🖊️", t: "他需要‘一支’圆珠笔。阳性第四格(Akk.)泛指用 einen。"},
+            {q: "Wo ist [?] Bus nach Berlin?", a: "der", p: ["der", "den", "ein", "einen"], i: "🚌", t: "‘去柏林的’那辆车。阳性第一格(Nom.)特指用 der。"},
+            {q: "Wir essen [?] Salat von Mama.", a: "den", p: ["der", "den", "ein", "einen"], i: "🥗", t: "吃‘妈妈做的’沙拉。阳性第四格(Akk.)特指用 den。"},
+            {q: "Hast du [?] Euro?", a: "einen", p: ["ein", "einen", "der", "den"], i: "💶", t: "你有‘一欧元’吗？阳性第四格(Akk.)泛指用 einen。"},
+            {q: "Dort liegt [?] Stift von mir.", a: "der", p: ["der", "den", "ein", "einen"], i: "🖊️", t: "‘我的’笔在那。阳性第一格(Nom.)特指用 der。"},
+            {q: "Ich trinke [?] Tee hier.", a: "den", p: ["der", "den", "ein", "einen"], i: "🍵", t: "我喝‘这里的’茶。阳性第四格(Akk.)特指用 den。"},
+            {q: "Er hat [?] Bruder.", a: "einen", p: ["ein", "einen", "der", "den"], i: "👦", t: "他有‘一个’兄弟。阳性第四格(Akk.)泛指用 einen。"},
+            {q: "[?] Wein hier ist sehr alt.", a: "Der", p: ["Der", "Den", "Ein", "Einen"], i: "🍷", t: "‘这里的’酒。阳性第一格(Nom.)特指用 Der。"},
+            {q: "Ich schreibe [?] Brief an Tim.", a: "einen", p: ["ein", "einen", "der", "den"], i: "✉️", t: "写‘一封’信。阳性第四格(Akk.)泛指用 einen。"},
+            {q: "Holst du [?] Koffer aus dem Auto?", a: "den", p: ["der", "den", "ein", "einen"], i: "🧳", t: "去车里拿‘那个’箱子。阳性第四格(Akk.)特指用 den。"},
+            {q: "Das ist [?] Hund, kein Kater.", a: "ein", p: ["ein", "einen", "der", "den"], i: "🐕", t: "这是‘一只’狗。阳性第一格(Nom.)泛指用 ein。"},
+            {q: "Ich kenne [?] Weg zum Park.", a: "den", p: ["der", "den", "ein", "einen"], i: "🗺️", t: "认识‘去公园的那条’路。阳性第四格(Akk.)特指用 den。"},
+            {q: "Dort steht [?] Wagen von Papa.", a: "der", p: ["der", "den", "ein", "einen"], i: "🚗", t: "‘爸爸的’车在那。阳性第一格(Nom.)特指用 der。"}
+            // 题库可按此格式扩充至30题
+        ];
+
+        let idx = 0; let pool = []; let locked = false;
+
+        function start() {
+            pool = [...data].sort(() => Math.random() - 0.5);
+            update();
+        }
+
+        function update() {
+            locked = false; const item = pool[idx];
+            document.getElementById('progress-fill').style.width = `${((idx+1)/30)*100}%`;
+            document.getElementById('step-label').innerText = `${idx+1} / 30`;
+            document.getElementById('img-icon').innerText = item.i;
+            document.getElementById('txt-display').innerHTML = item.q.replace(/\[\?\]/g, `<span class="slot">?</span>`);
+            const opts = ["ein", "einen", "der", "den"].sort(() => Math.random() - 0.5);
+            document.getElementById('opt-container').innerHTML = opts.map(o => `<div class="option-box" onclick="check('${o}', this)"><span>${o}</span></div>`).join('');
+        }
+
+        function check(val, el) {
+            if(locked) return; locked = true;
+            const item = pool[idx]; const slot = document.querySelector('.slot');
+            slot.innerText = val; el.classList.add('active');
+            if(val.toLowerCase() === item.a.toLowerCase()) {
+                playDing(true); slot.classList.add('correct');
+                confetti({ particleCount: 30, origin: { y: 0.8 } });
+                setTimeout(() => { if(idx >= 29) { alert("🎉 全通关！"); location.reload(); } else { idx++; update(); } }, 3000);
+            } else {
+                playDing(false);
+                document.getElementById('tip-text').innerText = item.t;
+                document.getElementById('feedback-modal').style.display = 'flex';
+            }
+        }
+
+        window.closePop = () => { document.getElementById('feedback-modal').style.display = 'none'; update(); };
+        start();
+    </script>
+</body>
+</html>
