@@ -3,86 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>直击 A1 德语焦虑 | 清零负担</title>
+    <title>A1德语通关营 | 轻松搞定入门</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
-        body { background-color: #F8FAFC; font-family: 'Noto Sans SC', sans-serif; color: #1E293B; -webkit-tap-highlight-color: transparent; }
-        @media (min-width: 1024px) { .app-container { transform: scale(1.1); transform-origin: top; } }
-        .premium-card { background: #FFFFFF; border: 1px solid #E2E8F0; border-bottom: 4px solid #E2E8F0; border-radius: 28px; transition: all 0.2s cubic-bezier(0, 0, 0, 0.2, 1); cursor: pointer; }
-        .premium-card:active { transform: translateY(2px); border-bottom-width: 1px; }
-        .duo-btn { background: #58CC02; border-bottom: 4px solid #46A302; color: white; border-radius: 18px; font-weight: 900; }
-        .locked-state { opacity: 0.45; filter: grayscale(0.85); pointer-events: none; }
         
-        .medal-pop { animation: medalPop 0.5s cubic-bezier(0.17, 0.89, 0.32, 1.49); }
+        body {
+            background-color: #F8FAFC;
+            font-family: 'Noto Sans SC', sans-serif;
+            color: #1E293B;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* 大厂风核心：微阴影与精致边框 */
+        .premium-card {
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-bottom: 3px solid #E2E8F0;
+            border-radius: 20px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .premium-card:active {
+            transform: scale(0.97);
+            border-bottom-width: 1px;
+        }
+
+        /* 多邻国风格按钮 */
+        .duo-btn {
+            background: #58CC02;
+            border-bottom: 3px solid #46A302;
+            color: white;
+            border-radius: 16px;
+            font-weight: 900;
+        }
+
+        /* 锁定状态：低饱和度 */
+        .locked-state {
+            opacity: 0.45;
+            filter: grayscale(0.8);
+            pointer-events: none;
+        }
+
+        /* 奖牌弹出动画 */
+        .medal-pop {
+            animation: medalPop 0.5s cubic-bezier(0.17, 0.89, 0.32, 1.49);
+        }
+
         @keyframes medalPop {
             0% { transform: scale(0) rotate(-45deg); opacity: 0; }
             100% { transform: scale(1) rotate(0); opacity: 1; }
         }
+
+        /* 标题渐变效果 */
+        .gradient-text {
+            background: linear-gradient(135deg, #1E293B 0%, #475569 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
     </style>
 </head>
-<body class="pt-10 pb-16 px-6"> 
-    <div class="app-container max-w-[480px] mx-auto flex flex-col min-h-[90vh]">
-        <header class="text-center mb-10">
-            <h1 class="text-4xl lg:text-5xl font-black text-slate-900 mb-5 tracking-tighter">直击 A1 德语焦虑</h1>
-            <div class="flex items-center justify-center gap-5 text-slate-400 font-bold tracking-[0.3em] uppercase">
-                <div class="w-10 h-px bg-slate-200 rounded-full"></div>
-                <h2 class="text-lg lg:text-xl">清零负担</h2>
-                <div class="w-10 h-px bg-slate-200 rounded-full"></div>
-            </div>
+<body class="py-10 px-4">
+    <div class="app-container max-w-[480px] mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-black gradient-text mb-2">A1德语通关营</h1>
+            <p class="text-sm text-slate-400 font-bold tracking-widest uppercase">零负担 · 闯关学德语</p>
+            <div class="w-12 h-1 bg-green-400 rounded-full mx-auto mt-4"></div>
         </header>
 
-        <main class="flex-grow space-y-8">
-            <div id="dynamic-panel" class="p-2 text-center">
-                <div id="auth-group" class="premium-card p-10 shadow-sm border-sky-100 bg-sky-50/50">
-                    <input id="key-input" type="text" placeholder="••••" class="w-full py-5 text-center bg-slate-50 rounded-2xl mb-8 outline-none font-black text-3xl border-2 border-transparent focus:border-sky-400">
-                    <button onclick="unlock()" class="w-full py-5 duo-btn text-xl shadow-lg shadow-green-100">立即开始闯关</button>
+        <main>
+            <div id="dynamic-panel" class="mb-8">
+                <div id="auth-group" class="premium-card p-6 shadow-sm bg-sky-50/30 border-sky-100">
+                    <input
+                        id="key-input"
+                        type="text"
+                        placeholder="请输入解锁码"
+                        class="w-full py-4 text-center bg-white rounded-xl mb-4 outline-none font-bold text-2xl border-2 border-transparent focus:border-sky-400"
+                    >
+                    <button onclick="unlock()" class="w-full py-4 duo-btn text-lg">
+                        解锁全部关卡
+                    </button>
                 </div>
             </div>
 
-            <div class="space-y-8">
-                <div id="lvl1" onclick="go(1)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm">
-                    <div class="w-16 h-16 bg-[#58CC02] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">1</div>
-                    <div><h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">名词词性捕手</h3><p class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">der / die / das</p></div>
-                    <div id="m1" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div>
+            <div class="grid grid-cols-2 gap-3">
+                
+                <div id="lvl1" onclick="go(1)" class="premium-card p-4 flex flex-col items-center text-center locked-state relative">
+                    <div class="w-12 h-12 bg-[#58CC02] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">1</div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-tight">名词词性捕手</h3>
+                    <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">der / die / das</p>
+                    <div id="m1" class="absolute -top-2 -right-2 text-3xl medal-pop"></div>
                 </div>
 
-                <div id="lvl2" onclick="go(2)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm"><div class="w-16 h-16 bg-[#00D4FF] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">2</div><div><h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">词性规律一眼破</h3><p class="text-xs font-bold text-slate-400 tracking-[0.2em]">规律分类练习</p></div><div id="m2" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div></div>
-                <div id="lvl3" onclick="go(3)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm"><div class="w-16 h-16 bg-[#A855F7] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">3</div><div><h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">复数实验室</h3><p class="text-xs font-bold text-slate-400 tracking-[0.2em]">Plural-Labor</p></div><div id="m3" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div></div>
-                <div id="lvl4" onclick="go(4)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm"><div class="w-16 h-16 bg-[#F59E0B] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">4</div><div><h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">弱变化动词驯服记</h3><p class="text-xs font-bold text-slate-400 tracking-[0.2em]">Verbkonjugation</p></div><div id="m4" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div></div>
-                <div id="lvl5" onclick="go(5)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm"><div class="w-16 h-16 bg-[#F43F5E] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">5</div><div><h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">强变化动词急救包</h3><p class="text-xs font-bold text-slate-400 tracking-[0.2em]">Starke Verben</p></div><div id="m5" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div></div>
-                <div id="lvl6" onclick="go(6)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm"><div class="w-16 h-16 bg-[#0EA5E9] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">6</div><div><h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">可分动词拆拆乐</h3><p class="text-xs font-bold text-slate-400 tracking-[0.2em]">Trennbare Verben</p></div><div id="m6" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div></div>
-                <div id="lvl7" onclick="go(7)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm"><div class="w-16 h-16 bg-[#D97706] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">7</div><div><h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">情态动词掌控术</h3><p class="text-xs font-bold text-slate-400 tracking-[0.2em]">Modalverben</p></div><div id="m7" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div></div>
-
-                <div id="lvl8" onclick="go(8)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm border-indigo-100">
-                    <div class="w-16 h-16 bg-[#6366F1] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">8</div>
-                    <div><h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">现在时全场景应用</h3><p class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">Präsens-Mix</p></div>
-                    <div id="m8" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div>
+                <div id="lvl2" onclick="go(2)" class="premium-card p-4 flex flex-col items-center text-center locked-state relative">
+                    <div class="w-12 h-12 bg-[#00D4FF] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">2</div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-tight">词性规律一眼破</h3>
+                    <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Nomen-Regeln</p>
+                    <div id="m2" class="absolute -top-2 -right-2 text-3xl medal-pop"></div>
                 </div>
 
-                <div id="lvl9" onclick="go(9)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm border-amber-100">
-                    <div class="w-16 h-16 bg-[#D97706] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">9</div>
-                    <div><h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">现在完成时一网打尽</h3><p class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">Perfekt Master</p></div>
-                    <div id="m9" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div>
+                <div id="lvl3" onclick="go(3)" class="premium-card p-4 flex flex-col items-center text-center locked-state relative">
+                    <div class="w-12 h-12 bg-[#A855F7] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">3</div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-tight">复数实验室</h3>
+                    <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Plural</p>
+                    <div id="m3" class="absolute -top-2 -right-2 text-3xl medal-pop"></div>
                 </div>
 
-                <div id="lvl10" onclick="go(10)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm border-teal-100">
-                    <div class="w-16 h-16 bg-[#0D9488] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">10</div>
-                    <div>
-                        <h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">一格四格基础用法</h3>
-                        <p class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">Nom. & Akk. Basis</p>
-                    </div>
-                    <div id="m10" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div>
+                <div id="lvl4" onclick="go(4)" class="premium-card p-4 flex flex-col items-center text-center locked-state relative">
+                    <div class="w-12 h-12 bg-[#F59E0B] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">4</div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-tight">弱变化动词</h3>
+                    <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Verbkonjugation</p>
+                    <div id="m4" class="absolute -top-2 -right-2 text-3xl medal-pop"></div>
+                </div>
+
+                <div id="lvl5" onclick="go(5)" class="premium-card p-4 flex flex-col items-center text-center locked-state relative">
+                    <div class="w-12 h-12 bg-[#F43F5E] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">5</div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-tight">强变化动词</h3>
+                    <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Starke Verben</p>
+                    <div id="m5" class="absolute -top-2 -right-2 text-3xl medal-pop"></div>
+                </div>
+
+                <div id="lvl6" onclick="go(6)" class="premium-card p-4 flex flex-col items-center text-center locked-state relative">
+                    <div class="w-12 h-12 bg-[#0EA5E9] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">6</div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-tight">可分动词</h3>
+                    <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Trennbare</p>
+                    <div id="m6" class="absolute -top-2 -right-2 text-3xl medal-pop"></div>
+                </div>
+
+                <div id="lvl7" onclick="go(7)" class="premium-card p-4 flex flex-col items-center text-center locked-state relative">
+                    <div class="w-12 h-12 bg-[#D97706] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">7</div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-tight">情态动词</h3>
+                    <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Modalverben</p>
+                    <div id="m7" class="absolute -top-2 -right-2 text-3xl medal-pop"></div>
+                </div>
+
+                <div id="lvl8" onclick="go(8)" class="premium-card p-4 flex flex-col items-center text-center locked-state relative">
+                    <div class="w-12 h-12 bg-[#6366F1] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">8</div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-tight">现在时应用</h3>
+                    <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Präsens-Mix</p>
+                    <div id="m8" class="absolute -top-2 -right-2 text-3xl medal-pop"></div>
+                </div>
+
+                <div id="lvl9" onclick="go(9)" class="premium-card p-4 flex flex-col items-center text-center locked-state relative">
+                    <div class="w-12 h-12 bg-[#D97706] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">9</div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-tight">现在完成时</h3>
+                    <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Perfekt Master</p>
+                    <div id="m9" class="absolute -top-2 -right-2 text-3xl medal-pop"></div>
+                </div>
+
+                <div id="lvl10" onclick="go(10)" class="premium-card p-4 flex flex-col items-center text-center locked-state relative">
+                    <div class="w-12 h-12 bg-[#0D9488] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">10</div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-tight">一格四格基础</h3>
+                    <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Nom. & Akk.</p>
+                    <div id="m10" class="absolute -top-2 -right-2 text-3xl medal-pop"></div>
                 </div>
             </div>
         </main>
 
-        <footer class="mt-24 text-center space-y-8 pb-10">
-            <div class="inline-flex items-center px-10 py-3 bg-white border border-slate-100 rounded-full shadow-sm">
-                <span class="text-xs font-black text-slate-300 uppercase tracking-widest">咨询微信:</span>
-                <span class="text-sm font-black text-slate-500 ml-2 uppercase">gehtalles</span>
+        <footer class="mt-12 text-center pb-10">
+            <div class="inline-flex items-center px-6 py-2 bg-white border border-slate-200 rounded-full shadow-sm mb-6">
+                <span class="text-[10px] font-black text-slate-300 uppercase tracking-widest">咨询微信:</span>
+                <span class="text-xs font-black text-slate-500 ml-2">gehtalles</span>
             </div>
-            <div><button onclick="clearAll()" class="text-[10px] font-bold text-slate-300 underline">RESET PROGRESS</button></div>
+            <div>
+                <button onclick="clearAll()" class="text-[10px] font-bold text-slate-300 underline uppercase tracking-tighter">
+                    Reset Progress
+                </button>
+            </div>
         </footer>
     </div>
 
@@ -91,57 +179,61 @@
             const unlocked = localStorage.getItem('isUnlocked') === 'true';
             if (unlocked) {
                 document.getElementById('auth-group').style.display = 'none';
-                ['lvl1', 'lvl2', 'lvl3', 'lvl4', 'lvl5', 'lvl6', 'lvl7', 'lvl8', 'lvl9', 'lvl10'].forEach(id => {
+                const levels = ['lvl1', 'lvl2', 'lvl3', 'lvl4', 'lvl5', 'lvl6', 'lvl7', 'lvl8', 'lvl9', 'lvl10'];
+                levels.forEach(id => {
                     const el = document.getElementById(id);
                     if(el) el.classList.remove('locked-state');
                 });
             }
 
-            // 奖牌逻辑
+            // 进度追踪：对应各关卡 LocalStorage Key
             const s1Score = localStorage.getItem('stage1_score'); 
-            if (s1Score === 'gold') { document.getElementById('m1').innerText = "🥇"; }
-            else if (s1Score === 'silver') { document.getElementById('m1').innerText = "🥈"; }
-            
-            if (localStorage.getItem('level2_cleared') === 'true') { document.getElementById('m2').innerText = "🏅"; }
-            if (localStorage.getItem('level3_cleared') === 'true') { document.getElementById('m3').innerText = "🧪"; }
-            if (localStorage.getItem('level4_cleared') === 'true') { document.getElementById('m4').innerText = "⚔️"; }
-            if (localStorage.getItem('level5_cleared') === 'true') { document.getElementById('m5').innerText = "🚑"; }
-            if (localStorage.getItem('level6_cleared') === 'true') { document.getElementById('m6').innerText = "🧩"; }
-            if (localStorage.getItem('level7_cleared') === 'true') { document.getElementById('m7').innerText = "👑"; }
-            if (localStorage.getItem('level8_cleared') === 'true') { document.getElementById('m8').innerText = "⚡"; }
-            if (localStorage.getItem('level9_cleared') === 'true') { document.getElementById('m9').innerText = "🏅"; }
-            
-            // 第十关奖牌逻辑
-            if (localStorage.getItem('level10_cleared') === 'true') { document.getElementById('m10').innerText = "🎯"; }
+            if (s1Score === 'gold') document.getElementById('m1').innerText = "🥇";
+            else if (s1Score === 'silver') document.getElementById('m1').innerText = "🥈";
+
+            if (localStorage.getItem('level2_cleared') === 'true') document.getElementById('m2').innerText = "🏅";
+            if (localStorage.getItem('level3_cleared') === 'true') document.getElementById('m3').innerText = "🧪";
+            if (localStorage.getItem('level4_cleared') === 'true') document.getElementById('m4').innerText = "⚔️";
+            if (localStorage.getItem('level5_cleared') === 'true') document.getElementById('m5').innerText = "🚑";
+            if (localStorage.getItem('level6_cleared') === 'true') document.getElementById('m6').innerText = "🧩";
+            if (localStorage.getItem('level7_cleared') === 'true') document.getElementById('m7').innerText = "👑";
+            if (localStorage.getItem('level8_cleared') === 'true') document.getElementById('m8').innerText = "⚡";
+            if (localStorage.getItem('level9_cleared') === 'true') document.getElementById('m9').innerText = "🏅";
+            if (localStorage.getItem('level10_cleared') === 'true') document.getElementById('m10').innerText = "🎯";
         }
 
         function unlock() {
             if (document.getElementById('key-input').value === '8888') {
                 localStorage.setItem('isUnlocked', 'true');
                 checkStatus();
-            } else { alert("请输入正确的激活码"); }
+            } else {
+                alert("请输入正确的激活码");
+            }
         }
 
-        function go(n) { 
-            if (localStorage.getItem('isUnlocked') === 'true') {
-                const pages = {
-                    1: '01-gender.html', 
-                    2: '02-classify.html', 
-                    3: '03-plural.html', 
-                    4: '04-verbs.html',
-                    5: '05-starke-verben.html',
-                    6: '06-trennbare-verben.html',
-                    7: '07-modalverben.html',
-                    8: '08-praesens-mix.html',
-                    9: '09-Perfekt-Master.html',
-                    10: '10_Artikel_Check.html' // 关联第十关文件
-                };
-                window.location.href = pages[n];
-            } 
+        // 跳转逻辑：严格对应 GitHub 仓库中的文件名
+        function go(n) {
+            if (localStorage.getItem('isUnlocked') !== 'true') return;
+            const pages = {
+                1: '01-gender.html',
+                2: '02-classify.html',
+                3: '03-plural.html',
+                4: '04-verbs.html',
+                5: '05-starke-verben.html',
+                6: '06-trennbare-verben.html',
+                7: '07-modalverben.html',
+                8: '08-praesens-mix.html',
+                9: '09-Perfekt-Master.html',
+                10: '10_Artikel_Check.html'
+            };
+            window.location.href = pages[n];
         }
 
-        function clearAll() { 
-            if (confirm("确定重置进度吗？")) { localStorage.clear(); location.reload(); } 
+        function clearAll() {
+            if (confirm("确定重置进度吗？")) {
+                localStorage.clear();
+                location.reload();
+            }
         }
 
         window.onload = checkStatus;
