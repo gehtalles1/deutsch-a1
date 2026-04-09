@@ -12,14 +12,19 @@
         .app-container { width: 100%; max-width: 430px; height: 100%; display: flex; flex-direction: column; padding: 0 20px; margin: 0 auto; }
         .nav-bar { display: flex; align-items: center; justify-content: space-between; padding: 20px 5px 10px; }
         .nav-icon { cursor: pointer; opacity: 0.7; transition: opacity 0.2s; }
-        .nav-icon:active { opacity: 1; transform: scale(0.9); }
+        
         #main-card { width: 100%; padding: 40px 20px; background: rgba(255, 255, 255, 0.04); border-radius: 40px; border: 1px solid rgba(255,255,255,0.1); }
         .sentence-text { font-size: 1.4rem; font-weight: 800; line-height: 2.2; text-align: center; color: #FFFFFF; }
+        
+        /* 填空样式 */
         .sentence-text b { color: #38BDF8; border-bottom: 3px solid #38BDF8; padding: 0 10px; margin: 0 6px; min-width: 90px; display: inline-block; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .no-break { white-space: nowrap; display: inline-flex; align-items: baseline; }
+        
+        /* 关键：答对后的高亮动画（停留3秒） */
         .sentence-text b.correct-active { color: #4ADE80 !important; border-bottom-color: #4ADE80 !important; transform: scale(1.15); text-shadow: 0 0 15px rgba(74, 222, 128, 0.5); }
+
         .glass-orb { height: 75px; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; font-size: 1.1rem; font-weight: 900; color: #D4AF37; }
-        .glass-orb.selected { background: #D4AF37; color: #000; border-color: #FFF; box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); }
+        .glass-orb.selected { background: #D4AF37; color: #000; border-color: #FFF; }
         .is-checking .glass-orb { opacity: 0.4; cursor: default; }
     </style>
 </head>
@@ -38,17 +43,19 @@
             </div>
         </div>
         
-        <div id="cur-step" class="text-center text-xs font-black text-zinc-600 mb-4 uppercase tracking-widest">1 / 30</div>
+        <div id="cur-step" class="text-center text-xs font-black text-zinc-600 mb-4 tracking-widest">1 / 30</div>
 
         <div class="flex-grow flex flex-col justify-start pt-2" id="game-body">
             <div class="text-center mb-8">
                 <h1 id="verb-display" class="text-4xl font-black tracking-tight mb-2"></h1>
                 <p id="verb-cn" class="text-zinc-500 font-bold"></p>
             </div>
+            
             <div id="main-card" class="mb-10">
                 <div id="emoji-icon" class="text-7xl mb-8 text-center"></div>
                 <div class="sentence-text" id="sentence-box"></div>
             </div>
+
             <div class="grid grid-cols-2 gap-4" id="orb-box"></div>
         </div>
     </div>
@@ -57,7 +64,7 @@
         <div class="bg-zinc-900 p-10 rounded-[50px] w-full max-w-[360px] border-2 border-yellow-600/50">
             <div class="text-8xl mb-6">🏆</div>
             <h2 class="text-3xl font-black text-yellow-500 mb-4">通关大吉!</h2>
-            <p class="text-zinc-400 mb-8">老师，第9关全部完成！</p>
+            <p class="text-zinc-400 mb-8">太棒了！30道练习全部达成！</p>
             <button onclick="window.location.href='index.html'" class="w-full py-5 bg-yellow-600 text-white rounded-2xl font-black text-xl">确认并返回</button>
         </div>
     </div>
@@ -65,14 +72,13 @@
     <div id="error-modal" class="hidden fixed inset-0 bg-black/98 z-[4000] flex items-center justify-center p-6">
         <div class="bg-zinc-900 p-8 rounded-[40px] w-full max-w-[340px] text-center border border-red-900/30">
             <div class="text-5xl mb-4">👩‍🏫</div>
-            <p id="error-title" class="text-yellow-500 font-black mb-4 text-xl italic"></p>
-            <div id="teacher-advice" class="text-zinc-400 text-sm mb-10 text-left border-l-4 border-yellow-700 pl-4 leading-relaxed"></div>
+            <p class="text-yellow-500 font-black mb-4 text-xl">哎呀，写错了</p>
+            <div id="teacher-advice" class="text-zinc-400 text-sm mb-10 text-left border-l-4 border-yellow-700 pl-4 leading-relaxed whitespace-pre-line"></div>
             <button onclick="tryAgain()" class="w-full py-4 bg-zinc-800 text-white rounded-2xl font-black">再试一次</button>
         </div>
     </div>
 
     <script>
-        // --- 音效生成器逻辑 ---
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         let isMuted = false;
 
@@ -80,42 +86,17 @@
             if (isMuted) return;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-
-            if (type === 'select') {
-                osc.type = 'sine'; osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
-            } else if (type === 'correct') {
-                osc.type = 'sine'; osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(1046.50, audioCtx.currentTime + 0.3);
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
-            } else if (type === 'wrong') {
-                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(220, audioCtx.currentTime);
-                osc.frequency.linearRampToValueAtTime(110, audioCtx.currentTime + 0.4);
-                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.4);
-            }
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            if (type === 'select') { osc.frequency.setValueAtTime(880, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1); osc.start(); osc.stop(audioCtx.currentTime + 0.1); }
+            else if (type === 'correct') { osc.frequency.setValueAtTime(523, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(1046, audioCtx.currentTime + 0.3); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); osc.start(); osc.stop(audioCtx.currentTime + 0.3); }
+            else if (type === 'wrong') { osc.type = 'sawtooth'; osc.frequency.setValueAtTime(220, audioCtx.currentTime); gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.4); osc.start(); osc.stop(audioCtx.currentTime + 0.4); }
         }
 
         function toggleMute() {
             isMuted = !isMuted;
-            const icon = document.getElementById('speaker-icon');
-            if(isMuted) {
-                icon.innerHTML = '<path d="M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6"/>';
-                document.getElementById('mute-btn').style.opacity = "0.4";
-            } else {
-                icon.innerHTML = '<path d="M11 5L6 9H2v6h4l5 4V5zM19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>';
-                document.getElementById('mute-btn').style.opacity = "0.7";
-            }
+            document.getElementById('speaker-icon').innerHTML = isMuted ? '<path d="M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6"/>' : '<path d="M11 5L6 9H2v6h4l5 4V5zM19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>';
         }
 
-        // 游戏核心数据与逻辑
         const rawData = [
             {q: "Ich [?] gestern Pizza [?].", v: "essen", cn: "吃", ans: ["habe", "gegessen"], icon: "🍕", auxTip: "及物动词用 haben。", partTip: "essen 变 gegessen。"},
             {q: "Warum [?] du gestern so spät [?]? ", v: "kommen", cn: "来", ans: ["bist", "gekommen"], icon: "🎉", auxTip: "‘来’是位移词，主语du对应bist。", partTip: "kommen 分词不变音。"},
@@ -149,21 +130,13 @@
             {q: "Sie [?] uns [?].", v: "besuchen", cn: "拜访", ans: ["hat", "besucht"], icon: "🏠", auxTip: "拜访选 haben。", partTip: "be开头不加ge。"}
         ];
 
-        let curIdx = 0;
-        let inputs = [null, null];
-        let selectedQuests = [];
-        let isChecking = false;
+        let curIdx = 0; let inputs = [null, null]; let selectedQuests = []; let isChecking = false;
 
-        function init() {
-            selectedQuests = rawData.sort(() => Math.random() - 0.5);
-            render();
-        }
+        function init() { selectedQuests = rawData.sort(() => Math.random() - 0.5); render(); }
 
         function render() {
-            isChecking = false;
-            document.getElementById('game-body').classList.remove('is-checking');
-            const data = selectedQuests[curIdx];
-            inputs = [null, null];
+            isChecking = false; document.getElementById('game-body').classList.remove('is-checking');
+            const data = selectedQuests[curIdx]; inputs = [null, null];
             document.getElementById('progress-fill').style.width = `${((curIdx+1)/30)*100}%`;
             document.getElementById('cur-step').innerText = `${curIdx + 1} / 30`;
             document.getElementById('verb-display').innerText = data.v;
@@ -171,9 +144,9 @@
             document.getElementById('emoji-icon').innerText = data.icon;
             const parts = data.q.split('[?]');
             document.getElementById('sentence-box').innerHTML = `<span>${parts[0]}</span><b id="s0">?</b><span>${parts[1]}</span><span class="no-break"><b id="s1">?</b><span>${parts[2]||""}</span></span>`;
-            const wrongAux = data.ans[0].toLowerCase().includes('i') ? "hat" : "ist";
-            const wrongPart = data.ans[1].endsWith('en') ? data.ans[1].replace('en', 't') : "ge" + data.ans[1].replace('ge','').replace('t','en');
-            const opts = [data.ans[0], data.ans[1], wrongAux, wrongPart].sort(() => Math.random() - 0.5);
+            
+            // 生成选项
+            const opts = [data.ans[0], data.ans[1], data.ans[0].includes('i')?'hat':'ist', data.ans[1]+'t'].sort(() => Math.random() - 0.5);
             document.getElementById('orb-box').innerHTML = opts.map(t => `<div class="glass-orb" onclick="sel('${t}', this)">${t}</div>`).join('');
         }
 
@@ -181,49 +154,46 @@
             if (isChecking) return;
             let idx = inputs[0] === null ? 0 : (inputs[1] === null ? 1 : -1);
             if (idx === -1 || el.classList.contains('selected')) return;
-            playSound('select'); // --- 选择音 ---
-            el.classList.add('selected');
-            inputs[idx] = val;
-            document.getElementById(`s${idx}`).innerText = val;
-            document.getElementById(`s${idx}`).style.color = "#FFF";
+            playSound('select'); el.classList.add('selected'); inputs[idx] = val;
+            document.getElementById(`s${idx}`).innerText = val; document.getElementById(`s${idx}`).style.color = "#FFF";
             if (inputs[0] && inputs[1]) setTimeout(check, 300);
         }
 
         function check() {
             isChecking = true;
-            document.getElementById('game-body').classList.add('is-checking');
             const data = selectedQuests[curIdx];
             const correct = (inputs[0].toLowerCase() === data.ans[0].toLowerCase() && inputs[1].toLowerCase() === data.ans[1].toLowerCase());
-
+            
             if (correct) {
-                playSound('correct'); // --- 成功音 ---
+                playSound('correct');
                 document.getElementById('s0').classList.add('correct-active');
                 document.getElementById('s1').classList.add('correct-active');
-                setTimeout(() => {
-                    if (curIdx === 29) celebrate();
-                    else { curIdx++; render(); }
-                }, 1500); 
-            } else {
-                playSound('wrong'); // --- 失败音 ---
-                showError(data);
+                
+                // 重点修改：此处改为 3000 毫秒，让学生看清对题
+                setTimeout(() => { 
+                    if (curIdx === 29) celebrate(); 
+                    else { curIdx++; render(); } 
+                }, 3000); 
+            } else { 
+                playSound('wrong'); 
+                showError(data); 
             }
         }
 
         function showError(data) {
-            document.getElementById('error-title').innerText = "哎呀，写错了";
             document.getElementById('teacher-advice').innerText = `${data.auxTip}\n\n${data.partTip}`;
             document.getElementById('error-modal').classList.remove('hidden');
         }
 
         function celebrate() {
             localStorage.setItem('level9_cleared', 'true');
-            const end = Date.now() + 3000;
+            const end = Date.now() + 2000;
             (function frame() {
-                confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#D4AF37','#38BDF8'] });
-                confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#D4AF37','#38BDF8'] });
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#D4AF37','#38BDF8'] });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#D4AF37','#38BDF8'] });
                 if (Date.now() < end) requestAnimationFrame(frame);
             }());
-            setTimeout(() => { document.getElementById('congrats-modal').classList.remove('hidden'); }, 800);
+            setTimeout(() => { document.getElementById('congrats-modal').classList.remove('hidden'); }, 500);
         }
 
         window.tryAgain = () => { document.getElementById('error-modal').classList.add('hidden'); render(); };
