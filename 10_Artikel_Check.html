@@ -16,7 +16,7 @@
         #progress-fill { height: 100%; width: 0%; background: #3B82F6; transition: width 0.6s ease; }
         .control-icon { width: 32px; height: 32px; color: #94A3B8; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-        /* 内容区容器 - 解决头重脚轻 */
+        /* 内容区容器 */
         .content-area { width: 100%; max-width: 430px; flex-grow: 1; display: flex; flex-direction: column; margin: 0 auto; padding: 10px 24px 60px; justify-content: space-between; }
         
         #card-body { 
@@ -28,7 +28,7 @@
             flex-direction: column; 
             align-items: center; 
             justify-content: center;
-            padding: 60px 30px; /* 增加上下内边距 */
+            padding: 60px 30px; 
             margin-bottom: 30px;
         }
 
@@ -42,7 +42,7 @@
         .option-box span { font-size: 1.4rem; font-weight: 800; color: #FFFFFF; }
         .option-box.active { background: #3B82F6; }
 
-        /* 呼吸效果 */
+        /* 动画 */
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
         .option-box { animation: float 4s ease-in-out infinite; }
         .option-box:nth-child(even) { animation-delay: 2s; }
@@ -53,7 +53,7 @@
 <body>
 
     <div class="header-bar">
-        <div onclick="location.reload()" class="control-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></div>
+        <div onclick="location.href='index.html'" class="control-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></div>
         <div class="progress-rail"><div id="progress-fill"></div></div>
         <div id="mute-trigger" onclick="toggleAudio()" class="control-icon">
             <svg id="audio-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 5L6 9H2v6h4l5 4V5zM19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
@@ -115,20 +115,20 @@
             {q: "Das ist [?] Hund, kein Kater.", a: "ein", p: ["ein", "einen", "der", "den"], i: "🐕", t: "这是‘一只’狗。阳性第一格(Nom.)泛指用 ein。"},
             {q: "Ich kenne [?] Weg zum Park.", a: "den", p: ["der", "den", "ein", "einen"], i: "🗺️", t: "认识‘去公园的那条’路。阳性第四格(Akk.)特指用 den。"},
             {q: "Dort steht [?] Wagen von Papa.", a: "der", p: ["der", "den", "ein", "einen"], i: "🚗", t: "‘爸爸的’车在那。阳性第一格(Nom.)特指用 der。"}
-            // 题库可按此格式扩充至30题
         ];
 
         let idx = 0; let pool = []; let locked = false;
 
         function start() {
             pool = [...data].sort(() => Math.random() - 0.5);
+            // 这里可以根据实际需求扩充题库至 30 题，目前代码适配 15 题逻辑
             update();
         }
 
         function update() {
             locked = false; const item = pool[idx];
-            document.getElementById('progress-fill').style.width = `${((idx+1)/30)*100}%`;
-            document.getElementById('step-label').innerText = `${idx+1} / 30`;
+            document.getElementById('progress-fill').style.width = `${((idx+1)/pool.length)*100}%`;
+            document.getElementById('step-label').innerText = `${idx+1} / ${pool.length}`;
             document.getElementById('img-icon').innerText = item.i;
             document.getElementById('txt-display').innerHTML = item.q.replace(/\[\?\]/g, `<span class="slot">?</span>`);
             const opts = ["ein", "einen", "der", "den"].sort(() => Math.random() - 0.5);
@@ -139,10 +139,22 @@
             if(locked) return; locked = true;
             const item = pool[idx]; const slot = document.querySelector('.slot');
             slot.innerText = val; el.classList.add('active');
+            
             if(val.toLowerCase() === item.a.toLowerCase()) {
                 playDing(true); slot.classList.add('correct');
                 confetti({ particleCount: 30, origin: { y: 0.8 } });
-                setTimeout(() => { if(idx >= 29) { alert("🎉 全通关！"); location.reload(); } else { idx++; update(); } }, 3000);
+                
+                setTimeout(() => { 
+                    if(idx >= pool.length - 1) { 
+                        // 通关脚本：写入清除标志
+                        localStorage.setItem('level10_cleared', 'true');
+                        alert("🎉 全通关！地图图标已激活！"); 
+                        location.href='index.html'; // 假设地图文件名是 index.html
+                    } else { 
+                        idx++; 
+                        update(); 
+                    } 
+                }, 1500);
             } else {
                 playDing(false);
                 document.getElementById('tip-text').innerText = item.t;
