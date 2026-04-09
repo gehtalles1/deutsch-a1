@@ -14,7 +14,6 @@
         .duo-btn { background: #58CC02; border-bottom: 4px solid #46A302; color: white; border-radius: 18px; font-weight: 900; }
         .locked-state { opacity: 0.45; filter: grayscale(0.85); pointer-events: none; }
         
-        /* 奖牌弹出动画 */
         .medal-pop { animation: medalPop 0.5s cubic-bezier(0.17, 0.89, 0.32, 1.49); }
         @keyframes medalPop {
             0% { transform: scale(0) rotate(-45deg); opacity: 0; }
@@ -51,59 +50,12 @@
                     <div id="m1" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div>
                 </div>
 
-                <div id="lvl2" onclick="go(2)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm">
-                    <div class="w-16 h-16 bg-[#00D4FF] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">2</div>
-                    <div>
-                        <h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">词性规律一眼破</h3>
-                        <p class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">规律分类练习</p>
-                    </div>
-                    <div id="m2" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div>
-                </div>
-
-                <div id="lvl3" onclick="go(3)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm border-purple-100">
-                    <div class="w-16 h-16 bg-[#A855F7] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">3</div>
-                    <div>
-                        <h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">复数实验室</h3>
-                        <p class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">Plural-Labor</p>
-                    </div>
-                    <div id="m3" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div>
-                </div>
-
-                <div id="lvl4" onclick="go(4)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm border-orange-100">
-                    <div class="w-16 h-16 bg-[#F59E0B] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">4</div>
-                    <div>
-                        <h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">弱变化动词驯服记</h3>
-                        <p class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">Verbkonjugation</p>
-                    </div>
-                    <div id="m4" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div>
-                </div>
-
-                <div id="lvl5" onclick="go(5)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm border-rose-100">
-                    <div class="w-16 h-16 bg-[#F43F5E] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">5</div>
-                    <div>
-                        <h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">强变化动词急救包</h3>
-                        <p class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">Starke Verben</p>
-                    </div>
-                    <div id="m5" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div>
-                </div>
-
-                <div id="lvl6" onclick="go(6)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm border-sky-100">
-                    <div class="w-16 h-16 bg-[#0EA5E9] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">6</div>
-                    <div>
-                        <h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">可分动词拆拆乐</h3>
-                        <p class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">Trennbare Verben</p>
-                    </div>
-                    <div id="m6" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div>
-                </div>
-
-                <div id="lvl7" onclick="go(7)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm border-amber-100">
-                    <div class="w-16 h-16 bg-[#D97706] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">7</div>
-                    <div>
-                        <h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">情态动词掌控术</h3>
-                        <p class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">Modalverben</p>
-                    </div>
-                    <div id="m7" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div>
-                </div>
+                <div id="lvl2" onclick="go(2)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm"><div class="w-16 h-16 bg-[#00D4FF] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">2</div><div><h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">词性规律一眼破</h3><p class="text-xs font-bold text-slate-400 tracking-[0.2em]">规律分类练习</p></div><div id="m2" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div></div>
+                <div id="lvl3" onclick="go(3)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm"><div class="w-16 h-16 bg-[#A855F7] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">3</div><div><h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">复数实验室</h3><p class="text-xs font-bold text-slate-400 tracking-[0.2em]">Plural-Labor</p></div><div id="m3" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div></div>
+                <div id="lvl4" onclick="go(4)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm"><div class="w-16 h-16 bg-[#F59E0B] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">4</div><div><h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">弱变化动词驯服记</h3><p class="text-xs font-bold text-slate-400 tracking-[0.2em]">Verbkonjugation</p></div><div id="m4" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div></div>
+                <div id="lvl5" onclick="go(5)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm"><div class="w-16 h-16 bg-[#F43F5E] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">5</div><div><h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">强变化动词急救包</h3><p class="text-xs font-bold text-slate-400 tracking-[0.2em]">Starke Verben</p></div><div id="m5" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div></div>
+                <div id="lvl6" onclick="go(6)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm"><div class="w-16 h-16 bg-[#0EA5E9] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">6</div><div><h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">可分动词拆拆乐</h3><p class="text-xs font-bold text-slate-400 tracking-[0.2em]">Trennbare Verben</p></div><div id="m6" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div></div>
+                <div id="lvl7" onclick="go(7)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm"><div class="w-16 h-16 bg-[#D97706] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">7</div><div><h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">情态动词掌控术</h3><p class="text-xs font-bold text-slate-400 tracking-[0.2em]">Modalverben</p></div><div id="m7" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div></div>
 
                 <div id="lvl8" onclick="go(8)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm border-indigo-100">
                     <div class="w-16 h-16 bg-[#6366F1] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">8</div>
@@ -112,6 +64,15 @@
                         <p class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">Präsens-Mix</p>
                     </div>
                     <div id="m8" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div>
+                </div>
+
+                <div id="lvl9" onclick="go(9)" class="premium-card p-7 flex items-center gap-6 relative locked-state shadow-sm border-amber-100">
+                    <div class="w-16 h-16 bg-[#D97706] rounded-[22px] flex items-center justify-center text-white font-black text-3xl shadow-inner">9</div>
+                    <div>
+                        <h3 class="font-black text-xl lg:text-2xl text-slate-800 mb-1">现在完成时一网打尽</h3>
+                        <p class="text-xs font-bold text-slate-400 lowercase tracking-[0.2em]">Perfekt Master</p>
+                    </div>
+                    <div id="m9" class="absolute -top-3 -right-3 text-5xl drop-shadow-md medal-pop"></div>
                 </div>
             </div>
         </main>
@@ -130,12 +91,13 @@
             const unlocked = localStorage.getItem('isUnlocked') === 'true';
             if (unlocked) {
                 document.getElementById('auth-group').style.display = 'none';
-                ['lvl1', 'lvl2', 'lvl3', 'lvl4', 'lvl5', 'lvl6', 'lvl7', 'lvl8'].forEach(id => {
+                ['lvl1', 'lvl2', 'lvl3', 'lvl4', 'lvl5', 'lvl6', 'lvl7', 'lvl8', 'lvl9'].forEach(id => {
                     const el = document.getElementById(id);
                     if(el) el.classList.remove('locked-state');
                 });
             }
 
+            // 奖牌逻辑
             const s1Score = localStorage.getItem('stage1_score'); 
             if (s1Score === 'gold') { document.getElementById('m1').innerText = "🥇"; }
             else if (s1Score === 'silver') { document.getElementById('m1').innerText = "🥈"; }
@@ -146,8 +108,10 @@
             if (localStorage.getItem('level5_cleared') === 'true') { document.getElementById('m5').innerText = "🚑"; }
             if (localStorage.getItem('level6_cleared') === 'true') { document.getElementById('m6').innerText = "🧩"; }
             if (localStorage.getItem('level7_cleared') === 'true') { document.getElementById('m7').innerText = "👑"; }
-            // 第八关奖牌逻辑 - 对应图标 ⚡
             if (localStorage.getItem('level8_cleared') === 'true') { document.getElementById('m8').innerText = "⚡"; }
+            
+            // 第九关奖牌逻辑
+            if (localStorage.getItem('level9_cleared') === 'true') { document.getElementById('m9').innerText = "🏅"; }
         }
 
         function unlock() {
@@ -167,7 +131,8 @@
                     5: '05-starke-verben.html',
                     6: '06-trennbare-verben.html',
                     7: '07-modalverben.html',
-                    8: '08-praesens-mix.html' // 对应第八关文件名
+                    8: '08-praesens-mix.html',
+                    9: '09-Perfekt-Master.html' // 关联第九关文件
                 };
                 window.location.href = pages[n];
             } 
