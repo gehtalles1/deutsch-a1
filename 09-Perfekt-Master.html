@@ -10,20 +10,14 @@
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@500;700;900&display=swap');
         body { background: #000; font-family: 'Noto Sans SC', sans-serif; margin: 0; width: 100vw; height: 100vh; overflow: hidden; color: #FFF; }
         .app-container { width: 100%; max-width: 430px; height: 100%; display: flex; flex-direction: column; padding: 0 20px; margin: 0 auto; }
-        
-        /* 顶部导航 */
         .nav-bar { display: flex; align-items: center; justify-content: space-between; padding: 20px 5px 10px; }
         .nav-icon { cursor: pointer; opacity: 0.7; transition: opacity 0.2s; }
         .nav-icon:active { opacity: 1; transform: scale(0.9); }
-
-        /* 核心卡片 */
         #main-card { width: 100%; padding: 40px 20px; background: rgba(255, 255, 255, 0.04); border-radius: 40px; border: 1px solid rgba(255,255,255,0.1); }
         .sentence-text { font-size: 1.4rem; font-weight: 800; line-height: 2.2; text-align: center; color: #FFFFFF; }
-        
         .sentence-text b { color: #38BDF8; border-bottom: 3px solid #38BDF8; padding: 0 10px; margin: 0 6px; min-width: 90px; display: inline-block; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .no-break { white-space: nowrap; display: inline-flex; align-items: baseline; }
         .sentence-text b.correct-active { color: #4ADE80 !important; border-bottom-color: #4ADE80 !important; transform: scale(1.15); text-shadow: 0 0 15px rgba(74, 222, 128, 0.5); }
-
         .glass-orb { height: 75px; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; font-size: 1.1rem; font-weight: 900; color: #D4AF37; }
         .glass-orb.selected { background: #D4AF37; color: #000; border-color: #FFF; box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); }
         .is-checking .glass-orb { opacity: 0.4; cursor: default; }
@@ -51,12 +45,10 @@
                 <h1 id="verb-display" class="text-4xl font-black tracking-tight mb-2"></h1>
                 <p id="verb-cn" class="text-zinc-500 font-bold"></p>
             </div>
-            
             <div id="main-card" class="mb-10">
                 <div id="emoji-icon" class="text-7xl mb-8 text-center"></div>
                 <div class="sentence-text" id="sentence-box"></div>
             </div>
-
             <div class="grid grid-cols-2 gap-4" id="orb-box"></div>
         </div>
     </div>
@@ -80,8 +72,37 @@
     </div>
 
     <script>
-        // --- 新增：消音逻辑 ---
+        // --- 音效生成器逻辑 ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         let isMuted = false;
+
+        function playSound(type) {
+            if (isMuted) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'select') {
+                osc.type = 'sine'; osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+            } else if (type === 'correct') {
+                osc.type = 'sine'; osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1046.50, audioCtx.currentTime + 0.3);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(110, audioCtx.currentTime + 0.4);
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+            }
+        }
+
         function toggleMute() {
             isMuted = !isMuted;
             const icon = document.getElementById('speaker-icon');
@@ -94,7 +115,7 @@
             }
         }
 
-        // 数据和游戏核心逻辑与之前一致
+        // 游戏核心数据与逻辑
         const rawData = [
             {q: "Ich [?] gestern Pizza [?].", v: "essen", cn: "吃", ans: ["habe", "gegessen"], icon: "🍕", auxTip: "及物动词用 haben。", partTip: "essen 变 gegessen。"},
             {q: "Warum [?] du gestern so spät [?]? ", v: "kommen", cn: "来", ans: ["bist", "gekommen"], icon: "🎉", auxTip: "‘来’是位移词，主语du对应bist。", partTip: "kommen 分词不变音。"},
@@ -148,14 +169,11 @@
             document.getElementById('verb-display').innerText = data.v;
             document.getElementById('verb-cn').innerText = `意思：${data.cn}`;
             document.getElementById('emoji-icon').innerText = data.icon;
-            
             const parts = data.q.split('[?]');
             document.getElementById('sentence-box').innerHTML = `<span>${parts[0]}</span><b id="s0">?</b><span>${parts[1]}</span><span class="no-break"><b id="s1">?</b><span>${parts[2]||""}</span></span>`;
-
             const wrongAux = data.ans[0].toLowerCase().includes('i') ? "hat" : "ist";
             const wrongPart = data.ans[1].endsWith('en') ? data.ans[1].replace('en', 't') : "ge" + data.ans[1].replace('ge','').replace('t','en');
             const opts = [data.ans[0], data.ans[1], wrongAux, wrongPart].sort(() => Math.random() - 0.5);
-            
             document.getElementById('orb-box').innerHTML = opts.map(t => `<div class="glass-orb" onclick="sel('${t}', this)">${t}</div>`).join('');
         }
 
@@ -163,6 +181,7 @@
             if (isChecking) return;
             let idx = inputs[0] === null ? 0 : (inputs[1] === null ? 1 : -1);
             if (idx === -1 || el.classList.contains('selected')) return;
+            playSound('select'); // --- 选择音 ---
             el.classList.add('selected');
             inputs[idx] = val;
             document.getElementById(`s${idx}`).innerText = val;
@@ -177,13 +196,15 @@
             const correct = (inputs[0].toLowerCase() === data.ans[0].toLowerCase() && inputs[1].toLowerCase() === data.ans[1].toLowerCase());
 
             if (correct) {
+                playSound('correct'); // --- 成功音 ---
                 document.getElementById('s0').classList.add('correct-active');
                 document.getElementById('s1').classList.add('correct-active');
                 setTimeout(() => {
                     if (curIdx === 29) celebrate();
                     else { curIdx++; render(); }
-                }, 3000); 
+                }, 1500); 
             } else {
+                playSound('wrong'); // --- 失败音 ---
                 showError(data);
             }
         }
@@ -205,11 +226,7 @@
             setTimeout(() => { document.getElementById('congrats-modal').classList.remove('hidden'); }, 800);
         }
 
-        window.tryAgain = () => { 
-            document.getElementById('error-modal').classList.add('hidden'); 
-            render(); 
-        };
-        
+        window.tryAgain = () => { document.getElementById('error-modal').classList.add('hidden'); render(); };
         init();
     </script>
 </body>
