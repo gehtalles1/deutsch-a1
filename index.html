@@ -68,7 +68,7 @@
     <div class="app-container max-w-[480px] mx-auto">
         <header class="text-center mb-8">
             <h1 class="text-3xl font-black gradient-text mb-2">A1德语通关营</h1>
-            <p class="text-sm text-slate-400 font-bold tracking-widest uppercase">零负担 · 闯关学德语</p>
+            <p class="text-sm text-slate-400 font-bold tracking-widest uppercase">A1 全内容・轻松学德语</p>
             <div class="w-12 h-1 bg-green-400 rounded-full mx-auto mt-4"></div>
         </header>
 
@@ -186,7 +186,7 @@
                 });
             }
 
-            // 进度追踪：对应各关卡 LocalStorage Key
+            // 进度追踪
             const s1Score = localStorage.getItem('stage1_score'); 
             if (s1Score === 'gold') document.getElementById('m1').innerText = "🥇";
             else if (s1Score === 'silver') document.getElementById('m1').innerText = "🥈";
@@ -211,7 +211,6 @@
             }
         }
 
-        // 跳转逻辑：严格对应 GitHub 仓库中的文件名
         function go(n) {
             if (localStorage.getItem('isUnlocked') !== 'true') return;
             const pages = {
