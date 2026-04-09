@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN" style="height: 100%; overflow: hidden;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>德语完成时 · 专项训练</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@500;700;900&display=swap');
+        body { background: #000; font-family: 'Noto Sans SC', sans-serif; margin: 0; width: 100vw; height: 100vh; overflow: hidden; color: #FFF; }
+        .app-container { width: 100%; max-width: 430px; height: 100%; display: flex; flex-direction: column; padding: 0 20px; margin: 0 auto; }
+        
+        /* 核心卡片 */
+        #main-card { width: 100%; padding: 40px 20px; background: rgba(255, 255, 255, 0.04); border-radius: 40px; border: 1px solid rgba(255,255,255,0.1); }
+        .sentence-text { font-size: 1.4rem; font-weight: 800; line-height: 2.2; text-align: center; color: #FFFFFF; }
+        
+        /* 填空占位 */
+        .sentence-text b { color: #38BDF8; border-bottom: 3px solid #38BDF8; padding: 0 10px; margin: 0 6px; min-width: 90px; display: inline-block; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .no-break { white-space: nowrap; display: inline-flex; align-items: baseline; }
+        
+        /* 答对停留样式 */
+        .sentence-text b.correct-active { color: #4ADE80 !important; border-bottom-color: #4ADE80 !important; transform: scale(1.15); text-shadow: 0 0 15px rgba(74, 222, 128, 0.5); }
+
+        /* 选项样式 */
+        .glass-orb { height: 75px; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; font-size: 1.1rem; font-weight: 900; color: #D4AF37; }
+        .glass-orb.selected { background: #D4AF37; color: #000; border-color: #FFF; box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); }
+        .is-checking .glass-orb { opacity: 0.4; cursor: default; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="flex items-center pt-10 pb-6">
+            <div class="flex-grow h-2 bg-zinc-800 rounded-full overflow-hidden">
+                <div id="progress-fill" class="h-full bg-yellow-600 transition-all duration-500 w-0"></div>
+            </div>
+            <div id="cur-step" class="ml-4 text-sm font-black text-zinc-500">1 / 30</div>
+        </div>
+
+        <div class="flex-grow flex flex-col justify-start pt-4" id="game-body">
+            <div class="text-center mb-8">
+                <h1 id="verb-display" class="text-4xl font-black tracking-tight mb-2"></h1>
+                <p id="verb-cn" class="text-zinc-500 font-bold"></p>
+            </div>
+            
+            <div id="main-card" class="mb-10">
+                <div id="emoji-icon" class="text-7xl mb-8 text-center"></div>
+                <div class="sentence-text" id="sentence-box"></div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4" id="orb-box"></div>
+        </div>
+    </div>
+
+    <div id="congrats-modal" class="hidden fixed inset-0 bg-black/95 z-[5000] flex items-center justify-center p-6 text-center">
+        <div class="bg-zinc-900 p-10 rounded-[50px] w-full max-w-[360px] border-2 border-yellow-600/50">
+            <div class="text-8xl mb-6">🏆</div>
+            <h2 class="text-3xl font-black text-yellow-500 mb-4">通关大吉!</h2>
+            <p class="text-zinc-400 mb-8">老师，30题全部完成！</p>
+            <button onclick="location.reload()" class="w-full py-5 bg-yellow-600 text-white rounded-2xl font-black text-xl">确认并返回</button>
+        </div>
+    </div>
+
+    <div id="error-modal" class="hidden fixed inset-0 bg-black/98 z-[4000] flex items-center justify-center p-6">
+        <div class="bg-zinc-900 p-8 rounded-[40px] w-full max-w-[340px] text-center border border-red-900/30">
+            <div class="text-5xl mb-4">👩‍🏫</div>
+            <p id="error-title" class="text-yellow-500 font-black mb-4 text-xl italic"></p>
+            <div id="teacher-advice" class="text-zinc-400 text-sm mb-10 text-left border-l-4 border-yellow-700 pl-4 leading-relaxed"></div>
+            <button onclick="tryAgain()" class="w-full py-4 bg-zinc-800 text-white rounded-2xl font-black">再试一次</button>
+        </div>
+    </div>
+
+    <script>
+        const rawData = [
+            {q: "Ich [?] gestern Pizza [?].", v: "essen", cn: "吃", ans: ["habe", "gegessen"], icon: "🍕", auxTip: "及物动词用 haben。", partTip: "essen 变 gegessen。"},
+            {q: "Warum [?] du gestern so spät [?]? ", v: "kommen", cn: "来", ans: ["bist", "gekommen"], icon: "🎉", auxTip: "‘来’是位移词，主语du对应bist。", partTip: "kommen 分词不变音。"},
+            {q: "Er [?] nach Berlin [?].", v: "fahren", cn: "开车/去", ans: ["ist", "gefahren"], icon: "🚄", auxTip: "位移词选 sein。", partTip: "fahren -> gefahren。"},
+            {q: "Wir [?] den ganzen Tag [?].", v: "arbeiten", cn: "工作", ans: ["haben", "gearbeitet"], icon: "💻", auxTip: "工作无位移，选 haben。", partTip: "t结尾加 et。"},
+            {q: "Ich [?] um 6 Uhr [?].", v: "aufstehen", cn: "起床", ans: ["bin", "aufgestanden"], icon: "⏰", auxTip: "状态改变选 sein。", partTip: "auf-ge-standen。"},
+            {q: "[?] du das Buch [?]?", v: "lesen", cn: "读", ans: ["Hast", "gelesen"], icon: "📖", auxTip: "读书选 haben。", partTip: "lesen -> gelesen。"},
+            {q: "Ich [?] den Schlüssel [?].", v: "suchen", cn: "找", ans: ["habe", "gesucht"], icon: "🔑", auxTip: "及物选 haben。", partTip: "规则：gesucht。"},
+            {q: "Wir [?] am Wochenende [?].", v: "tanzen", cn: "跳舞", ans: ["haben", "getanzt"], icon: "💃", auxTip: "原地动作选 haben。", partTip: "规则：getanzt。"},
+            {q: "Er [?] Wasser [?].", v: "trinken", cn: "喝", ans: ["hat", "getrunken"], icon: "💧", auxTip: "及物选 haben。", partTip: "i -> u: getrunken。"},
+            {q: "Wann [?] du den Brief [?]?", v: "schreiben", cn: "写", ans: ["hast", "geschrieben"], icon: "✉️", auxTip: "写信选 haben。", partTip: "ei -> ie: geschrieben。"},
+            {q: "Das Kind [?] schnell [?].", v: "einschlafen", cn: "入睡", ans: ["ist", "eingeschlafen"], icon: "💤", auxTip: "状态改变选 sein。", partTip: "ein-ge-schlafen。"},
+            {q: "Was [?] am Montag [?]? ", v: "passieren", cn: "发生", ans: ["ist", "passiert"], icon: "❓", auxTip: "‘发生’固定选 sein。", partTip: "ieren不加ge。"},
+            {q: "Ich [?] meine Tasche [?].", v: "vergessen", cn: "忘记", ans: ["habe", "vergessen"], icon: "✍️", auxTip: "心理动作选 haben。", partTip: "ver不加ge。"},
+            {q: "Sie [?] mit dem Lehrer [?].", v: "sprechen", cn: "说", ans: ["hat", "gesprochen"], icon: "🗣️", auxTip: "说话选 haben。", partTip: "e -> o: gesprochen。"},
+            {q: "Ich [?] gestern 5 km [?].", v: "laufen", cn: "跑", ans: ["bin", "gelaufen"], icon: "👟", auxTip: "位移选 sein。", partTip: "laufen -> gelaufen。"},
+            {q: "Wir [?] ein neues Haus [?].", v: "bauen", cn: "造", ans: ["haben", "gebaut"], icon: "🏗️", auxTip: "及物选 haben。", partTip: "规则：gebaut。"},
+            {q: "Ich [?] ein Geschenk [?].", v: "bekommen", cn: "收到", ans: ["habe", "bekommen"], icon: "🎁", auxTip: "及物选 haben。", partTip: "be不加ge。"},
+            {q: "Wann [?] ihr [?]? ", v: "ankommen", cn: "到达", ans: ["seid", "angekommen"], icon: "🚉", auxTip: "位移终点选 sein。", partTip: "an-ge-kommen。"},
+            {q: "Ich [?] im Pool [?].", v: "schwimmen", cn: "游泳", ans: ["bin", "geschwommen"], icon: "🌊", auxTip: "位移选 sein。", partTip: "强变化：geschwommen。"},
+            {q: "Ich [?] drei Tage [?].", v: "bleiben", cn: "停留", ans: ["bin", "geblieben"], icon: "📅", auxTip: "停留固定选 sein。", partTip: "ei -> ie: geblieben。"},
+            {q: "Wir [?] Radio [?].", v: "hören", cn: "听", ans: ["haben", "gehört"], icon: "📻", auxTip: "听选 haben。", partTip: "规则：gehört。"},
+            {q: "Er [?] mir [?].", v: "helfen", cn: "帮助", ans: ["hat", "geholfen"], icon: "🤝", auxTip: "及物选 haben。", partTip: "e -> o: geholfen。"},
+            {q: "Ich [?] dich [?].", v: "sehen", cn: "看", ans: ["habe", "gesehen"], icon: "🎬", auxTip: "及物选 haben。", partTip: "sehen不变音。"},
+            {q: "Sie [?] in die Stadt [?].", v: "gehen", cn: "走", ans: ["ist", "gegangen"], icon: "🚶", auxTip: "位移选 sein。", partTip: "gehen -> gegangen。"},
+            {q: "Ich [?] das Fenster [?].", v: "aufmachen", cn: "打开", ans: ["habe", "aufgemacht"], icon: "🔓", auxTip: "及物选 haben。", partTip: "auf-ge-macht。"},
+            {q: "Wir [?] gestern [?].", v: "spielen", cn: "玩", ans: ["haben", "gespielt"], icon: "⚽", auxTip: "及物选 haben。", partTip: "规则：gespielt。"},
+            {q: "Er [?] ein Auto [?].", v: "kaufen", cn: "买", ans: ["hat", "gekauft"], icon: "🚗", auxTip: "及物选 haben。", partTip: "规则：gekauft。"},
+            {q: "Ich [?] Suppe [?].", v: "kochen", cn: "做饭", ans: ["habe", "gekocht"], icon: "🍳", auxTip: "做饭选 haben。", partTip: "规则：gekocht。"},
+            {q: "Wir [?] Deutsch [?].", v: "lernen", cn: "学习", ans: ["haben", "gelernt"], icon: "📚", auxTip: "学习选 haben。", partTip: "规则：gelernt。"},
+            {q: "Sie [?] uns [?].", v: "besuchen", cn: "拜访", ans: ["hat", "besucht"], icon: "🏠", auxTip: "拜访选 haben。", partTip: "be开头不加ge。"}
+        ];
+
+        let curIdx = 0;
+        let inputs = [null, null];
+        let selectedQuests = [];
+        let isChecking = false;
+
+        function init() {
+            selectedQuests = rawData.sort(() => Math.random() - 0.5);
+            render();
+        }
+
+        function render() {
+            isChecking = false;
+            document.getElementById('game-body').classList.remove('is-checking');
+            const data = selectedQuests[curIdx];
+            inputs = [null, null];
+            document.getElementById('progress-fill').style.width = `${((curIdx+1)/30)*100}%`;
+            document.getElementById('cur-step').innerText = `${curIdx + 1} / 30`;
+            document.getElementById('verb-display').innerText = data.v;
+            document.getElementById('verb-cn').innerText = `意思：${data.cn}`;
+            document.getElementById('emoji-icon').innerText = data.icon;
+            
+            const parts = data.q.split('[?]');
+            document.getElementById('sentence-box').innerHTML = `<span>${parts[0]}</span><b id="s0">?</b><span>${parts[1]}</span><span class="no-break"><b id="s1">?</b><span>${parts[2]||""}</span></span>`;
+
+            const wrongAux = data.ans[0].toLowerCase().includes('i') ? "hat" : "ist";
+            const wrongPart = data.ans[1].endsWith('en') ? data.ans[1].replace('en', 't') : "ge" + data.ans[1].replace('ge','').replace('t','en');
+            const opts = [data.ans[0], data.ans[1], wrongAux, wrongPart].sort(() => Math.random() - 0.5);
+            
+            document.getElementById('orb-box').innerHTML = opts.map(t => `<div class="glass-orb" onclick="sel('${t}', this)">${t}</div>`).join('');
+        }
+
+        window.sel = function(val, el) {
+            if (isChecking) return;
+            let idx = inputs[0] === null ? 0 : (inputs[1] === null ? 1 : -1);
+            if (idx === -1 || el.classList.contains('selected')) return;
+            el.classList.add('selected');
+            inputs[idx] = val;
+            document.getElementById(`s${idx}`).innerText = val;
+            document.getElementById(`s${idx}`).style.color = "#FFF";
+            if (inputs[0] && inputs[1]) setTimeout(check, 300);
+        }
+
+        function check() {
+            isChecking = true;
+            document.getElementById('game-body').classList.add('is-checking');
+            const data = selectedQuests[curIdx];
+            const correct = (inputs[0].toLowerCase() === data.ans[0].toLowerCase() && inputs[1].toLowerCase() === data.ans[1].toLowerCase());
+
+            if (correct) {
+                document.getElementById('s0').classList.add('correct-active');
+                document.getElementById('s1').classList.add('correct-active');
+                setTimeout(() => {
+                    if (curIdx === 29) celebrate();
+                    else { curIdx++; render(); }
+                }, 3000); 
+            } else {
+                showError(data);
+            }
+        }
+
+        function showError(data) {
+            document.getElementById('error-title').innerText = "哎呀，写错了";
+            document.getElementById('teacher-advice').innerText = `${data.auxTip}\n\n${data.partTip}`;
+            document.getElementById('error-modal').classList.remove('hidden');
+        }
+
+        function celebrate() {
+            const end = Date.now() + 3000;
+            (function frame() {
+                confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#D4AF37','#38BDF8'] });
+                confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#D4AF37','#38BDF8'] });
+                if (Date.now() < end) requestAnimationFrame(frame);
+            }());
+            setTimeout(() => { document.getElementById('congrats-modal').classList.remove('hidden'); }, 800);
+        }
+
+        window.tryAgain = () => { 
+            document.getElementById('error-modal').classList.add('hidden'); 
+            render(); 
+        };
+        
+        init();
+    </script>
+</body>
+</html>
