@@ -99,13 +99,14 @@
                 `<path d="M11 5L6 9H2v6h4l5 4V5zM19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>`;
         }
 
+        // 数据检查点：修正了 Euro 一题的答案逻辑（Akk.）
         const data = [
             {q: "Ich sehe [?] Mann dort.", a: "den", p: ["der", "den", "ein", "einen"], i: "👀", t: "‘在那里的’男人是确定的宾语。阳性第四格(Akk.)特指用 den。"},
             {q: "Hier ist [?] Computer von Lisa.", a: "der", p: ["der", "den", "ein", "einen"], i: "💻", t: "这是‘利萨的’电脑。阳性第一格(Nom.)特指用 der。"},
             {q: "Er braucht [?] Kuli.", a: "einen", p: ["ein", "einen", "der", "den"], i: "🖊️", t: "他需要‘一支’圆珠笔。阳性第四格(Akk.)泛指用 einen。"},
             {q: "Wo ist [?] Bus nach Berlin?", a: "der", p: ["der", "den", "ein", "einen"], i: "🚌", t: "‘去柏林的’那辆车。阳性第一格(Nom.)特指用 der。"},
             {q: "Wir essen [?] Salat von Mama.", a: "den", p: ["der", "den", "ein", "einen"], i: "🥗", t: "吃‘妈妈做的’沙拉。阳性第四格(Akk.)特指用 den。"},
-            {q: "Hast du [?] Euro?", a: "einen", p: ["ein", "einen", "der", "den"], i: "💶", t: "你有‘一欧元’吗？阳性第四格(Akk.)泛指用 einen。"},
+            {q: "Hast du [?] Euro?", a: "einen", p: ["ein", "einen", "der", "den"], i: "💶", t: "你有‘一欧元’吗？动词 haben 要求第四格，阳性泛指用 einen。"},
             {q: "Dort liegt [?] Stift von mir.", a: "der", p: ["der", "den", "ein", "einen"], i: "🖊️", t: "‘我的’笔在那。阳性第一格(Nom.)特指用 der。"},
             {q: "Ich trinke [?] Tee hier.", a: "den", p: ["der", "den", "ein", "einen"], i: "🍵", t: "我喝‘这里的’茶。阳性第四格(Akk.)特指用 den。"},
             {q: "Er hat [?] Bruder.", a: "einen", p: ["ein", "einen", "der", "den"], i: "👦", t: "他有‘一个’兄弟。阳性第四格(Akk.)泛指用 einen。"},
@@ -120,8 +121,8 @@
         let idx = 0; let pool = []; let locked = false;
 
         function start() {
+            // 保持随机出题顺序
             pool = [...data].sort(() => Math.random() - 0.5);
-            // 这里可以根据实际需求扩充题库至 30 题，目前代码适配 15 题逻辑
             update();
         }
 
@@ -149,7 +150,7 @@
                         // 通关脚本：写入清除标志
                         localStorage.setItem('level10_cleared', 'true');
                         alert("🎉 全通关！地图图标已激活！"); 
-                        location.href='index.html'; // 假设地图文件名是 index.html
+                        location.href='index.html'; 
                     } else { 
                         idx++; 
                         update(); 
