@@ -16,12 +16,11 @@
         #main-card { width: 100%; padding: 40px 20px; background: rgba(255, 255, 255, 0.04); border-radius: 40px; border: 1px solid rgba(255,255,255,0.1); }
         .sentence-text { font-size: 1.4rem; font-weight: 800; line-height: 2.2; text-align: center; color: #FFFFFF; }
         
-        /* 填空样式 */
         .sentence-text b { color: #38BDF8; border-bottom: 3px solid #38BDF8; padding: 0 10px; margin: 0 6px; min-width: 90px; display: inline-block; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .no-break { white-space: nowrap; display: inline-flex; align-items: baseline; }
         
-        /* 关键：答对后的高亮动画（停留3秒） */
-        .sentence-text b.correct-active { color: #4ADE80 !important; border-bottom-color: #4ADE80 !important; transform: scale(1.15); text-shadow: 0 0 15px rgba(74, 222, 128, 0.5); }
+        /* 答对后的3秒高亮 */
+        .sentence-text b.correct-active { color: #4ADE80 !important; border-bottom-color: #4ADE80 !important; transform: scale(1.1); text-shadow: 0 0 15px rgba(74, 222, 128, 0.5); }
 
         .glass-orb { height: 75px; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; font-size: 1.1rem; font-weight: 900; color: #D4AF37; }
         .glass-orb.selected { background: #D4AF37; color: #000; border-color: #FFF; }
@@ -50,12 +49,10 @@
                 <h1 id="verb-display" class="text-4xl font-black tracking-tight mb-2"></h1>
                 <p id="verb-cn" class="text-zinc-500 font-bold"></p>
             </div>
-            
             <div id="main-card" class="mb-10">
                 <div id="emoji-icon" class="text-7xl mb-8 text-center"></div>
                 <div class="sentence-text" id="sentence-box"></div>
             </div>
-
             <div class="grid grid-cols-2 gap-4" id="orb-box"></div>
         </div>
     </div>
@@ -64,7 +61,7 @@
         <div class="bg-zinc-900 p-10 rounded-[50px] w-full max-w-[360px] border-2 border-yellow-600/50">
             <div class="text-8xl mb-6">🏆</div>
             <h2 class="text-3xl font-black text-yellow-500 mb-4">通关大吉!</h2>
-            <p class="text-zinc-400 mb-8">太棒了！30道练习全部达成！</p>
+            <p class="text-zinc-400 mb-8">30道练习全部完成，德语水平UP！</p>
             <button onclick="window.location.href='index.html'" class="w-full py-5 bg-yellow-600 text-white rounded-2xl font-black text-xl">确认并返回</button>
         </div>
     </div>
@@ -103,7 +100,7 @@
             {q: "Er [?] nach Berlin [?].", v: "fahren", cn: "开车/去", ans: ["ist", "gefahren"], icon: "🚄", auxTip: "位移词选 sein。", partTip: "fahren -> gefahren。"},
             {q: "Wir [?] den ganzen Tag [?].", v: "arbeiten", cn: "工作", ans: ["haben", "gearbeitet"], icon: "💻", auxTip: "工作无位移，选 haben。", partTip: "t结尾加 et。"},
             {q: "Ich [?] um 6 Uhr [?].", v: "aufstehen", cn: "起床", ans: ["bin", "aufgestanden"], icon: "⏰", auxTip: "状态改变选 sein。", partTip: "auf-ge-standen。"},
-            {q: "[?] du das Buch [?]?", v: "lesen", cn: "读", ans: ["Hast", "gelesen"], icon: "📖", auxTip: "读书选 haben。", partTip: "lesen -> gelesen。"},
+            {q: "[?] du das Buch [?]?", v: "lesen", cn: "读", ans: ["hast", "gelesen"], icon: "📖", auxTip: "读书选 haben。", partTip: "lesen -> gelesen。"},
             {q: "Ich [?] den Schlüssel [?].", v: "suchen", cn: "找", ans: ["habe", "gesucht"], icon: "🔑", auxTip: "及物选 haben。", partTip: "规则：gesucht。"},
             {q: "Wir [?] am Wochenende [?].", v: "tanzen", cn: "跳舞", ans: ["haben", "getanzt"], icon: "💃", auxTip: "原地动作选 haben。", partTip: "规则：getanzt。"},
             {q: "Er [?] Wasser [?].", v: "trinken", cn: "喝", ans: ["hat", "getrunken"], icon: "💧", auxTip: "及物选 haben。", partTip: "i -> u: getrunken。"},
@@ -142,11 +139,24 @@
             document.getElementById('verb-display').innerText = data.v;
             document.getElementById('verb-cn').innerText = `意思：${data.cn}`;
             document.getElementById('emoji-icon').innerText = data.icon;
+            
             const parts = data.q.split('[?]');
             document.getElementById('sentence-box').innerHTML = `<span>${parts[0]}</span><b id="s0">?</b><span>${parts[1]}</span><span class="no-break"><b id="s1">?</b><span>${parts[2]||""}</span></span>`;
             
-            // 生成选项
-            const opts = [data.ans[0], data.ans[1], data.ans[0].includes('i')?'hat':'ist', data.ans[1]+'t'].sort(() => Math.random() - 0.5);
+            // 智能生成干扰项
+            const correctAux = data.ans[0];
+            const correctPart = data.ans[1];
+            
+            // 1. 助动词干扰 (haben <-> sein)
+            const wrongAux = correctAux.match(/hab|has|hat/i) ? 
+                (correctAux === "habe" ? "bin" : (correctAux === "hast" ? "bist" : "ist")) : 
+                (correctAux === "bin" ? "habe" : (correctAux === "bist" ? "hast" : "hat"));
+
+            // 2. 分词后缀干扰 (en <-> t)
+            let wrongPart = correctPart.endsWith('en') ? correctPart.replace(/en$/, 't') : correctPart.replace(/t$/, 'en');
+            if (!correctPart.startsWith('ge')) wrongPart = "ge" + correctPart; // 针对besucht这种增加ge干扰
+
+            const opts = [correctAux, correctPart, wrongAux, wrongPart].sort(() => Math.random() - 0.5);
             document.getElementById('orb-box').innerHTML = opts.map(t => `<div class="glass-orb" onclick="sel('${t}', this)">${t}</div>`).join('');
         }
 
@@ -168,8 +178,7 @@
                 playSound('correct');
                 document.getElementById('s0').classList.add('correct-active');
                 document.getElementById('s1').classList.add('correct-active');
-                
-                // 重点修改：此处改为 3000 毫秒，让学生看清对题
+                // 等待3秒，让学生看清正确组合
                 setTimeout(() => { 
                     if (curIdx === 29) celebrate(); 
                     else { curIdx++; render(); } 
