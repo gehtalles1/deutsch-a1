@@ -15,7 +15,6 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* 大厂风核心：微阴影与精致边框 */
         .premium-card {
             background: #FFFFFF;
             border: 1px solid #E2E8F0;
@@ -30,7 +29,6 @@
             border-bottom-width: 1px;
         }
 
-        /* 多邻国风格按钮 */
         .duo-btn {
             background: #58CC02;
             border-bottom: 3px solid #46A302;
@@ -39,14 +37,12 @@
             font-weight: 900;
         }
 
-        /* 锁定状态：低饱和度 */
         .locked-state {
             opacity: 0.45;
             filter: grayscale(0.8);
             pointer-events: none;
         }
 
-        /* 奖牌弹出动画 */
         .medal-pop {
             animation: medalPop 0.5s cubic-bezier(0.17, 0.89, 0.32, 1.49);
         }
@@ -56,7 +52,6 @@
             100% { transform: scale(1) rotate(0); opacity: 1; }
         }
 
-        /* 标题渐变效果 */
         .gradient-text {
             background: linear-gradient(135deg, #1E293B 0%, #475569 100%);
             -webkit-background-clip: text;
@@ -88,7 +83,6 @@
             </div>
 
             <div class="grid grid-cols-2 gap-3">
-                
                 <div id="lvl1" onclick="go(1)" class="premium-card p-4 flex flex-col items-center text-center locked-state relative">
                     <div class="w-12 h-12 bg-[#58CC02] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">1</div>
                     <h3 class="text-sm font-bold text-slate-800 leading-tight">名词词性捕手</h3>
@@ -158,6 +152,14 @@
                     <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Nom. & Akk.</p>
                     <div id="m10" class="absolute -top-2 -right-2 text-3xl medal-pop"></div>
                 </div>
+
+                <div id="lvl11" onclick="go(11)" class="premium-card p-4 flex flex-col items-center text-center locked-state relative">
+                    <div class="w-12 h-12 bg-[#1E1B4B] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">11</div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-tight">三格训练营</h3>
+                    <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Dativ Training</p>
+                    <div id="m11" class="absolute -top-2 -right-2 text-3xl medal-pop"></div>
+                </div>
+
             </div>
         </main>
 
@@ -179,7 +181,8 @@
             const unlocked = localStorage.getItem('isUnlocked') === 'true';
             if (unlocked) {
                 document.getElementById('auth-group').style.display = 'none';
-                const levels = ['lvl1', 'lvl2', 'lvl3', 'lvl4', 'lvl5', 'lvl6', 'lvl7', 'lvl8', 'lvl9', 'lvl10'];
+                // 更新关卡列表至 11
+                const levels = ['lvl1', 'lvl2', 'lvl3', 'lvl4', 'lvl5', 'lvl6', 'lvl7', 'lvl8', 'lvl9', 'lvl10', 'lvl11'];
                 levels.forEach(id => {
                     const el = document.getElementById(id);
                     if(el) el.classList.remove('locked-state');
@@ -200,6 +203,8 @@
             if (localStorage.getItem('level8_cleared') === 'true') document.getElementById('m8').innerText = "⚡";
             if (localStorage.getItem('level9_cleared') === 'true') document.getElementById('m9').innerText = "🏅";
             if (localStorage.getItem('level10_cleared') === 'true') document.getElementById('m10').innerText = "🎯";
+            // 第 11 关奖牌逻辑
+            if (localStorage.getItem('level11_cleared') === 'true') document.getElementById('m11').innerText = "🏅";
         }
 
         function unlock() {
@@ -223,7 +228,8 @@
                 7: '07-modalverben.html',
                 8: '08-praesens-mix.html',
                 9: '09-Perfekt-Master.html',
-                10: '10_Artikel_Check.html'
+                10: '10_Artikel_Check.html',
+                11: '11-dativ.html' // 新增路径
             };
             window.location.href = pages[n];
         }
