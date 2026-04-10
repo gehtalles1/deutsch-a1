@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>德语三格大师 | 刘老师课堂</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@500;700;900&display=swap');
+        body { background: #F1F5F9; font-family: 'Noto Sans SC', sans-serif; margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .app-container { width: 100%; max-width: 600px; height: 95vh; max-height: 850px; background: #FFFFFF; border-radius: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); position: relative; display: flex; flex-direction: column; overflow: hidden; border: 8px solid white; }
+        
+        .header-nav { padding: 25px 25px 15px; display: flex; align-items: center; gap: 12px; }
+        .back-btn { background: #F8FAFC; padding: 8px; border-radius: 12px; color: #64748B; cursor: pointer; }
+        .progress-container { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+        .progress-info { font-size: 16px; font-weight: 900; color: #64748B; text-align: center; letter-spacing: 1px; }
+        .progress-bar-bg { width: 100%; height: 10px; background: #E2E8F0; border-radius: 20px; overflow: hidden; }
+        #progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #3B82F6, #60A5FA); transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .mute-btn { background: #F8FAFC; padding: 10px; border-radius: 16px; color: #64748B; border: 1px solid #F1F5F9; transition: 0.2s; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+        .main-stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 30px; position: relative; }
+        .scene-card { width: 100%; padding: 35px 20px; background: #F8FAFC; border-radius: 32px; text-align: center; border: 2px dashed #E2E8F0; }
+        .scene-emoji { font-size: 60px; margin-bottom: 12px; display: block; }
+        .sentence-area { font-size: 1.35rem; font-weight: 700; color: #1E293B; line-height: 1.7; }
+        .drop-zone { display: inline-block; min-width: 85px; height: 36px; border-bottom: 4px solid #CBD5E1; margin: 0 6px; color: #3B82F6; vertical-align: middle; text-align: center; }
+        .drop-zone.correct { border-bottom-color: #22C55E; color: #22C55E; }
+        
+        .options-area { padding: 20px 30px 40px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .option-btn { background: white; border: 2px solid #E2E8F0; padding: 18px 0; border-radius: 22px; font-size: 1.3rem; font-weight: 900; color: #475569; box-shadow: 0 6px 0 #E2E8F0; transition: 0.2s; }
+        .option-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #E2E8F0; }
+        
+        .finish-btn { margin-top: 25px; padding: 15px 40px; background: #22C55E; color: white; border-radius: 20px; font-size: 1.2rem; font-weight: 900; box-shadow: 0 6px 0 #16a34a; transition: 0.2s; }
+        .finish-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #16a34a; }
+
+        #teacher-tip { position: absolute; bottom: -100%; left: 0; right: 0; background: white; padding: 35px; border-radius: 40px 40px 0 0; box-shadow: 0 -10px 50px rgba(0,0,0,0.15); transition: 0.5s; z-index: 100; }
+        #teacher-tip.active { bottom: 0; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header-nav">
+            <button onclick="location.href='map.html'" class="back-btn">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" /></svg>
+            </button>
+            <div class="progress-container">
+                <div class="progress-info"><span id="cur-num">1</span> / 30</div>
+                <div class="progress-bar-bg"><div id="progress-fill"></div></div>
+            </div>
+            <button id="mute-btn" class="mute-btn" onclick="toggleMute()">
+                <svg id="mute-icon" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="main-stage">
+            <div id="quiz-content" class="w-full flex flex-col items-center">
+                <div class="scene-card">
+                    <span class="scene-emoji" id="emoji-box">🇩🇪</span>
+                    <div class="sentence-area" id="sentence-box">Lade...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="options-area" id="options-grid"></div>
+
+        <div id="teacher-tip">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-2xl">👩‍🏫</div>
+                <h3 class="text-xl font-black">刘老师提醒</h3>
+            </div>
+            <p id="tip-text" class="text-slate-600 font-bold mb-8 text-lg"></p>
+            <button onclick="closeTip()" class="w-full py-4 bg-blue-600 text-white rounded-2xl font-black">懂了，继续！</button>
+        </div>
+    </div>
+
+    <audio id="snd-ok" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+    <audio id="snd-err" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
+
+    <script>
+        const rawData = [
+            { q: "Wem vertraust du?", e: "Ich vertraue <span class='drop-zone'></span> Freund (ein).", a: "einem", img: "🤝", t: "vertrauen支配三格。阳性名词用不定冠词ein时变位为einem。" },
+            { q: "Wem schenkst du es?", e: "Ich schenke es <span class='drop-zone'></span> Freund (ein).", a: "einem", img: "🎁", t: "Wem(对人三格提问)对应三格。阳性不定冠词用einem。" },
+            { q: "Wie schreibst du?", e: "Mit <span class='drop-zone'></span> Kuli (ein).", a: "einem", img: "🖊️", t: "mit固定接三格。阳性不定冠词ein变位为einem。" },
+            { q: "Wo isst du?", e: "In <span class='drop-zone'></span> Pizzeria (die).", a: "der", img: "🍕", t: "在某处(静态)用三格。阴性定冠词die变位为der。" },
+            { q: "Wo wohnt sie?", e: "Sie wohnt bei <span class='drop-zone'></span> Eltern (Pl.).", a: "den", img: "🏠", t: "bei固定接三格。复数名词定冠词用den。" },
+            { q: "Wem hilfst du?", e: "Ich helfe <span class='drop-zone'></span> Lehrer (der).", a: "dem", img: "👨‍🏫", t: "helfen支配三格。阳性定冠词der变位为dem。" },
+            { q: "Wo ist der Kaffee?", e: "Er steht auf <span class='drop-zone'></span> Tisch (der).", a: "dem", img: "☕", t: "在桌子上(静态)。阳性der变位为dem。" },
+            { q: "Wie fährst du?", e: "Mit <span class='drop-zone'></span> Bus (der).", a: "dem", img: "🚌", t: "mit接三格。阳性der变位为dem。" },
+            { q: "Wem gehört das?", e: "Es gehört <span class='drop-zone'></span> Kind (ein).", a: "einem", img: "🧸", t: "gehören支配三格。中性不定冠词ein变位为einem。" },
+            { q: "Wem dankst du?", e: "Ich danke <span class='drop-zone'></span> Oma (die).", a: "der", img: "👵", t: "danken支配三格。阴性die变位为der。" },
+            { q: "Wo lernt er?", e: "In <span class='drop-zone'></span> Schule (die).", a: "der", img: "🏫", t: "在学校里(静态)。阴性die变位为der。" },
+            { q: "Wo ist die Katze?", e: "Unter <span class='drop-zone'></span> Bett (das).", a: "dem", img: "🐱", t: "在床下(静态)。中性das变位为dem。" },
+            { q: "Wem antwortest du?", e: "Ich antworte <span class='drop-zone'></span> Frau (die).", a: "der", img: "👩", t: "antworten支配三格。阴性die变位为der。" },
+            { q: "Wo warst du?", e: "Ich war bei <span class='drop-zone'></span> Arzt (der).", a: "dem", img: "🏥", t: "bei固定接三格。阳性定冠词der变位为dem。" },
+            { q: "Wem gratulierst du?", e: "Ich gratuliere <span class='drop-zone'></span> Kind (das).", a: "dem", img: "🎂", t: "gratulieren支配三格。中性das变位为dem。" },
+            { q: "Wo sind die Kinder?", e: "In <span class='drop-zone'></span> Garten (der).", a: "dem", img: "🌳", t: "在花园里(静态)。阳性der变位为dem。" },
+            { q: "Wo schläft er?", e: "In <span class='drop-zone'></span> Hotel (ein).", a: "einem", img: "🏨", t: "在旅馆里。中性不定冠词ein变位为einem。" },
+            { q: "Wem gefällt das?", e: "Es gefällt <span class='drop-zone'></span> Mann (der).", a: "dem", img: "👍", t: "gefallen支配三格。阳性der变位为dem。" },
+            { q: "Wo arbeitest du?", e: "In <span class='drop-zone'></span> Büro (ein).", a: "einem", img: "💻", t: "在办公室。中性不定冠词ein变位为einem。" },
+            { q: "Wo liegt das Buch?", e: "Auf <span class='drop-zone'></span> Regal (das).", a: "dem", img: "📖", t: "在书架上(静态)。中性das变位为dem。" },
+            { q: "Wo ist die Milch?", e: "In <span class='drop-zone'></span> Kühlschrank (der).", a: "dem", img: "🥛", t: "在冰箱里(静态)。阳性der变位为dem。" },
+            { q: "Wo sind die Bücher?", e: "In <span class='drop-zone'></span> Taschen (Pl.).", a: "den", img: "🎒", t: "复数三格定冠词固定为den。" },
+            { q: "Wo kauft sie ein?", e: "In <span class='drop-zone'></span> Supermarkt (der).", a: "dem", img: "🛒", t: "在超市。阳性der变位为dem。" },
+            { q: "Wann kommst du?", e: "Nach <span class='drop-zone'></span> Kurs (der).", a: "dem", img: "⏰", t: "nach接三格。阳性der变位为dem。" },
+            { q: "Wo tanzt sie?", e: "In <span class='drop-zone'></span> Disco (die).", a: "der", img: "💃", t: "在迪厅(静态)。阴性die变位为der。" },
+            { q: "Wo ist der Hund?", e: "Hinter <span class='drop-zone'></span> Haus (das).", a: "dem", img: "🐕", t: "在房子后面(静态)。中性das变位为dem。" },
+            { q: "Wie kommst du?", e: "Mit <span class='drop-zone'></span> U-Bahn (die).", a: "der", img: "🚇", t: "乘坐地铁。阴性die变位为der。" },
+            { q: "Wo lebst du?", e: "In <span class='drop-zone'></span> Stadt (die).", a: "der", img: "🏙️", t: "在城市里(静态)。阴性die变位为der。" },
+            { q: "Wo spielt er?", e: "Auf <span class='drop-zone'></span> Spielplatz (der).", a: "dem", img: "🛝", t: "在操场上(静态)。阳性der变位为dem。" },
+            { q: "Wo schlafen sie?", e: "Bei <span class='drop-zone'></span> Freunden (Pl.).", a: "den", img: "👫", t: "在朋友家。复数三格定冠词用den。" }
+        ];
+
+        let quizData = [];
+        let currentIndex = 0;
+        let isMuted = false;
+        let canClick = true;
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            const icon = document.getElementById('mute-icon');
+            icon.innerHTML = isMuted ? 
+                '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />' :
+                '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />';
+        }
+
+        function playSound(id) {
+            if (isMuted) return;
+            const s = document.getElementById(id);
+            if(s) { s.currentTime = 0; s.play().catch(()=>{}); }
+        }
+
+        function generateOptions(correctAnswer) {
+            const allPossible = ["dem", "der", "den", "einem", "einer"];
+            let options = [correctAnswer];
+            let filtered = allPossible.filter(o => o !== correctAnswer);
+            filtered.sort(() => Math.random() - 0.5);
+            options.push(...filtered.slice(0, 3));
+            return options.sort(() => Math.random() - 0.5);
+        }
+
+        function renderQuestion() {
+            if (currentIndex >= quizData.length) {
+                const content = document.getElementById('quiz-content');
+                document.getElementById('options-grid').innerHTML = '';
+                content.innerHTML = `
+                    <div class="text-center">
+                        <span class="text-7xl mb-6 block">🏆</span>
+                        <h2 class="text-3xl font-black text-blue-600 mb-2">太棒了！</h2>
+                        <p class="text-slate-500 font-bold text-lg">你已经掌握了德语三格！</p>
+                        <button onclick="location.href='map.html'" class="finish-btn">回到地图</button>
+                    </div>
+                `;
+                confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
+                return;
+            }
+            canClick = true;
+            const data = quizData[currentIndex];
+            document.getElementById('emoji-box').innerText = data.img;
+            document.getElementById('sentence-box').innerHTML = `<span class="text-blue-600 block mb-1 text-base font-black">“ ${data.q} ”</span>${data.e}`;
+            
+            document.getElementById('cur-num').innerText = currentIndex + 1;
+            document.getElementById('progress-fill').style.width = ((currentIndex + 1) / quizData.length * 100) + '%';
+            
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            
+            generateOptions(data.a).forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    if(!canClick) return;
+                    if(opt === data.a) {
+                        canClick = false;
+                        playSound('snd-ok');
+                        document.querySelector('.drop-zone').innerText = opt;
+                        document.querySelector('.drop-zone').classList.add('correct');
+                        setTimeout(() => { currentIndex++; renderQuestion(); }, 3000);
+                    } else {
+                        playSound('snd-err');
+                        showTip(data.t);
+                    }
+                };
+                grid.appendChild(btn);
+            });
+        }
+
+        function showTip(text) {
+            document.getElementById('tip-text').innerText = text;
+            document.getElementById('teacher-tip').classList.add('active');
+            canClick = false;
+        }
+
+        function closeTip() {
+            document.getElementById('teacher-tip').classList.remove('active');
+            canClick = true;
+        }
+
+        quizData = [...rawData].sort(() => Math.random() - 0.5);
+        renderQuestion();
+    </script>
+</body>
+</html>
