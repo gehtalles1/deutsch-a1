@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>德语定冠词格位特训 | 刘老师课堂</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@500;700;900&display=swap');
+        body { background: #F1F5F9; font-family: 'Noto Sans SC', sans-serif; margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .app-container { width: 100%; max-width: 600px; height: 95vh; max-height: 850px; background: #FFFFFF; border-radius: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); position: relative; display: flex; flex-direction: column; overflow: hidden; border: 8px solid white; }
+        
+        .header-nav { padding: 25px 25px 15px; display: flex; align-items: center; gap: 15px; }
+        .back-btn, .mute-btn { background: #F8FAFC; padding: 12px; border-radius: 18px; color: #64748B; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+        .back-btn:active, .mute-btn:active { transform: scale(0.9); background: #F1F5F9; }
+        
+        .progress-container { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+        .progress-info { font-size: 16px; font-weight: 900; color: #94A3B8; text-align: center; letter-spacing: 1px; }
+        .progress-bar-bg { width: 100%; height: 12px; background: #E2E8F0; border-radius: 20px; overflow: hidden; }
+        #progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #6366F1, #A855F7); transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        .main-stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 30px; }
+        .scene-card { width: 100%; padding: 45px 25px; background: #F8FAFC; border-radius: 35px; text-align: center; border: 2px dashed #CBD5E1; min-height: 260px; display: flex; flex-direction: column; justify-content: center; }
+        .scene-emoji { font-size: 64px; margin-bottom: 20px; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1)); }
+        .sentence-area { font-size: 1.5rem; font-weight: 800; color: #1E293B; line-height: 1.6; }
+        .drop-zone { display: inline-block; min-width: 65px; border-bottom: 4px solid #6366F1; margin: 0 6px; color: transparent; vertical-align: baseline; transition: all 0.4s; }
+        .drop-zone.correct { border-bottom-color: transparent; color: #10B981 !important; transform: scale(1.1); }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); box-shadow: 0 6px 0 #312E81; }
+            50% { transform: scale(1.03); box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3); }
+        }
+        .options-area { padding: 20px 30px 45px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .option-btn { background: #4F46E5; border: 2px solid #4338CA; padding: 18px 0; border-radius: 25px; font-size: 1.5rem; font-weight: 900; color: white; box-shadow: 0 6px 0 #312E81; transition: 0.1s; animation: breathe 4s infinite ease-in-out; }
+        .option-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #312E81; animation: none; }
+
+        #teacher-tip { position: absolute; bottom: -100%; left: 0; right: 0; background: white; padding: 40px; border-radius: 45px 45px 0 0; box-shadow: 0 -20px 60px rgba(0,0,0,0.25); transition: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); z-index: 100; border-top: 5px solid #6366F1; }
+        #teacher-tip.active { bottom: 0; }
+        #finish-modal { position: absolute; inset: 0; background: rgba(255,255,255,0.96); z-index: 200; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 40px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header-nav">
+            <button onclick="window.location.href='map.html'" class="back-btn"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" /></svg></button>
+            <div class="progress-container">
+                <div class="progress-info"><span id="cur-num">1</span> / 40</div>
+                <div class="progress-bar-bg"><div id="progress-fill"></div></div>
+            </div>
+            <button onclick="toggleMute()" class="mute-btn" id="mute-trigger">
+                <svg id="mute-icon" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+            </button>
+        </div>
+
+        <div class="main-stage"><div class="scene-card"><span class="scene-emoji" id="emoji-box"></span><div class="sentence-area" id="sentence-box"></div></div></div>
+        <div class="options-area" id="options-grid"></div>
+
+        <div id="teacher-tip">
+            <div class="flex items-center gap-4 mb-6">
+                <div class="w-14 h-14 bg-indigo-100 rounded-2xl flex items-center justify-center text-3xl">👩‍🏫</div>
+                <div><h3 class="text-xl font-black text-indigo-900">语法解析</h3><p class="text-indigo-400 font-bold text-sm uppercase">Grammatik Fokus</p></div>
+            </div>
+            <div id="tip-text" class="text-slate-700 font-bold mb-8 text-lg bg-slate-50 p-6 rounded-2xl border-l-8 border-indigo-500"></div>
+            <button onclick="closeTip()" class="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black text-xl shadow-lg">听懂了，继续</button>
+        </div>
+
+        <div id="finish-modal">
+            <div class="bg-indigo-50 p-10 rounded-[50px] border-4 border-indigo-200">
+                <span class="text-8xl mb-6 block">🏅</span>
+                <h2 class="text-4xl font-black text-indigo-900 mb-4">绝佳的表现！</h2>
+                <p class="text-slate-500 font-bold text-lg mb-8">恭喜！你已精准掌握<br>40道定冠词格位特训题！</p>
+                <button onclick="window.location.href='map.html'" class="w-full py-5 bg-indigo-600 text-white rounded-3xl font-black text-2xl">确定并返回地图</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="snd-ok" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+    <audio id="snd-err" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
+
+    <script>
+        const rawData = [
+            { s: "Ich helfe ____ Mutter in der Küche.", a: "der", e: "🥣", t: "helfen 支配第三格 (Dativ)。阴性名词 die 变为 der。" },
+            { s: "Wir besuchen ____ Opa im Krankenhaus.", a: "den", e: "🏥", t: "besuchen 支配第四格 (Akkusativ)。阳性名词 der 变为 den。" },
+            { s: "Der Lehrer erklärt ____ Schüler die Regel.", a: "dem", e: "👨‍🏫", t: "向某人(三格)解释某物。阳性单数 Schüler 变为 dem。" },
+            { s: "Ich kenne ____ Mann dort nicht.", a: "den", e: "❓", t: "kennen 支配第四格。阳性名词 der 变为 den。" },
+            { s: "Das Eis gehört ____ Kind.", a: "dem", e: "🍦", t: "gehören 支配第三格。中性名词 das 变为 dem。" },
+            { s: "Siehst du ____ Kind dort?", a: "das", e: "👀", t: "sehen 支配第四格。中性名词保持 das 不变。" },
+            { s: "Ich spiele mit ____ Kindern.", a: "den", e: "🎲", t: "mit 支配第三格。复数定冠词 die 变为 den。" },
+            { s: "Er putzt ____ Tisch am Abend.", a: "den", e: "🧽", t: "及物动词支配第四格宾语。阳性名词 der 变为 den。" },
+            { s: "Das Buch liegt auf ____ Tisch.", a: "dem", e: "📖", t: "auf 表示位置(在哪儿)支配第三格。阳性变为 dem。" },
+            { s: "Ich schenke ____ Freund ein Buch.", a: "dem", e: "🎁", t: "送给某人(三格)东西。阳性名词 der 变为 dem。" },
+            { s: "Ohne ____ Hund gehe ich nicht.", a: "den", e: "🐕", t: "ohne 固定支配第四格。阳性名词 der 变为 den。" },
+            { s: "____ Vater von Tim ist sehr nett.", a: "Der", e: "👨", t: "句子主语用第一格 (Nominativ)。阳性名词定冠词为 Der。" },
+            { s: "Gefällt dir ____ Film?", a: "der", e: "🎬", t: "gefallen 的主语是令人喜欢的东西(一格)。阳性用 der。" },
+            { s: "Ich schreibe ____ Lehrer eine E-Mail.", a: "dem", e: "📧", t: "给某人(三格)写信。阳性名词 der 变为 dem。" },
+            { s: "____ Frau dort ist meine Tante.", a: "Die", e: "👩", t: "主语用第一格。阴性名词定冠词为 Die。" },
+            { s: "Er dankt ____ Frau für die Hilfe.", a: "der", e: "🙏", t: "danken 支配第三格。阴性名词 die 变为 der。" },
+            { s: "Wir brauchen ____ Schlüssel.", a: "den", e: "🔑", t: "brauchen 支配第四格。阳性名词 der 变为 den。" },
+            { s: "____ Buch ist sehr interessant.", a: "Das", e: "📚", t: "中性主语用第一格。定冠词为 Das。" },
+            { s: "Ich lese ____ Buch gern.", a: "das", e: "📖", t: "中性名词第四格保持不变，依然是 das。" },
+            { s: "Die Tasche liegt unter ____ Bett.", a: "dem", e: "🛌", t: "unter 表示位置(在哪儿)支配第三格。中性 das 变为 dem。" },
+            { s: "____ Äpfel sind gesund.", a: "Die", e: "🍎", t: "复数主语用第一格。定冠词为 Die。" },
+            { s: "Er isst ____ Äpfel.", a: "die", e: "😋", t: "复数第四格保持不变，依然是 die。" },
+            { s: "Er gibt ____ Kindern Schokolade.", a: "den", e: "🍫", t: "给某些人(三格复数)。die 变为 den。" },
+            { s: "____ Lehrerin ist freundlich.", a: "Die", e: "👩‍🏫", t: "阴性主语用第一格。定冠词为 Die。" },
+            { s: "Wir fragen ____ Lehrerin.", a: "die", e: "🙋", t: "fragen 支配第四格。阴性 die 保持不变。" },
+            { s: "Ich antworte ____ Lehrerin.", a: "der", e: "💬", t: "antworten 支配第三格。阴性 die 变为 der。" },
+            { s: "____ Garten ist sehr groß.", a: "Der", e: "🏡", t: "阳性主语用第一格。定冠词为 Der。" },
+            { s: "Wir sitzen in ____ Garten.", a: "dem", e: "🌳", t: "in 表示位置(在哪儿)支配第三格。阳性 der 变为 dem。" },
+            { s: "Ich sehe ____ Garten.", a: "den", e: "👁️", t: "看见(第四格)。阳性名词 der 变为 den。" },
+            { s: "____ Fenster ist sauber.", a: "Das", e: "🪟", t: "中性主语用第一格。定冠词为 Das。" },
+            { s: "Er schließt ____ Fenster.", a: "das", e: "🔒", t: "关闭(第四格)。中性名词 das 保持不变。" },
+            { s: "____ Stifte liegen hier.", a: "Die", e: "✏️", t: "复数主语用第一格。定冠词为 Die。" },
+            { s: "Ich suche ____ Stifte.", a: "die", e: "🔎", t: "寻找(第四格复数)。定冠词保持 die 不变。" },
+            { s: "Sie schreibt mit ____ Stiften.", a: "den", e: "📝", t: "mit 支配第三格。复数 die 变为 den。" },
+            { s: "____ Bruder von Max ist klein.", a: "Der", e: "👶", t: "阳性主语用第一格。定冠词为 Der。" },
+            { s: "Max liebt ____ Bruder.", a: "den", e: "🍼", t: "爱(第四格)。阳性名词 der 变为 den。" },
+            { s: "Ich spiele mit ____ Bruder.", a: "dem", e: "⚽", t: "mit 支配第三格。阳性 der 变为 dem。" },
+            { s: "____ Sonne scheint.", a: "Die", e: "☀️", t: "阴性主语用第一格。定冠词为 Die。" },
+            { s: "Wir gehen in ____ Park.", a: "den", e: "🚶", t: "in 表示动作方向(去哪儿)支配第四格。阳性 der 变为 den。" },
+            { s: "Wir sind in ____ Park.", a: "dem", e: "🌳", t: "in 表示位置(在哪儿)支配第三格。阳性 der 变为 dem。" }
+        ];
+
+        let quizData = [...rawData].sort(() => Math.random() - 0.5);
+        let currentIndex = 0; let isMuted = false; let canClick = true;
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            const icon = document.getElementById('mute-icon');
+            icon.innerHTML = isMuted ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />' : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />';
+        }
+
+        function playSound(type) { if (!isMuted) { const s = document.getElementById(type === 'ok' ? 'snd-ok' : 'snd-err'); s.currentTime = 0; s.play().catch(()=>{}); } }
+
+        function renderQuestion() {
+            if (currentIndex >= quizData.length) { showFinal(); return; }
+            canClick = true;
+            const data = quizData[currentIndex];
+            document.getElementById('emoji-box').innerText = data.e;
+            document.getElementById('sentence-box').innerHTML = data.s.replace("____", `<span class="drop-zone">____</span>`);
+            document.getElementById('cur-num').innerText = currentIndex + 1;
+            document.getElementById('progress-fill').style.width = ((currentIndex + 1) / 40 * 100) + '%';
+            
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            
+            // 4选项逻辑
+            let options = [data.a.toLowerCase()];
+            let others = ["der", "die", "das", "den", "dem"].filter(o => o !== data.a.toLowerCase()).sort(() => Math.random() - 0.5);
+            options = [...options, ...others.slice(0, 3)].sort(() => Math.random() - 0.5);
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                const displayOpt = data.s.startsWith("____") ? opt.charAt(0).toUpperCase() + opt.slice(1) : opt;
+                btn.innerText = displayOpt;
+                btn.onclick = () => {
+                    if(!canClick) return;
+                    if(displayOpt.toLowerCase() === data.a.toLowerCase()) {
+                        canClick = false; playSound('ok'); if("vibrate" in navigator) navigator.vibrate(50);
+                        const dz = document.querySelector('.drop-zone'); dz.innerText = data.a; dz.classList.add('correct');
+                        setTimeout(() => { currentIndex++; renderQuestion(); }, 2000);
+                    } else {
+                        playSound('err'); document.getElementById('tip-text').innerText = data.t;
+                        document.getElementById('teacher-tip').classList.add('active'); canClick = false;
+                    }
+                };
+                grid.appendChild(btn);
+            });
+        }
+
+        function closeTip() { document.getElementById('teacher-tip').classList.remove('active'); canClick = true; }
+
+        function showFinal() {
+            document.getElementById('finish-modal').style.display = 'flex';
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>
