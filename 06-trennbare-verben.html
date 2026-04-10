@@ -3,240 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>06-可分动词拆拆乐 | 全端适配名师版</title>
+    <title>06-可分动词拆拆乐 | 手机优化版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
         
-        :root { --brand-blue: #0EA5E9; --brand-dark: #1E293B; }
-        
+        /* 核心修复：确保内容在手机屏幕垂直居中 */
         body { 
             background-color: #F8FAFC; 
             font-family: 'Noto Sans SC', sans-serif; 
-            color: var(--brand-dark);
-            height: 100vh;
+            color: #1E293B; 
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-        }
-
-        /* 顶部导航：静音键紧贴进度条右侧 */
-        .nav-bar { display: flex; align-items: center; gap: 12px; width: 100%; max-width: 600px; margin: 0 auto; padding: 16px; }
-        .progress-bg { flex-grow: 1; height: 12px; background: white; border-radius: 10px; border: 1.5px solid #E2E8F0; overflow: hidden; }
-
-        /* 内容自适应区 */
-        .main-content {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center; /* 居中对齐，解决头重脚轻 */
             align-items: center;
+            justify-content: center; /* 垂直方向居中 */
+            height: 100vh; /* 占满全屏高度 */
+        }
+
+        /* 顶部导航固定在上方 */
+        .nav-header {
+            position: absolute;
+            top: 10px;
             width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
+            max-width: 440px;
+            padding: 0 16px;
+        }
+
+        .nav-bar { width: 100%; display: flex; align-items: center; gap: 12px; }
+        .progress-container { flex-grow: 1; height: 10px; background: white; border-radius: 10px; border: 1.5px solid #E2E8F0; overflow: hidden; }
+
+        /* 答题主体区：往上提的视觉调整 */
+        .quiz-container {
+            width: 100%;
+            max-width: 460px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             padding: 0 20px;
-            overflow-y: auto;
+            margin-top: -20px; /* 视觉微调，让画面稍微偏上一点更符合操作习惯 */
         }
 
-        /* 句子卡片响应式 */
         .sentence-card { 
-            width: 100%; 
-            padding: 35px 24px; 
-            background: white; 
-            border-radius: 28px; 
-            box-shadow: 0 12px 30px rgba(0,0,0,0.04);
-            border: 1px solid #F1F5F9;
-            display: flex; 
-            flex-wrap: wrap; 
-            justify-content: center; 
-            align-items: center; 
-            gap: 10px; 
-            font-size: clamp(1.4rem, 4vw, 1.8rem); /* 字体大小随屏变 */
-            font-weight: 800; 
+            width: 100%; min-height: 160px;
+            padding: 24px 16px; background: white; border-radius: 25px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.03); border: 1px solid #F1F5F9;
+            display: flex; flex-wrap: wrap; justify-content: center; align-items: center; 
+            gap: 10px; font-size: 1.5rem; font-weight: 800; 
         }
 
-        .slot-box { min-width: 80px; border-bottom: 4px solid #CBD5E1; color: var(--brand-blue); height: 50px; display: flex; align-items: center; justify-content: center; }
-        
-        /* 选项区：手机2列，平板电脑4列 */
-        .options-area {
+        .slot-box { min-width: 85px; border-bottom: 4px solid #CBD5E1; color: #0EA5E9; height: 45px; display: flex; align-items: center; justify-content: center; }
+        .p-placeholder { min-width: 50px; border-bottom: 4px solid #E2E8F0; height: 45px; display: inline-flex; align-items: center; justify-content: center; color: #CBD5E1; }
+
+        /* 选项网格：防止被底部遮挡 */
+        .options-grid {
+            display: grid;
+            grid-template-cols: repeat(2, 1fr);
+            gap: 12px;
             width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background: #F8FAFC;
+            margin-top: 30px;
+            padding-bottom: 20px;
         }
 
         .option-item { 
-            background: white; 
-            border-radius: 16px; 
-            border: 2px solid #E2E8F0; 
-            border-bottom: 5px solid #E2E8F0; 
-            font-size: 1.25rem; 
-            font-weight: 800; 
-            color: #475569; 
-            padding: 14px 0; 
-            transition: all 0.1s; 
-            text-align: center;
+            background: white; border-radius: 15px; border: 2px solid #E2E8F0; 
+            border-bottom: 5px solid #E2E8F0; font-size: 1.2rem; font-weight: 800; 
+            color: #475569; padding: 12px 0; transition: all 0.1s; 
         }
-        .option-item:active { transform: translateY(3px); border-bottom-width: 2px; }
-        .option-item.correct { background: var(--brand-blue) !important; border-color: #0284C7 !important; color: white !important; }
+        .option-item:active { transform: translateY(4px); border-bottom-width: 2px; }
+        .option-item.correct { background: #0EA5E9 !important; border-color: #0284C7 !important; color: white !important; }
 
-        /* 老师点评 - 适配窄屏 */
-        #teacher-tip { 
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9);
-            width: 85%; max-width: 350px; background: rgba(30, 41, 59, 0.98); 
-            color: white; padding: 20px; border-radius: 24px; z-index: 100; 
-            opacity: 0; pointer-events: none; transition: all 0.3s;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-            text-align: center;
-        }
-        #teacher-tip.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-
-        /* 动画前缀 */
-        .prefix-active { background: #BAE6FD; color: var(--brand-blue); padding: 2px 8px; border-radius: 8px; animation: bounce 1s infinite; cursor: pointer; }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        #teacher-tip { position: fixed; bottom: 10%; left: 50%; transform: translateX(-50%); width: 85%; z-index: 100; opacity: 0; pointer-events: none; transition: 0.3s; }
+        #teacher-tip.show { opacity: 1; }
     </style>
 </head>
 <body>
 
-    <div class="nav-bar">
-        <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm border border-slate-100 cursor-pointer" onclick="alert('返回主页')">
-            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg>
-        </div>
-        <div class="progress-bg">
-            <div id="progress-bar" class="h-full bg-sky-500 w-0 transition-all duration-500"></div>
-        </div>
-        <button id="mute-btn" class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm border border-slate-100" onclick="toggleMute()">🔊</button>
-    </div>
-
-    <div class="w-full max-w-[600px] mx-auto px-4 flex justify-end">
-        <span id="counter" class="text-sm font-black text-slate-300 italic">1/30</span>
-    </div>
-
-    <div class="main-content">
-        <div class="mb-8 text-center">
-            <div class="bg-white rounded-2xl px-8 py-3 inline-flex items-baseline gap-1 text-[2.2rem] font-black shadow-sm border border-slate-100">
-                <span id="p-src"></span><span id="v-src" class="text-slate-700"></span>
+    <div class="nav-header">
+        <div class="nav-bar">
+            <div class="w-9 h-9 bg-white rounded-xl flex items-center justify-center shadow-sm border border-slate-100">
+                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg>
             </div>
-            <p id="mean" class="text-slate-400 font-bold mt-2 italic text-lg"></p>
+            <div class="progress-container"><div id="progress" class="h-full bg-sky-500 w-0 transition-all duration-500"></div></div>
+            <button id="mute-btn" class="w-9 h-9 bg-white rounded-xl flex items-center justify-center shadow-sm border border-slate-100 text-lg">🔊</button>
+        </div>
+        <div class="flex justify-end mt-2"><span id="counter" class="text-xs font-black text-slate-300 italic">0/30</span></div>
+    </div>
+
+    <div class="quiz-container">
+        <div class="mb-6 text-center">
+            <div class="bg-white rounded-2xl px-6 py-3 inline-flex text-[1.8rem] font-black shadow-sm border border-slate-100">
+                <span id="p-src" class="text-sky-500">mit</span><span id="v-src" class="text-slate-700">kommen</span>
+            </div>
+            <p id="mean" class="text-slate-400 font-bold mt-2 italic text-base">一起去吗？</p>
         </div>
 
         <div class="sentence-card">
             <span id="pre-text"></span>
             <div id="v-target" class="slot-box"></div>
-            <span id="post-text"></span>
+            <span id="post-text">du heute Nachmittag</span>
             <div class="flex items-center gap-1">
-                <div id="p-placeholder" class="min-w-[40px] border-bottom-2 border-slate-200 text-slate-200">___</div>
-                <div id="p-target" class="hidden min-w-[80px] h-[50px] border-2 border-dashed border-sky-400 rounded-xl items-center justify-center text-sky-200 bg-sky-50 font-black">?</div>
-                <span id="punc" class="opacity-20">.</span>
+                <div id="p-placeholder" class="p-placeholder">___</div>
+                <span id="punc" class="opacity-30">?</span>
             </div>
+        </div>
+
+        <div id="options-grid" class="options-grid">
+            <button class="option-item">Kommt</button>
+            <button class="option-item">Kommen</button>
+            <button class="option-item">Kommst</button>
+            <button class="option-item">Komme</button>
         </div>
     </div>
 
-    <div class="options-area">
-        <div id="options-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            </div>
-    </div>
-
     <div id="teacher-tip">
-        <p class="text-sky-400 font-black mb-2 text-lg">💡 老师点评</p>
-        <p id="tip-content" class="text-slate-100"></p>
+        <div class="bg-slate-800 text-white p-4 rounded-2xl shadow-2xl border-l-4 border-sky-400">
+            <p class="text-sky-400 text-sm font-black mb-1">💡 老师点评：</p>
+            <p id="tip-content" class="text-sm">疑问句动词提前，主语 du 对应的词尾是 -st。</p>
+        </div>
     </div>
 
-    <script>
-        const quiz = [
-            { p: 'mit', r: 'kommen', m: '一起去吗?', pre: '', post: 'du heute Nachmittag', a: 'Kommst', o: ['Kommst', 'Kommt', 'Kommen', 'Komme'], tip: "疑问句动词提前，主语 du 对应的词尾是 -st。" },
-            { p: 'aus', r: 'gehen', m: '出去玩', pre: 'Wir', post: 'am Wochenende gerne', a: 'gehen', o: ['gehen', 'geht', 'gehst', 'gehe'], tip: "Wir 对应的变位和动词原型一致。" },
-            { p: 'fern', r: 'sehen', m: '看电视', pre: 'Du', post: 'heute Abend', a: 'siehst', o: ['siehst', 'sieht', 'sehen', 'seht'], tip: "主语是 du，注意 sehen 是强变化动词，e -> ie。" },
-            { p: 'an', r: 'rufen', m: '打电话', pre: 'Er', post: 'seine Eltern oft', a: 'ruft', o: ['ruft', 'rufe', 'rufst', 'rufen'], tip: "单三 (Er) 变位通常以 -t 结尾。" },
-            { p: 'ein', r: 'kaufen', m: '购物吗?', pre: '', post: 'ihr im Supermarkt', a: 'Kauft', o: ['Kauft', 'Kaufst', 'Kaufen', 'Kaufet'], tip: "你们 (ihr) 购物吗？词尾记得用 -t。" }
-            // 此处可继续添加至30题...
-        ];
-
-        let idx = 0;
-        let isMuted = false;
-        let phase = 'V'; // V: 选动词, P: 选前缀
-
-        function toggleMute() { isMuted = !isMuted; document.getElementById('mute-btn').innerText = isMuted ? '🔇' : '🔊'; }
-
-        function loadQuestion() {
-            phase = 'V';
-            const q = quiz[idx];
-            document.getElementById('counter').innerText = `${idx + 1}/${quiz.length}`;
-            document.getElementById('p-src').innerText = q.p;
-            document.getElementById('p-src').className = "";
-            document.getElementById('p-src').style.opacity = "1";
-            document.getElementById('v-src').innerText = q.r;
-            document.getElementById('mean').innerText = q.m;
-            document.getElementById('pre-text').innerText = q.pre;
-            document.getElementById('post-text').innerText = q.post;
-            document.getElementById('v-target').innerText = "";
-            document.getElementById('p-placeholder').classList.remove('hidden');
-            document.getElementById('p-target').classList.add('hidden');
-            document.getElementById('p-target').classList.remove('bg-sky-500', 'text-white');
-            document.getElementById('punc').classList.add('opacity-20');
-
-            const grid = document.getElementById('options-grid');
-            grid.innerHTML = '';
-            [...q.o].sort(() => Math.random() - 0.5).forEach(opt => {
-                const btn = document.createElement('button');
-                btn.className = 'option-item';
-                btn.innerText = opt;
-                btn.onclick = () => checkAnswer(opt, btn);
-                grid.appendChild(btn);
-            });
-        }
-
-        function checkAnswer(val, btn) {
-            const q = quiz[idx];
-            if (phase === 'V') {
-                if (val === q.a) {
-                    phase = 'P';
-                    btn.classList.add('correct');
-                    document.getElementById('v-target').innerText = val;
-                    document.getElementById('p-placeholder').classList.add('hidden');
-                    document.getElementById('p-target').classList.remove('hidden');
-                    document.getElementById('p-target').classList.add('flex');
-                    document.getElementById('punc').classList.remove('opacity-20');
-                    document.getElementById('p-src').classList.add('prefix-active');
-                    document.getElementById('p-src').onclick = movePrefix;
-                } else {
-                    showTip(q.tip);
-                }
-            }
-        }
-
-        function movePrefix() {
-            const q = quiz[idx];
-            const src = document.getElementById('p-src');
-            const target = document.getElementById('p-target');
-            
-            src.style.opacity = "0";
-            target.innerText = q.p;
-            target.classList.add('bg-sky-500', 'text-white', 'border-none');
-            
-            confetti({ particleCount: 100, spread: 70, origin: { y: 0.8 } });
-
-            setTimeout(() => {
-                idx++;
-                if (idx < quiz.length) {
-                    document.getElementById('progress-bar').style.width = `${(idx / quiz.length) * 100}%`;
-                    loadQuestion();
-                } else {
-                    document.getElementById('progress-bar').style.width = `100%`;
-                    alert("太棒了！全部完成！");
-                }
-            }, 2500); // 停留2.5秒让学生读完整个句子
-        }
-
-        function showTip(msg) {
-            const tip = document.getElementById('teacher-tip');
-            document.getElementById('tip-content').innerText = msg;
-            tip.classList.add('show');
-            setTimeout(() => tip.classList.remove('show'), 3000);
-        }
-
-        loadQuestion();
-    </script>
 </body>
 </html>
