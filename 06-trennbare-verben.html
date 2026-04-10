@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>06-可分动词拆拆乐 | 变位强化版</title>
+    <title>06-可分动词拆拆乐 | 刘老师定制版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
@@ -11,151 +11,113 @@
         body { background-color: #F0F4F8; font-family: 'Noto Sans SC', sans-serif; color: #1E293B; overflow: hidden; touch-action: manipulation; }
         
         .nav-bar { width: 100%; max-width: 440px; display: flex; align-items: center; padding: 25px 0 15px 0; }
-        .back-btn { width: 38px; height: 38px; border-radius: 12px; background: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 0 #E2E8F0; cursor: pointer; }
-        .progress-container { flex-grow: 1; margin: 0 15px; }
-
+        .back-btn { width: 38px; height: 38px; border-radius: 12px; background: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 0 #E2E8F0; }
+        
         .verb-preview-box { background: white; border-radius: 20px; padding: 10px 24px; display: inline-flex; font-size: 1.8rem; font-weight: 900; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1.5px solid #F1F5F9; }
-        .prefix-text { color: #0EA5E9; padding: 0 4px; border-radius: 6px; transition: all 0.3s; }
+        .prefix-text { color: #0EA5E9; padding: 0 4px; border-radius: 6px; }
         .prefix-text.active-glow { background: #BAE6FD; animation: pulse 1s infinite; cursor: pointer; }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 
         .sentence-card { 
             width: 100%; max-width: 440px; 
-            padding: 35px 15px; 
+            padding: 40px 20px; 
             background: white; 
-            border-radius: 30px; 
-            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.04); 
+            border-radius: 35px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.02); 
             display: flex; flex-wrap: wrap; 
             justify-content: center; align-items: center; 
-            gap: 8px; font-size: 1.5rem; font-weight: 800; 
-            line-height: 1.4;
+            gap: 10px; font-size: 1.6rem; font-weight: 800; 
         }
-        .slot-box { min-width: 100px; border-bottom: 3px solid #E2E8F0; color: #0EA5E9; height: 48px; display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; }
-        .prefix-box { width: 85px; height: 48px; border: 3px dashed #E2E8F0; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; color: transparent; vertical-align: middle; transition: all 0.3s; }
+        .slot-box { min-width: 110px; border-bottom: 4px solid #E2E8F0; color: #0EA5E9; height: 50px; display: inline-flex; align-items: center; justify-content: center; }
+        .prefix-box { width: 90px; height: 50px; border: 3px dashed #E2E8F0; border-radius: 15px; display: inline-flex; align-items: center; justify-content: center; color: transparent; transition: all 0.3s; }
         .prefix-box.waiting { border-color: #0EA5E9; background: #F0F9FF; color: #BAE6FD !important; }
-        .prefix-box.filled { background: #0EA5E9; color: white !important; border: none; transform: scale(1.05); box-shadow: 0 5px 15px rgba(14, 165, 233, 0.3); }
+        .prefix-box.filled { background: #0EA5E9; color: white !important; border: none; transform: scale(1.1); box-shadow: 0 5px 15px rgba(14, 165, 233, 0.3); }
 
-        .option-item { background: white; border-radius: 18px; border: 2px solid #E2E8F0; border-bottom: 5px solid #E2E8F0; transition: all 0.1s; font-size: 1.3rem; font-weight: 800; color: #475569; padding: 15px 0; }
-        .option-item:active { transform: translateY(3px); border-bottom-width: 2px; }
+        .option-item { background: white; border-radius: 20px; border: 2px solid #E2E8F0; border-bottom: 6px solid #E2E8F0; font-size: 1.4rem; font-weight: 800; color: #475569; padding: 18px 0; transition: all 0.1s; }
+        .option-item:active { transform: translateY(4px); border-bottom-width: 2px; }
         .option-item.correct { background: #0EA5E9 !important; border-color: #0284C7 !important; color: white !important; }
-
-        #congrats-modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(5px); }
     </style>
 </head>
 <body class="flex flex-col items-center min-h-screen px-4">
 
     <div class="nav-bar">
-        <div class="back-btn" onclick="location.href='index.html'">
-            <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg>
+        <div class="back-btn" onclick="location.href='index.html'"><svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg></div>
+        <div class="progress-container flex-grow mx-4">
+            <div class="h-3 bg-white rounded-full overflow-hidden border border-slate-100"><div id="progress" class="h-full bg-sky-500 w-0 transition-all duration-500"></div></div>
         </div>
-        <div class="progress-container">
-            <div class="h-3 bg-white rounded-full overflow-hidden shadow-inner border border-slate-100">
-                <div id="progress" class="h-full bg-sky-500 w-0 transition-all duration-500"></div>
-            </div>
-        </div>
-        <div class="flex items-center">
-            <span id="counter" class="font-black text-sky-600 italic text-lg">0/20</span>
-            <span id="mute-btn" onclick="toggleMute()" class="ml-2 cursor-pointer">🔊</span>
-        </div>
+        <span id="counter" class="font-black text-sky-600 italic">0/20</span>
     </div>
 
-    <div class="w-full max-w-[460px] flex flex-col items-center mt-2">
-        <div id="hint-text" class="mb-4 text-sky-600 font-black text-sm bg-white px-5 py-1.5 rounded-full shadow-sm border border-sky-50">第一步：选择动词变位</div>
+    <div class="w-full max-w-[460px] flex flex-col items-center mt-4">
+        <div id="hint-text" class="mb-6 text-sky-600 font-black text-sm bg-white px-6 py-2 rounded-full shadow-sm border border-sky-50">第一步：选择动词变位</div>
 
-        <div class="mb-8 text-center">
+        <div class="mb-10 text-center">
             <div class="verb-preview-box">
-                <span id="p-src" class="prefix-text">fern</span>
-                <span id="v-src" class="text-slate-700">sehen</span>
+                <span id="p-src" class="prefix-text">fern</span><span id="v-src" class="text-slate-700">sehen</span>
             </div>
-            <p id="mean" class="text-slate-400 font-bold mt-2 italic text-sm">看电视</p>
+            <p id="mean" class="text-slate-400 font-bold mt-2 italic">看电视</p>
         </div>
 
         <div class="sentence-card">
-            <span id="pre-text" class="text-slate-800"></span>
+            <span id="pre-text"></span>
             <div id="v-target" class="slot-box"></div>
-            <span id="post-text" class="text-slate-800 text-center"></span>
-            <div class="punctuation-wrap flex items-center">
+            <span id="post-text"></span>
+            <div class="flex items-center gap-1">
                 <div id="p-target" class="prefix-box">?</div>
-                <span id="punc" class="text-slate-800 ml-1">.</span>
+                <span id="punc">.</span>
             </div>
         </div>
 
-        <div id="options-grid" class="grid grid-cols-2 gap-3 w-full mt-8"></div>
-    </div>
-
-    <div id="congrats-modal">
-        <div class="bg-white p-10 rounded-[40px] text-center max-w-sm w-[90%]">
-            <div class="text-6xl mb-4">🏆</div>
-            <h2 class="text-2xl font-black text-slate-800 mb-2">变位大师！</h2>
-            <p class="text-slate-500 font-bold mb-8">你已经完美掌握了<br>可分动词的变位与拆分规则！</p>
-            <button onclick="location.href='index.html'" class="w-full py-4 bg-sky-500 text-white rounded-2xl font-black text-xl shadow-[0_6px_0_#0369a1] active:translate-y-1 active:shadow-none transition-all">确定</button>
-        </div>
+        <div id="options-grid" class="grid grid-cols-2 gap-4 w-full mt-12"></div>
     </div>
 
     <script>
         const quiz = [
             { p: 'fern', r: 'sehen', m: '看电视', pre: 'Du', post: 'heute Abend', a: 'siehst', o: ['siehst', 'sieht', 'sehen', 'seht'], end: '.' },
             { p: 'mit', r: 'kommen', m: '一起去吗?', pre: '', post: 'du heute Nachmittag', a: 'Kommst', o: ['Kommst', 'Kommt', 'Kommen', 'Komme'], end: '?' },
-            { p: 'auf', r: 'stehen', m: '起床吗?', pre: 'Wann', post: 'du normalerweise', a: 'stehst', o: ['stehst', 'stehe', 'steht', 'stehen'], end: '?' },
+            { p: 'auf', r: 'stehen', m: '起床', pre: 'Wann', post: 'du normalerweise', a: 'stehst', o: ['stehst', 'stehe', 'steht', 'stehen'], end: '?' },
             { p: 'an', r: 'rufen', m: '打电话', pre: 'Er', post: 'seine Eltern oft', a: 'ruft', o: ['ruft', 'rufe', 'rufst', 'rufen'], end: '.' },
             { p: 'ein', r: 'kaufen', m: '购物吗?', pre: '', post: 'ihr im Supermarkt', a: 'Kauft', o: ['Kauft', 'Kaufst', 'Kaufen', 'Kaufet'], end: '?' },
             { p: 'aus', r: 'gehen', m: '出去玩', pre: 'Wir', post: 'am Wochenende gerne', a: 'gehen', o: ['gehen', 'geht', 'gehst', 'gehe'], end: '.' },
             { p: 'auf', r: 'räumen', m: '整理房间吗?', pre: '', post: 'du dein Zimmer', a: 'Räumst', o: ['Räumst', 'Räumt', 'Räumen', 'Räume'], end: '?' },
             { p: 'an', r: 'fangen', m: '开始', pre: 'Wann', post: 'der Film endlich', a: 'fängt', o: ['fängt', 'fangt', 'fangen', 'fangst'], end: '?' },
             { p: 'mit', r: 'bringen', m: '带上', pre: 'Ich', post: 'einen Salat zur Party', a: 'bringe', o: ['bringe', 'bringst', 'bringt', 'bringen'], end: '.' },
-            { p: 'zu', r: 'hören', m: '听着吗?', pre: '', post: 'du mir überhaupt', a: 'Hörst', o: ['Hörst', 'Hört', 'Hören', 'Hör'], end: '?' },
+            { p: 'zu', r: 'hören', m: '听着吗?', pre: '', post: 'du mir überhaupt', a: 'Hörst', o: ['Hörst', 'Hört', 'Hören', 'Höre'], end: '?' },
             { p: 'ein', r: 'laden', m: '邀请', pre: 'Wer', post: 'dich zum Essen', a: 'lädt', o: ['lädt', 'ladet', 'laden', 'ladest'], end: '?' },
             { p: 'ab', r: 'holen', m: '接某人', pre: 'Ich', post: 'dich um acht Uhr', a: 'hole', o: ['hole', 'holst', 'holt', 'holen'], end: '.' },
-            { p: 'um', r: 'steigen', m: '换乘吗?', pre: 'Muss', post: 'ich in Hannover', a: 'ich', o: ['ich'], end: '?', skip: true }, // 特殊处理：情态动词
             { p: 'aus', r: 'füllen', m: '填写', pre: 'Sie', post: 'das Formular bitte', a: 'füllen', o: ['füllen', 'füllt', 'füllst', 'fülle'], end: '.' },
-            { p: 'vor', r: 'bereiten', m: '准备', pre: 'Wir', post: 'die Präsentation vor', a: 'bereiten', o: ['bereiten', 'bereitet', 'bereite', 'bereitest'], end: '.' },
+            // 修正第14题：移除了原本post里的 "vor"
+            { p: 'vor', r: 'bereiten', m: '准备', pre: 'Wir', post: 'die Präsentation', a: 'bereiten', o: ['bereiten', 'bereitet', 'bereite', 'bereitest'], end: '.' },
             { p: 'an', r: 'kommen', m: '到达', pre: 'Wann', post: 'der Zug in Berlin', a: 'kommt', o: ['kommt', 'kommen', 'kommst', 'komme'], end: '?' },
             { p: 'weg', r: 'gehen', m: '离开吗?', pre: '', post: 'du jetzt schon', a: 'Gehst', o: ['Gehst', 'Geht', 'Gehen', 'Gehe'], end: '?' },
             { p: 'aus', r: 'machen', m: '关掉吗?', pre: '', post: 'du bitte den Fernseher', a: 'Machst', o: ['Machst', 'Macht', 'Machen', 'Mache'], end: '?' },
             { p: 'an', r: 'probieren', m: '试穿', pre: 'Ich', post: 'diese Jacke kurz', a: 'probiere', o: ['probiere', 'probierst', 'probiert', 'probieren'], end: '.' },
-            { p: 'zu', r: 'machen', m: '关上', pre: 'Er', post: 'das Fenster', a: 'macht', o: ['macht', 'machst', 'machen', 'mache'], end: '.' }
+            { p: 'vor', r: 'stellen', m: '介绍', pre: 'Ich', post: 'euch meinen Freund', a: 'stelle', o: ['stelle', 'stellst', 'stellt', 'stellen'], end: '.' },
+            { p: 'auf', r: 'machen', m: '打开', pre: 'Er', post: 'das Fenster', a: 'macht', o: ['macht', 'machst', 'machen', 'mache'], end: '.' }
         ];
 
-        // 重新过滤掉那个选主语的逻辑，确保全部练变位
-        quiz[12] = { p: 'um', r: 'steigen', m: '换乘吗?', pre: 'Muss ich in Hannover', post: '', a: 'umsteigen', o: ['umsteigen', 'steige um', 'steigt um', 'umzusteigen'], end: '?', isModal: true };
-
-        let idx = 0, phase = 'V', muted = false;
-        const audio = new (window.AudioContext || window.webkitAudioContext)();
-
-        function play(type) {
-            if (muted) return;
-            const o = audio.createOscillator(), g = audio.createGain();
-            o.connect(g); g.connect(audio.destination);
-            if (type === 'ok') {
-                o.frequency.setValueAtTime(523, audio.currentTime);
-                o.frequency.exponentialRampToValueAtTime(880, audio.currentTime + 0.3);
-                g.gain.exponentialRampToValueAtTime(0.01, audio.currentTime + 0.3);
-                o.start(); o.stop(audio.currentTime + 0.3);
-            } else {
-                o.frequency.setValueAtTime(150, audio.currentTime);
-                g.gain.exponentialRampToValueAtTime(0.01, audio.currentTime + 0.2);
-                o.start(); o.stop(audio.currentTime + 0.2);
-            }
-        }
-
-        function toggleMute() { muted = !muted; document.getElementById('mute-btn').innerText = muted ? '🔇' : '🔊'; }
+        let idx = 0, phase = 'V';
 
         function loadQ() {
             phase = 'V';
             const q = quiz[idx % quiz.length];
             document.getElementById('hint-text').innerText = "第一步：选择动词变位";
-            document.getElementById('p-src').innerText = q.p;
-            document.getElementById('p-src').classList.remove('active-glow');
-            document.getElementById('p-src').style.opacity = '1';
+            const pSrc = document.getElementById('p-src');
+            pSrc.innerText = q.p;
+            pSrc.classList.remove('active-glow');
+            pSrc.style.opacity = '1';
+            pSrc.onclick = null;
+            
             document.getElementById('v-src').innerText = q.r;
             document.getElementById('mean').innerText = q.m;
             document.getElementById('pre-text').innerText = q.pre;
             document.getElementById('post-text').innerText = q.post;
             document.getElementById('punc').innerText = q.end;
             document.getElementById('v-target').innerText = "";
-            document.getElementById('v-target').className = "slot-box";
-            document.getElementById('p-target').innerText = q.isModal ? "" : "?"; 
-            document.getElementById('p-target').className = q.isModal ? "hidden" : "prefix-box";
+            
+            const pTgt = document.getElementById('p-target');
+            pTgt.innerText = "?";
+            pTgt.className = "prefix-box";
 
             const grid = document.getElementById('options-grid');
             grid.innerHTML = '';
@@ -163,38 +125,28 @@
                 const b = document.createElement('button');
                 b.className = 'option-item';
                 b.innerText = opt;
-                b.onclick = () => { if(phase === 'V') checkV(opt, q.a, b, q.isModal); };
+                b.onclick = () => { if(phase === 'V') checkV(opt, q.a, b); };
                 grid.appendChild(b);
             });
         }
 
-        function checkV(val, ans, b, isModal) {
+        function checkV(val, ans, b) {
             if(val === ans) {
-                play('ok');
+                phase = 'P';
                 b.classList.add('correct');
                 document.getElementById('v-target').innerText = val;
-                
-                if(isModal) {
-                    // 情态动词不需要第二步拆分
-                    document.getElementById('hint-text').innerText = "太棒了！情态动词不拆分";
-                    setTimeout(nextIdx, 1500);
-                } else {
-                    phase = 'P';
-                    document.getElementById('hint-text').innerText = "第二步：点击上方蓝色前缀";
-                    const pSrc = document.getElementById('p-src'), pTgt = document.getElementById('p-target');
-                    pSrc.classList.add('active-glow');
-                    pTgt.classList.add('waiting');
-                    pSrc.onclick = () => moveP(quiz[idx % quiz.length].p);
-                }
+                document.getElementById('hint-text').innerText = "第二步：点击上方蓝色前缀";
+                const pSrc = document.getElementById('p-src'), pTgt = document.getElementById('p-target');
+                pSrc.classList.add('active-glow');
+                pTgt.classList.add('waiting');
+                pSrc.onclick = () => moveP(quiz[idx % quiz.length].p);
             } else {
-                play('err');
                 b.classList.add('bg-rose-500', 'text-white');
                 setTimeout(() => b.classList.remove('bg-rose-500', 'text-white'), 500);
             }
         }
 
         function moveP(txt) {
-            play('ok');
             const s = document.getElementById('p-src'), t = document.getElementById('p-target');
             const sr = s.getBoundingClientRect(), tr = t.getBoundingClientRect();
             const f = document.createElement('div');
@@ -207,21 +159,15 @@
                 document.body.removeChild(f);
                 t.innerText = txt; t.classList.replace('waiting', 'filled');
                 document.getElementById('hint-text').innerText = "太棒了！";
-                setTimeout(nextIdx, 1200);
+                setTimeout(() => {
+                    idx++;
+                    document.getElementById('progress').style.width = (idx*5)+'%';
+                    document.getElementById('counter').innerText = `${idx}/20`;
+                    if(idx < 20) loadQ(); else {
+                        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                    }
+                }, 1200);
             }, 600);
-        }
-
-        function nextIdx() {
-            idx++;
-            document.getElementById('progress').style.width = (idx*5)+'%';
-            document.getElementById('counter').innerText = `${idx}/20`;
-            if(idx < 20) loadQ(); else finish();
-        }
-
-        function finish() {
-            localStorage.setItem('level6_cleared', 'true');
-            confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
-            setTimeout(() => { document.getElementById('congrats-modal').style.display = 'flex'; }, 500);
         }
 
         loadQ();
