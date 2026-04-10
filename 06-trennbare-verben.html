@@ -2,27 +2,23 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>06-可分动词拆拆乐</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>06-可分动词拆拆乐 | 变位强化版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
         body { background-color: #F0F4F8; font-family: 'Noto Sans SC', sans-serif; color: #1E293B; overflow: hidden; touch-action: manipulation; }
         
-        /* 导航栏布局 */
         .nav-bar { width: 100%; max-width: 440px; display: flex; align-items: center; padding: 25px 0 15px 0; }
         .back-btn { width: 38px; height: 38px; border-radius: 12px; background: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 0 #E2E8F0; cursor: pointer; }
         .progress-container { flex-grow: 1; margin: 0 15px; }
-        .mute-btn { font-size: 1.2rem; cursor: pointer; margin-left: 10px; }
 
-        /* 引导与动词区 */
         .verb-preview-box { background: white; border-radius: 20px; padding: 10px 24px; display: inline-flex; font-size: 1.8rem; font-weight: 900; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1.5px solid #F1F5F9; }
         .prefix-text { color: #0EA5E9; padding: 0 4px; border-radius: 6px; transition: all 0.3s; }
         .prefix-text.active-glow { background: #BAE6FD; animation: pulse 1s infinite; cursor: pointer; }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 
-        /* 答题卡片 */
         .sentence-card { 
             width: 100%; max-width: 440px; 
             padding: 35px 15px; 
@@ -39,26 +35,11 @@
         .prefix-box.waiting { border-color: #0EA5E9; background: #F0F9FF; color: #BAE6FD !important; }
         .prefix-box.filled { background: #0EA5E9; color: white !important; border: none; transform: scale(1.05); box-shadow: 0 5px 15px rgba(14, 165, 233, 0.3); }
 
-        /* 强制标点不掉行 */
-        .punctuation-wrap { display: inline-flex; align-items: center; white-space: nowrap; }
-
-        /* 选项 */
         .option-item { background: white; border-radius: 18px; border: 2px solid #E2E8F0; border-bottom: 5px solid #E2E8F0; transition: all 0.1s; font-size: 1.3rem; font-weight: 800; color: #475569; padding: 15px 0; }
         .option-item:active { transform: translateY(3px); border-bottom-width: 2px; }
-        .option-item.correct { background: #0EA5E9; border-color: #0284C7; color: white; }
+        .option-item.correct { background: #0EA5E9 !important; border-color: #0284C7 !important; color: white !important; }
 
-        /* 祝贺弹窗 */
-        #congrats-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.8);
-            display: none; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 100; backdrop-filter: blur(5px);
-        }
-        .modal-content {
-            background: white; padding: 40px; border-radius: 30px; text-align: center;
-            max-width: 320px; width: 85%; transform: scale(0.9); animation: modalIn 0.3s forwards;
-        }
-        @keyframes modalIn { to { transform: scale(1); opacity: 1; } }
+        #congrats-modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(5px); }
     </style>
 </head>
 <body class="flex flex-col items-center min-h-screen px-4">
@@ -74,7 +55,7 @@
         </div>
         <div class="flex items-center">
             <span id="counter" class="font-black text-sky-600 italic text-lg">0/20</span>
-            <span id="mute-btn" onclick="toggleMute()" class="mute-btn">🔊</span>
+            <span id="mute-btn" onclick="toggleMute()" class="ml-2 cursor-pointer">🔊</span>
         </div>
     </div>
 
@@ -90,10 +71,10 @@
         </div>
 
         <div class="sentence-card">
-            <span id="subj" class="text-slate-800">Du</span>
+            <span id="pre-text" class="text-slate-800"></span>
             <div id="v-target" class="slot-box"></div>
-            <span id="ctx" class="text-slate-800 text-center">heute Abend</span>
-            <div class="punctuation-wrap">
+            <span id="post-text" class="text-slate-800 text-center"></span>
+            <div class="punctuation-wrap flex items-center">
                 <div id="p-target" class="prefix-box">?</div>
                 <span id="punc" class="text-slate-800 ml-1">.</span>
             </div>
@@ -103,40 +84,40 @@
     </div>
 
     <div id="congrats-modal">
-        <div class="modal-content">
+        <div class="bg-white p-10 rounded-[40px] text-center max-w-sm w-[90%]">
             <div class="text-6xl mb-4">🏆</div>
-            <h2 class="text-2xl font-black text-slate-800 mb-2">全通关！</h2>
-            <p class="text-slate-500 font-bold mb-8">你已经掌握了陈述句与疑问句的用法！</p>
-            <button onclick="location.href='index.html'" class="w-full py-4 bg-sky-500 text-white rounded-2xl font-black text-xl shadow-[0_6px_0_#0369a1] active:translate-y-1 active:shadow-none transition-all">
-                确定
-            </button>
+            <h2 class="text-2xl font-black text-slate-800 mb-2">变位大师！</h2>
+            <p class="text-slate-500 font-bold mb-8">你已经完美掌握了<br>可分动词的变位与拆分规则！</p>
+            <button onclick="location.href='index.html'" class="w-full py-4 bg-sky-500 text-white rounded-2xl font-black text-xl shadow-[0_6px_0_#0369a1] active:translate-y-1 active:shadow-none transition-all">确定</button>
         </div>
     </div>
 
     <script>
         const quiz = [
-            // A1-A2 混合陈述句与疑问句
-            { p: 'fern', r: 'sehen', m: '看电视', s: 'Du', c: 'heute Abend', a: 'siehst', o: ['siehst', 'sieht', 'sehen', 'seht'], end: '.' },
-            { p: 'mit', r: 'kommen', m: '一起去吗?', s: 'Kommst', c: 'du heute Nachmittag', a: 'du', o: ['du', 'ihr', 'wir', 'sie'], end: '?', isInv: true },
-            { p: 'auf', r: 'stehen', m: '起床', s: 'Wann', c: 'du normalerweise', a: 'stehst', o: ['stehst', 'stehe', 'steht', 'stehen'], end: '?', isInv: true },
-            { p: 'an', r: 'rufen', m: '打电话', s: 'Er', c: 'seine Eltern oft', a: 'ruft', o: ['ruft', 'rufe', 'rufst', 'anruft'], end: '.' },
-            { p: 'ein', r: 'kaufen', m: '购物吗?', s: 'Kauft', c: 'ihr im Supermarkt', a: 'ihr', o: ['ihr', 'du', 'wir', 'Sie'], end: '?', isInv: true },
-            { p: 'aus', r: 'gehen', m: '出去玩', s: 'Wir', c: 'am Wochenende gerne', a: 'gehen', o: ['gehen', 'geht', 'gehst', 'ausgehen'], end: '.' },
-            { p: 'auf', r: 'räumen', m: '整理房间吗?', s: 'Räumst', c: 'du dein Zimmer', a: 'du', o: ['du', 'er', 'sie', 'ihr'], end: '?', isInv: true },
-            { p: 'an', r: 'fangen', m: '开始', s: 'Wann', c: 'der Film endlich', a: 'fängt', o: ['fängt', 'fangen', 'fangt', 'anfängt'], end: '?', isInv: true },
-            { p: 'mit', r: 'bringen', m: '带上', s: 'Ich', c: 'einen Salat zur Party', a: 'bringe', o: ['bringe', 'bringst', 'bringt', 'mitbringen'], end: '.' },
-            { p: 'zu', r: 'hören', m: '听着吗?', s: 'Hörst', c: 'du mir überhaupt', a: 'du', o: ['du', 'ihr', 'er', 'wir'], end: '?', isInv: true },
-            { p: 'ein', r: 'laden', m: '邀请', s: 'Wer', c: 'dich zum Essen', a: 'lädt', o: ['lädt', 'laden', 'lade', 'lädst'], end: '?', isInv: true },
-            { p: 'vor', r: 'stellen', m: '介绍', s: 'Darf ich', c: 'euch meinen Freund', a: 'euch', o: ['euch', 'dir', 'ihnen', 'uns'], end: '?', isInv: true },
-            { p: 'ab', r: 'holen', m: '接某人', s: 'Ich', c: 'dich um acht Uhr', a: 'hole', o: ['hole', 'holst', 'holt', 'abholen'], end: '.' },
-            { p: 'um', r: 'steigen', m: '换乘', s: 'Muss ich', c: 'in Hannover', a: 'ich', o: ['ich', 'du', 'wir', 'Sie'], end: '?', isInv: true },
-            { p: 'aus', r: 'füllen', m: '填写', s: 'Sie', c: 'das Formular bitte', a: 'füllen', o: ['füllen', 'füllt', 'füllst', 'ausfüllen'], end: '.' },
-            { p: 'vor', r: 'bereiten', m: '准备', s: 'Wir', c: 'die Präsentation gemeinsam', a: 'bereiten', o: ['bereiten', 'bereitet', 'bereite', 'vorbereiten'], end: '.' },
-            { p: 'an', r: 'kommen', m: '到达', s: 'Wann', c: 'der Zug in Berlin', a: 'kommt', o: ['kommt', 'kommen', 'kommst', 'ankommt'], end: '?', isInv: true },
-            { p: 'weg', r: 'gehen', m: '离开吗?', s: 'Gehst', c: 'du jetzt schon', a: 'du', o: ['du', 'ihr', 'Sie', 'wir'], end: '?', isInv: true },
-            { p: 'aus', r: 'machen', m: '关掉', s: 'Machst', c: 'du bitte den Fernseher', a: 'du', o: ['du', 'ihr', 'er', 'wir'], end: '?', isInv: true },
-            { p: 'an', r: 'probieren', m: '试穿', s: 'Ich', c: 'diese Jacke kurz', a: 'probiere', o: ['probiere', 'probierst', 'probiert', 'anprobieren'], end: '.' }
+            { p: 'fern', r: 'sehen', m: '看电视', pre: 'Du', post: 'heute Abend', a: 'siehst', o: ['siehst', 'sieht', 'sehen', 'seht'], end: '.' },
+            { p: 'mit', r: 'kommen', m: '一起去吗?', pre: '', post: 'du heute Nachmittag', a: 'Kommst', o: ['Kommst', 'Kommt', 'Kommen', 'Komme'], end: '?' },
+            { p: 'auf', r: 'stehen', m: '起床吗?', pre: 'Wann', post: 'du normalerweise', a: 'stehst', o: ['stehst', 'stehe', 'steht', 'stehen'], end: '?' },
+            { p: 'an', r: 'rufen', m: '打电话', pre: 'Er', post: 'seine Eltern oft', a: 'ruft', o: ['ruft', 'rufe', 'rufst', 'rufen'], end: '.' },
+            { p: 'ein', r: 'kaufen', m: '购物吗?', pre: '', post: 'ihr im Supermarkt', a: 'Kauft', o: ['Kauft', 'Kaufst', 'Kaufen', 'Kaufet'], end: '?' },
+            { p: 'aus', r: 'gehen', m: '出去玩', pre: 'Wir', post: 'am Wochenende gerne', a: 'gehen', o: ['gehen', 'geht', 'gehst', 'gehe'], end: '.' },
+            { p: 'auf', r: 'räumen', m: '整理房间吗?', pre: '', post: 'du dein Zimmer', a: 'Räumst', o: ['Räumst', 'Räumt', 'Räumen', 'Räume'], end: '?' },
+            { p: 'an', r: 'fangen', m: '开始', pre: 'Wann', post: 'der Film endlich', a: 'fängt', o: ['fängt', 'fangt', 'fangen', 'fangst'], end: '?' },
+            { p: 'mit', r: 'bringen', m: '带上', pre: 'Ich', post: 'einen Salat zur Party', a: 'bringe', o: ['bringe', 'bringst', 'bringt', 'bringen'], end: '.' },
+            { p: 'zu', r: 'hören', m: '听着吗?', pre: '', post: 'du mir überhaupt', a: 'Hörst', o: ['Hörst', 'Hört', 'Hören', 'Hör'], end: '?' },
+            { p: 'ein', r: 'laden', m: '邀请', pre: 'Wer', post: 'dich zum Essen', a: 'lädt', o: ['lädt', 'ladet', 'laden', 'ladest'], end: '?' },
+            { p: 'ab', r: 'holen', m: '接某人', pre: 'Ich', post: 'dich um acht Uhr', a: 'hole', o: ['hole', 'holst', 'holt', 'holen'], end: '.' },
+            { p: 'um', r: 'steigen', m: '换乘吗?', pre: 'Muss', post: 'ich in Hannover', a: 'ich', o: ['ich'], end: '?', skip: true }, // 特殊处理：情态动词
+            { p: 'aus', r: 'füllen', m: '填写', pre: 'Sie', post: 'das Formular bitte', a: 'füllen', o: ['füllen', 'füllt', 'füllst', 'fülle'], end: '.' },
+            { p: 'vor', r: 'bereiten', m: '准备', pre: 'Wir', post: 'die Präsentation vor', a: 'bereiten', o: ['bereiten', 'bereitet', 'bereite', 'bereitest'], end: '.' },
+            { p: 'an', r: 'kommen', m: '到达', pre: 'Wann', post: 'der Zug in Berlin', a: 'kommt', o: ['kommt', 'kommen', 'kommst', 'komme'], end: '?' },
+            { p: 'weg', r: 'gehen', m: '离开吗?', pre: '', post: 'du jetzt schon', a: 'Gehst', o: ['Gehst', 'Geht', 'Gehen', 'Gehe'], end: '?' },
+            { p: 'aus', r: 'machen', m: '关掉吗?', pre: '', post: 'du bitte den Fernseher', a: 'Machst', o: ['Machst', 'Macht', 'Machen', 'Mache'], end: '?' },
+            { p: 'an', r: 'probieren', m: '试穿', pre: 'Ich', post: 'diese Jacke kurz', a: 'probiere', o: ['probiere', 'probierst', 'probiert', 'probieren'], end: '.' },
+            { p: 'zu', r: 'machen', m: '关上', pre: 'Er', post: 'das Fenster', a: 'macht', o: ['macht', 'machst', 'machen', 'mache'], end: '.' }
         ];
+
+        // 重新过滤掉那个选主语的逻辑，确保全部练变位
+        quiz[12] = { p: 'um', r: 'steigen', m: '换乘吗?', pre: 'Muss ich in Hannover', post: '', a: 'umsteigen', o: ['umsteigen', 'steige um', 'steigt um', 'umzusteigen'], end: '?', isModal: true };
 
         let idx = 0, phase = 'V', muted = false;
         const audio = new (window.AudioContext || window.webkitAudioContext)();
@@ -150,34 +131,31 @@
                 o.frequency.exponentialRampToValueAtTime(880, audio.currentTime + 0.3);
                 g.gain.exponentialRampToValueAtTime(0.01, audio.currentTime + 0.3);
                 o.start(); o.stop(audio.currentTime + 0.3);
-            } else if (type === 'err') {
+            } else {
                 o.frequency.setValueAtTime(150, audio.currentTime);
                 g.gain.exponentialRampToValueAtTime(0.01, audio.currentTime + 0.2);
                 o.start(); o.stop(audio.currentTime + 0.2);
             }
         }
 
-        function toggleMute() {
-            muted = !muted;
-            document.getElementById('mute-btn').innerText = muted ? '🔇' : '🔊';
-        }
+        function toggleMute() { muted = !muted; document.getElementById('mute-btn').innerText = muted ? '🔇' : '🔊'; }
 
         function loadQ() {
             phase = 'V';
             const q = quiz[idx % quiz.length];
-            document.getElementById('hint-text').innerText = "第一步：选择正确变位";
+            document.getElementById('hint-text').innerText = "第一步：选择动词变位";
             document.getElementById('p-src').innerText = q.p;
             document.getElementById('p-src').classList.remove('active-glow');
             document.getElementById('p-src').style.opacity = '1';
-            document.getElementById('p-src').onclick = null;
             document.getElementById('v-src').innerText = q.r;
             document.getElementById('mean').innerText = q.m;
-            document.getElementById('subj').innerText = q.s;
-            document.getElementById('ctx').innerText = q.c;
+            document.getElementById('pre-text').innerText = q.pre;
+            document.getElementById('post-text').innerText = q.post;
             document.getElementById('punc').innerText = q.end;
             document.getElementById('v-target').innerText = "";
-            document.getElementById('p-target').innerText = "?"; 
-            document.getElementById('p-target').className = "prefix-box";
+            document.getElementById('v-target').className = "slot-box";
+            document.getElementById('p-target').innerText = q.isModal ? "" : "?"; 
+            document.getElementById('p-target').className = q.isModal ? "hidden" : "prefix-box";
 
             const grid = document.getElementById('options-grid');
             grid.innerHTML = '';
@@ -185,22 +163,29 @@
                 const b = document.createElement('button');
                 b.className = 'option-item';
                 b.innerText = opt;
-                b.onclick = () => { if(phase === 'V') checkV(opt, q.a, b); };
+                b.onclick = () => { if(phase === 'V') checkV(opt, q.a, b, q.isModal); };
                 grid.appendChild(b);
             });
         }
 
-        function checkV(val, ans, b) {
+        function checkV(val, ans, b, isModal) {
             if(val === ans) {
-                phase = 'P';
+                play('ok');
                 b.classList.add('correct');
                 document.getElementById('v-target').innerText = val;
-                document.getElementById('hint-text').innerText = "第二步：点击上方蓝色前缀";
-                const pSrc = document.getElementById('p-src'), pTgt = document.getElementById('p-target');
-                pSrc.classList.add('active-glow');
-                pTgt.classList.add('waiting');
-                pTgt.innerText = pSrc.innerText;
-                pSrc.onclick = () => moveP(quiz[idx % quiz.length].p);
+                
+                if(isModal) {
+                    // 情态动词不需要第二步拆分
+                    document.getElementById('hint-text').innerText = "太棒了！情态动词不拆分";
+                    setTimeout(nextIdx, 1500);
+                } else {
+                    phase = 'P';
+                    document.getElementById('hint-text').innerText = "第二步：点击上方蓝色前缀";
+                    const pSrc = document.getElementById('p-src'), pTgt = document.getElementById('p-target');
+                    pSrc.classList.add('active-glow');
+                    pTgt.classList.add('waiting');
+                    pSrc.onclick = () => moveP(quiz[idx % quiz.length].p);
+                }
             } else {
                 play('err');
                 b.classList.add('bg-rose-500', 'text-white');
@@ -222,21 +207,21 @@
                 document.body.removeChild(f);
                 t.innerText = txt; t.classList.replace('waiting', 'filled');
                 document.getElementById('hint-text').innerText = "太棒了！";
-                setTimeout(() => {
-                    idx++;
-                    document.getElementById('progress').style.width = (idx*5)+'%';
-                    document.getElementById('counter').innerText = `${idx}/20`;
-                    if(idx < 20) loadQ(); else finish();
-                }, 1500); 
+                setTimeout(nextIdx, 1200);
             }, 600);
+        }
+
+        function nextIdx() {
+            idx++;
+            document.getElementById('progress').style.width = (idx*5)+'%';
+            document.getElementById('counter').innerText = `${idx}/20`;
+            if(idx < 20) loadQ(); else finish();
         }
 
         function finish() {
             localStorage.setItem('level6_cleared', 'true');
             confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
-            setTimeout(() => {
-                document.getElementById('congrats-modal').style.display = 'flex';
-            }, 500);
+            setTimeout(() => { document.getElementById('congrats-modal').style.display = 'flex'; }, 500);
         }
 
         loadQ();
