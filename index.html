@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>A1德语通关营 | 轻松搞定入门</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -140,7 +140,7 @@
                 </div>
 
                 <div id="lvl9" onclick="go(9)" class="premium-card p-4 flex flex-col items-center text-center locked-state relative">
-                    <div class="w-12 h-12 bg-[#D97706] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">9</div>
+                    <div class="w-12 h-12 bg-[#F97316] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">9</div>
                     <h3 class="text-sm font-bold text-slate-800 leading-tight">现在完成时</h3>
                     <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Perfekt Master</p>
                     <div id="m9" class="absolute -top-2 -right-2 text-3xl medal-pop"></div>
@@ -158,6 +158,13 @@
                     <h3 class="text-sm font-bold text-slate-800 leading-tight">三格训练营</h3>
                     <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Dativ Training</p>
                     <div id="m11" class="absolute -top-2 -right-2 text-3xl medal-pop"></div>
+                </div>
+
+                <div id="lvl12" onclick="go(12)" class="premium-card p-4 flex flex-col items-center text-center locked-state relative">
+                    <div class="w-12 h-12 bg-[#4338CA] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">12</div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-tight">定冠词变格全掌握</h3>
+                    <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Nom/Dat/Akk Mix</p>
+                    <div id="m12" class="absolute -top-2 -right-2 text-3xl medal-pop"></div>
                 </div>
 
             </div>
@@ -181,8 +188,8 @@
             const unlocked = localStorage.getItem('isUnlocked') === 'true';
             if (unlocked) {
                 document.getElementById('auth-group').style.display = 'none';
-                // 更新关卡列表至 11
-                const levels = ['lvl1', 'lvl2', 'lvl3', 'lvl4', 'lvl5', 'lvl6', 'lvl7', 'lvl8', 'lvl9', 'lvl10', 'lvl11'];
+                // 更新关卡列表至 12
+                const levels = ['lvl1', 'lvl2', 'lvl3', 'lvl4', 'lvl5', 'lvl6', 'lvl7', 'lvl8', 'lvl9', 'lvl10', 'lvl11', 'lvl12'];
                 levels.forEach(id => {
                     const el = document.getElementById(id);
                     if(el) el.classList.remove('locked-state');
@@ -203,8 +210,9 @@
             if (localStorage.getItem('level8_cleared') === 'true') document.getElementById('m8').innerText = "⚡";
             if (localStorage.getItem('level9_cleared') === 'true') document.getElementById('m9').innerText = "🏅";
             if (localStorage.getItem('level10_cleared') === 'true') document.getElementById('m10').innerText = "🎯";
-            // 第 11 关奖牌逻辑
             if (localStorage.getItem('level11_cleared') === 'true') document.getElementById('m11').innerText = "🏅";
+            // 第 12 关奖牌逻辑
+            if (localStorage.getItem('level12_cleared') === 'true') document.getElementById('m12').innerText = "🏆";
         }
 
         function unlock() {
@@ -229,7 +237,8 @@
                 8: '08-praesens-mix.html',
                 9: '09-Perfekt-Master.html',
                 10: '10_Artikel_Check.html',
-                11: '11-dativ.html' // 新增路径
+                11: '11-dativ.html',
+                12: '12-nodaakk-mix.html' // 新增第 12 关路径
             };
             window.location.href = pages[n];
         }
