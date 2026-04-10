@@ -144,6 +144,10 @@
             if (currentIndex >= quizData.length) {
                 const content = document.getElementById('quiz-content');
                 document.getElementById('options-grid').innerHTML = '';
+                
+                // 核心更新：写入通关状态，地图页即可显示奖牌
+                localStorage.setItem('level11_cleared', 'true');
+
                 content.innerHTML = `
                     <div class="text-center">
                         <span class="text-7xl mb-6 block">🏆</span>
