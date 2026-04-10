@@ -3,26 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>06-可分动词拆拆乐 | 逻辑修复版</title>
+    <title>06-可分动词拆拆乐 | 终极修复版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
         body { background-color: #F8FAFC; font-family: 'Noto Sans SC', sans-serif; color: #1E293B; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         
-        /* 导航栏 */
         .header-section { width: 100%; max-width: 500px; margin: 0 auto; padding: 15px; display: flex; align-items: center; gap: 12px; }
         .back-btn { width: 42px; height: 42px; background: white; border-radius: 14px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 0 #E2E8F0; border: 1px solid #F1F5F9; cursor: pointer; }
         .progress-bar { flex-grow: 1; height: 12px; background: white; border-radius: 10px; border: 1.5px solid #E2E8F0; overflow: hidden; }
 
-        /* 题目展示区 */
         .quiz-body { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 0 20px; width: 100%; max-width: 500px; margin: 0 auto; }
         .verb-card { background: white; border-radius: 20px; padding: 15px 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid #F1F5F9; text-align: center; margin-bottom: 25px; }
         .prefix-text { color: #0EA5E9; font-weight: 900; transition: all 0.3s; padding: 0 4px; border-radius: 6px; }
         .prefix-glow { background: #BAE6FD; animation: pulse 1s infinite; cursor: pointer; }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
 
-        /* 句子卡片 */
         .sentence-card { 
             width: 100%; min-height: 140px; padding: 25px 20px; background: white; border-radius: 25px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.04); border: 1px solid #F1F5F9;
@@ -30,11 +27,10 @@
             gap: 10px; font-size: 1.45rem; font-weight: 800; line-height: 1.4;
         }
         .slot-box { min-width: 95px; border-bottom: 4px solid #0EA5E9; color: #0EA5E9; height: 40px; display: flex; align-items: center; justify-content: center; }
-        .p-box { min-width: 75px; height: 40px; border: 3px dashed #E2E8F0; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: transparent; }
+        .p-box { min-width: 75px; height: 40px; border: 3px dashed #E2E8F0; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: transparent; transition: all 0.3s; }
         .p-box.waiting { border-color: #0EA5E9; background: #F0F9FF; }
         .p-box.filled { background: #0EA5E9; color: white !important; border: none; }
 
-        /* 选项矩阵 2x2 */
         .footer-section { width: 100%; max-width: 500px; margin: 0 auto; padding: 0 16px 40px; }
         .options-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
         .option-btn { 
@@ -65,13 +61,8 @@
             <p id="mean" class="text-slate-400 font-bold mt-1 italic text-base"></p>
         </div>
 
-        <div class="sentence-card">
-            <span id="pre-text"></span>
-            <div id="v-target" class="slot-box"></div>
-            <span id="post-text"></span>
-            <div id="p-target" class="p-box"></div>
-            <span id="punc" class="text-slate-800">.</span>
-        </div>
+        <div id="sentence" class="sentence-card">
+            </div>
     </div>
 
     <div class="footer-section">
@@ -80,26 +71,27 @@
 
     <script>
         const quiz = [
-            { p: 'fern', r: 'sehen', m: '看电视', pre: 'Du', post: 'heute Abend', a: 'siehst', o: ['siehst', 'sieht', 'sehen', 'seht'], end: '.' },
-            { p: 'mit', r: 'kommen', m: '一起去吗?', pre: '', post: 'du heute Nachmittag', a: 'Kommst', o: ['Kommst', 'Kommt', 'Kommen', 'Komme'], end: '?' },
-            { p: 'auf', r: 'stehen', m: '起床', pre: 'Wann', post: 'du normalerweise', a: 'stehst', o: ['stehst', 'stehe', 'steht', 'stehen'], end: '?' },
-            { p: 'an', r: 'rufen', m: '打电话', pre: 'Er', post: 'seine Eltern oft', a: 'ruft', o: ['ruft', 'rufe', 'rufst', 'anruft'], end: '.' },
-            { p: 'ein', r: 'kaufen', m: '购物吗?', pre: '', post: 'ihr im Supermarkt', a: 'Kauft', o: ['Kauft', 'Kaufen', 'Kaufst', 'Kaufet'], end: '?' },
-            { p: 'aus', r: 'gehen', m: '出去玩', pre: 'Wir', post: 'am Wochenende gerne', a: 'gehen', o: ['gehen', 'geht', 'gehst', 'gehe'], end: '.' },
-            { p: 'auf', r: 'räumen', m: '整理房间吗?', pre: '', post: 'du dein Zimmer', a: 'Räumst', o: ['Räumst', 'Räumt', 'Räumen', 'Räume'], end: '?' },
-            { p: 'an', r: 'fangen', m: '开始', pre: 'Wann', post: 'der Film endlich', a: 'fängt', o: ['fängt', 'fangen', 'fangt', 'anfängt'], end: '?' },
-            { p: 'mit', r: 'bringen', m: '带上', pre: 'Ich', post: 'einen Salat zur Party', a: 'bringe', o: ['bringe', 'bringst', 'bringt', 'bringen'], end: '.' },
-            { p: 'zu', r: 'hören', m: '听着吗?', pre: '', post: 'du mir überhaupt', a: 'Hörst', o: ['Hörst', 'Hört', 'Hören', 'Hörst'], end: '?' },
-            { p: 'ein', r: 'laden', m: '邀请', pre: 'Wer', post: 'dich zum Essen', a: 'lädt', o: ['lädt', 'laden', 'lade', 'lädst'], end: '?' },
-            { p: 'vor', r: 'stellen', m: '介绍', pre: 'Ich', post: 'euch meinen Freund', a: 'stelle', o: ['stelle', 'stellst', 'stellt', 'stellen'], end: '.' },
-            { p: 'ab', r: 'holen', m: '接某人', pre: 'Ich', post: 'dich um acht Uhr', a: 'hole', o: ['hole', 'holst', 'holt', 'holen'], end: '.' },
-            { p: 'um', r: 'steigen', m: '换乘', pre: 'Muss ich', post: 'in Hannover', a: 'steigen', o: ['steigen', 'steige', 'steigt', 'stiegt'], end: '?' },
-            { p: 'aus', r: 'füllen', m: '填写', pre: 'Sie', post: 'das Formular bitte', a: 'füllen', o: ['füllen', 'füllt', 'füllst', 'fülle'], end: '.' },
-            { p: 'vor', r: 'bereiten', m: '准备', pre: 'Wir', post: 'die Präsentation gemeinsam', a: 'bereiten', o: ['bereiten', 'bereitet', 'bereite', 'bereitet'], end: '.' },
-            { p: 'an', r: 'kommen', m: '到达', pre: 'Wann', post: 'der Zug in Berlin', a: 'kommt', o: ['kommt', 'kommen', 'kommst', 'ankommt'], end: '?' },
-            { p: 'weg', r: 'gehen', m: '离开吗?', pre: '', post: 'du jetzt schon', a: 'Gehst', o: ['Gehst', 'Geht', 'Gehen', 'Gehe'], end: '?' },
-            { p: 'aus', r: 'machen', m: '关掉', pre: '', post: 'du bitte den Fernseher', a: 'Machst', o: ['Machst', 'Macht', 'Machen', 'Mache'], end: '?' },
-            { p: 'an', r: 'probieren', m: '试穿', pre: 'Ich', post: 'diese Jacke kurz', a: 'probiere', o: ['probiere', 'probierst', 'probiert', 'probieren'], end: '.' }
+            { p: 'fern', r: 'sehen', m: '看电视', pre: 'Du', post: 'heute Abend', a: 'siehst', o: ['siehst', 'sieht', 'sehen', 'seht'], end: '.', type: 'split' },
+            { p: 'mit', r: 'kommen', m: '一起来吗?', pre: '', post: 'du heute Nachmittag', a: 'Kommst', o: ['Kommst', 'Kommt', 'Kommen', 'Komme'], end: '?', type: 'split' },
+            { p: 'auf', r: 'stehen', m: '起床', pre: 'Wann', post: 'du normalerweise', a: 'stehst', o: ['stehst', 'stehe', 'steht', 'stehen'], end: '?', type: 'split' },
+            { p: 'an', r: 'rufen', m: '打电话', pre: 'Er', post: 'seine Eltern oft', a: 'ruft', o: ['ruft', 'rufe', 'rufst', 'anruft'], end: '.', type: 'split' },
+            { p: 'ein', r: 'kaufen', m: '购物吗?', pre: '', post: 'ihr im Supermarkt', a: 'Kauft', o: ['Kauft', 'Kaufen', 'Kaufst', 'Kaufet'], end: '?', type: 'split' },
+            { p: 'aus', r: 'gehen', m: '出去玩', pre: 'Wir', post: 'am Wochenende gerne', a: 'gehen', o: ['gehen', 'geht', 'gehst', 'gehe'], end: '.', type: 'split' },
+            { p: 'auf', r: 'räumen', m: '整理房间吗?', pre: '', post: 'du dein Zimmer', a: 'Räumst', o: ['Räumst', 'Räumt', 'Räumen', 'Räume'], end: '?', type: 'split' },
+            { p: 'an', r: 'fangen', m: '开始', pre: 'Wann', post: 'der Film endlich', a: 'fängt', o: ['fängt', 'fangen', 'fangt', 'anfängt'], end: '?', type: 'split' },
+            { p: 'mit', r: 'bringen', m: '带上', pre: 'Ich', post: 'einen Salat zur Party', a: 'bringe', o: ['bringe', 'bringst', 'bringt', 'bringen'], end: '.', type: 'split' },
+            { p: 'zu', r: 'hören', m: '听着吗?', pre: '', post: 'du mir überhaupt', a: 'Hörst', o: ['Hörst', 'Hört', 'Hören', 'Hörst'], end: '?', type: 'split' },
+            { p: 'ein', r: 'laden', m: '邀请', pre: 'Wer', post: 'dich zum Essen', a: 'lädt', o: ['lädt', 'laden', 'lade', 'lädst'], end: '?', type: 'split' },
+            { p: 'vor', r: 'stellen', m: '介绍', pre: 'Ich', post: 'euch meinen Freund', a: 'stelle', o: ['stelle', 'stellst', 'stellt', 'stellen'], end: '.', type: 'split' },
+            { p: 'ab', r: 'holen', m: '接某人', pre: 'Ich', post: 'dich um acht Uhr', a: 'hole', o: ['hole', 'holst', 'holt', 'holen'], end: '.', type: 'split' },
+            // 特殊情况：情态动词不拆分
+            { p: 'um', r: 'steigen', m: '必须换乘吗?', pre: 'Muss ich', post: 'in Hannover', a: 'umsteigen', o: ['umsteigen', 'steige um', 'steigt um', 'umsteige'], end: '?', type: 'no-split' },
+            { p: 'aus', r: 'füllen', m: '填写', pre: 'Sie', post: 'das Formular bitte', a: 'füllen', o: ['füllen', 'füllt', 'füllst', 'fülle'], end: '.', type: 'split' },
+            { p: 'vor', r: 'bereiten', m: '准备', pre: 'Wir', post: 'die Präsentation gemeinsam', a: 'bereiten', o: ['bereiten', 'bereitet', 'bereite', 'vorbereiten'], end: '.', type: 'split' },
+            { p: 'an', r: 'kommen', m: '到达', pre: 'Wann', post: 'der Zug in Berlin', a: 'kommt', o: ['kommt', 'kommen', 'kommst', 'ankommt'], end: '?', type: 'split' },
+            { p: 'weg', r: 'gehen', m: '离开吗?', pre: '', post: 'du jetzt schon', a: 'Gehst', o: ['Gehst', 'Geht', 'Gehen', 'Gehe'], end: '?', type: 'split' },
+            { p: 'aus', r: 'machen', m: '关掉吗?', pre: '', post: 'du bitte den Fernseher', a: 'Machst', o: ['Machst', 'Macht', 'Machen', 'Mache'], end: '?', type: 'split' },
+            { p: 'an', r: 'probieren', m: '试穿', pre: 'Ich', post: 'diese Jacke kurz', a: 'probiere', o: ['probiere', 'probierst', 'probiert', 'probieren'], end: '.', type: 'split' }
         ];
 
         let idx = 0, phase = 'V';
@@ -109,7 +101,7 @@
             const q = quiz[idx];
             document.getElementById('counter').innerText = `${idx + 1}/20`;
             document.getElementById('progress').style.width = `${(idx / 20) * 100}%`;
-            document.getElementById('hint').innerText = "第一步：选择动词变位";
+            document.getElementById('hint').innerText = "第一步：选择正确动词形式";
             
             const pSrc = document.getElementById('p-src');
             pSrc.innerText = q.p;
@@ -119,14 +111,26 @@
 
             document.getElementById('v-src').innerText = q.r;
             document.getElementById('mean').innerText = q.m;
-            document.getElementById('pre-text').innerText = q.pre;
-            document.getElementById('post-text').innerText = q.post;
-            document.getElementById('v-target').innerText = "";
-            document.getElementById('punc').innerText = q.end;
-            
-            const pTgt = document.getElementById('p-target');
-            pTgt.innerText = "";
-            pTgt.className = "p-box";
+
+            // 动态构建句子卡片，根据是否拆分渲染结构
+            const sentence = document.getElementById('sentence');
+            if(q.type === 'split') {
+                sentence.innerHTML = `
+                    <span class="text-slate-800">${q.pre}</span>
+                    <div id="v-target" class="slot-box"></div>
+                    <span class="text-slate-800 text-center">${q.post}</span>
+                    <div id="p-target" class="p-box"></div>
+                    <span class="text-slate-800">${q.end}</span>
+                `;
+            } else {
+                // 不拆分模式 (情态动词等)
+                sentence.innerHTML = `
+                    <span class="text-slate-800">${q.pre}</span>
+                    <span class="text-slate-800 text-center">${q.post}</span>
+                    <div id="v-target" class="slot-box" style="min-width:140px"></div>
+                    <span class="text-slate-800">${q.end}</span>
+                `;
+            }
 
             const grid = document.getElementById('options-grid');
             grid.innerHTML = '';
@@ -140,16 +144,22 @@
         }
 
         function checkV(val, ans, btn) {
+            const q = quiz[idx];
             if(val === ans) {
-                phase = 'P';
                 btn.classList.add('correct');
                 document.getElementById('v-target').innerText = val;
-                document.getElementById('hint').innerText = "第二步：点击上方蓝色前缀";
                 
-                const pSrc = document.getElementById('p-src');
-                pSrc.classList.add('prefix-glow');
-                document.getElementById('p-target').classList.add('waiting');
-                pSrc.onclick = moveP;
+                if(q.type === 'split') {
+                    phase = 'P';
+                    document.getElementById('hint').innerText = "第二步：点击上方蓝色前缀";
+                    const pSrc = document.getElementById('p-src');
+                    pSrc.classList.add('prefix-glow');
+                    document.getElementById('p-target').classList.add('waiting');
+                    pSrc.onclick = moveP;
+                } else {
+                    // 不拆分的情况直接过关
+                    successAction();
+                }
             } else {
                 btn.classList.add('bg-rose-50', 'border-rose-200');
                 setTimeout(() => btn.classList.remove('bg-rose-50', 'border-rose-200'), 500);
@@ -161,11 +171,10 @@
             const pSrc = document.getElementById('p-src');
             const pTgt = document.getElementById('p-target');
             
-            // 弹射动画逻辑
             const sr = pSrc.getBoundingClientRect(), tr = pTgt.getBoundingClientRect();
             const fly = document.createElement('div');
             fly.innerText = q.p;
-            fly.style.cssText = `position:fixed; left:${sr.left}px; top:${sr.top}px; font-weight:900; font-size:1.8rem; color:#0EA5E9; transition:all 0.5s cubic-bezier(0.68,-0.55,0.265,1.55); z-index:99;`;
+            fly.style.cssText = `position:fixed; left:${sr.left}px; top:${sr.top}px; font-weight:900; font-size:1.8rem; color:#0EA5E9; transition:all 0.5s cubic-bezier(0.68,-0.55,0.265,1.55); z-index:9999;`;
             document.body.appendChild(fly);
             
             pSrc.style.opacity = "0";
@@ -176,27 +185,31 @@
             }, 10);
 
             setTimeout(() => {
-                document.body.removeChild(fly);
+                if(fly.parentNode) document.body.removeChild(fly);
                 pTgt.innerText = q.p;
                 pTgt.className = "p-box filled";
-                confetti({ particleCount: 60, spread: 50, origin: { y: 0.8 } });
-                
-                setTimeout(() => {
-                    idx++;
-                    if(idx < 20) loadQ();
-                    else finish();
-                }, 1000);
+                successAction();
             }, 510);
+        }
+
+        function successAction() {
+            confetti({ particleCount: 60, spread: 50, origin: { y: 0.8 } });
+            document.getElementById('hint').innerText = "太棒了！";
+            setTimeout(() => {
+                idx++;
+                if(idx < 20 && idx < quiz.length) loadQ();
+                else finish();
+            }, 1200);
         }
 
         function finish() {
             confetti({ particleCount: 200, spread: 100 });
             document.body.innerHTML = `
-                <div class="flex flex-col items-center justify-center h-full">
+                <div class="flex flex-col items-center justify-center h-full text-center px-6">
                     <div class="text-8xl mb-6">🏆</div>
-                    <h1 class="text-4xl font-black text-slate-800 mb-2">全关通关！</h1>
-                    <p class="text-slate-500 font-bold mb-8">你已经完美掌握了可分动词的拆分逻辑！</p>
-                    <button onclick="location.href='index.html'" class="px-12 py-4 bg-sky-500 text-white rounded-2xl font-black text-xl shadow-lg">确定</button>
+                    <h1 class="text-4xl font-black text-slate-800 mb-2">德语拆拆乐通关！</h1>
+                    <p class="text-slate-500 font-bold mb-8">你已经掌握了可分动词在陈述句、疑问句及情态动词句中的所有用法。</p>
+                    <button onclick="location.href='index.html'" class="px-12 py-4 bg-sky-500 text-white rounded-2xl font-black text-xl shadow-lg active:scale-95 transition-transform">返回主菜单</button>
                 </div>`;
         }
 
