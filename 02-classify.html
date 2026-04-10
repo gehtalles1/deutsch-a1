@@ -96,15 +96,15 @@
                 <div class="guide-label label-die">↑ die</div>
                 <div class="guide-label label-das">das →</div>
                 <div id="active-card" class="card">
-                    <div id="word">加载中...</div>
-                    <div id="mean">Lade...</div>
+                    <div id="word"></div>
+                    <div id="mean"></div>
                 </div>
             </div>
         </div>
 
         <div class="bottom-info">
             <div class="progress-box">
-                已掌握：<span id="cur-num" class="text-rose-600">1</span> <span class="text-slate-400">/ 50</span>
+                已掌握：<span id="cur-num" class="text-rose-600">0</span> <span class="text-slate-400">/ 50</span>
             </div>
             <div class="text-[10px] font-black text-slate-400 tracking-[0.3em] uppercase opacity-60">
                 Viel Erfolg!
@@ -188,12 +188,8 @@
         const sndErr = document.getElementById('snd-err');
 
         function updateCard() {
-            // 通关逻辑判定
             if (currentIdx >= words.length) {
-                // 1. 设置本地存储标记，供地图页读取显示奖牌
                 localStorage.setItem('level2_cleared', 'true');
-                
-                // 2. 触发礼花动画
                 confetti({
                     particleCount: 150,
                     spread: 70,
@@ -201,12 +197,10 @@
                     colors: ['#1E3A8A', '#991B1B', '#065F46', '#F59E0B']
                 });
 
-                // 3. 视觉反馈
                 document.getElementById('word').innerText = "🏆 通关成功！";
                 document.getElementById('mean').innerText = "点击返回地图查看奖牌";
                 document.getElementById('cur-num').innerText = "50";
                 
-                // 4. 自动引导
                 setTimeout(() => {
                     if(confirm("恭喜你已经掌握这50个词性规律！是否返回地图查看奖牌？")) {
                         location.href = 'index.html';
@@ -225,8 +219,10 @@
             card.style.opacity = '1';
         }
 
+        // 初始化第1个词，解决加载闪烁问题
+        updateCard(); 
+
         window.onload = () => {
-            updateCard();
             document.body.addEventListener('touchstart', () => {
                 if(!audioUnlocked) {
                     sndOk.play().then(()=>sndOk.pause()).catch(()=>{});
@@ -240,7 +236,7 @@
         mc.get('pan').set({ direction: Hammer.DIRECTION_ALL });
 
         mc.on("panmove", (e) => {
-            if (currentIdx >= words.length) return; // 通关后禁止滑动
+            if (currentIdx >= words.length) return;
             card.style.transition = 'none';
             card.style.transform = `translate(${e.deltaX}px, ${e.deltaY}px) rotate(${e.deltaX/20}deg)`;
         });
