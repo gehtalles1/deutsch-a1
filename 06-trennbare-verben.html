@@ -3,66 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>06-可分动词拆拆乐 | 终极修复版</title>
+    <title>06-可分动词拆拆乐 | 比例优化版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
         body { background-color: #F8FAFC; font-family: 'Noto Sans SC', sans-serif; color: #1E293B; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         
-        .header-section { width: 100%; max-width: 500px; margin: 0 auto; padding: 15px; display: flex; align-items: center; gap: 12px; }
-        .back-btn { width: 42px; height: 42px; background: white; border-radius: 14px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 0 #E2E8F0; border: 1px solid #F1F5F9; cursor: pointer; }
-        .progress-bar { flex-grow: 1; height: 12px; background: white; border-radius: 10px; border: 1.5px solid #E2E8F0; overflow: hidden; }
+        /* 顶部导航 */
+        .header-section { width: 100%; max-width: 500px; margin: 0 auto; padding: 10px 15px; display: flex; align-items: center; gap: 10px; }
+        .back-btn { width: 34px; height: 34px; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 0 #E2E8F0; border: 1px solid #F1F5F9; cursor: pointer; }
+        .progress-bar { flex-grow: 1; height: 8px; background: white; border-radius: 10px; border: 1.5px solid #E2E8F0; overflow: hidden; }
+        .mute-btn { font-size: 1.1rem; cursor: pointer; min-width: 25px; order: -1; }
 
+        /* 核心区：使用 flex-grow 自动填补并垂直居中，消除多余空白 */
         .quiz-body { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 0 20px; width: 100%; max-width: 500px; margin: 0 auto; }
-        .verb-card { background: white; border-radius: 20px; padding: 15px 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid #F1F5F9; text-align: center; margin-bottom: 25px; }
-        .prefix-text { color: #0EA5E9; font-weight: 900; transition: all 0.3s; padding: 0 4px; border-radius: 6px; }
-        .prefix-glow { background: #BAE6FD; animation: pulse 1s infinite; cursor: pointer; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-
+        
+        .hint-tag { margin-bottom: 15px; text-shadow: 0 1px 1px rgba(255,255,255,0.8); }
+        
+        .verb-card { background: white; border-radius: 20px; padding: 12px 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid #F1F5F9; text-align: center; margin-bottom: 20px; width: fit-content; }
+        
         .sentence-card { 
-            width: 100%; min-height: 140px; padding: 25px 20px; background: white; border-radius: 25px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.04); border: 1px solid #F1F5F9;
+            width: 100%; min-height: 120px; padding: 25px 20px; background: white; border-radius: 30px; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.04); border: 1px solid #F1F5F9;
             display: flex; flex-wrap: wrap; justify-content: center; align-items: center; 
-            gap: 10px; font-size: 1.45rem; font-weight: 800; line-height: 1.4;
+            gap: 8px; font-size: 1.4rem; font-weight: 800; line-height: 1.5;
         }
-        .slot-box { min-width: 95px; border-bottom: 4px solid #0EA5E9; color: #0EA5E9; height: 40px; display: flex; align-items: center; justify-content: center; }
-        .p-box { min-width: 75px; height: 40px; border: 3px dashed #E2E8F0; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: transparent; transition: all 0.3s; }
+
+        .p-wrap { display: inline-flex; align-items: center; white-space: nowrap; gap: 2px; }
+        .slot-box { min-width: 85px; border-bottom: 4px solid #0EA5E9; color: #0EA5E9; height: 38px; display: flex; align-items: center; justify-content: center; }
+        .p-box { min-width: 65px; height: 38px; border: 3px dashed #E2E8F0; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: transparent; }
         .p-box.waiting { border-color: #0EA5E9; background: #F0F9FF; }
         .p-box.filled { background: #0EA5E9; color: white !important; border: none; }
 
-        .footer-section { width: 100%; max-width: 500px; margin: 0 auto; padding: 0 16px 40px; }
+        /* 底部选项区 */
+        .footer-section { width: 100%; max-width: 500px; margin: 0 auto; padding: 20px 16px 30px; }
         .options-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
         .option-btn { 
-            background: white; border-radius: 16px; border: 2px solid #E2E8F0; border-bottom: 5px solid #E2E8F0; 
-            font-size: 1.25rem; font-weight: 800; color: #475569; padding: 18px 0; transition: all 0.1s; 
+            background: white; border-radius: 16px; border: 2px solid #E2E8F0; border-bottom: 4px solid #E2E8F0; 
+            font-size: 1.15rem; font-weight: 800; color: #475569; padding: 15px 0; transition: all 0.1s; 
         }
-        .option-btn:active { transform: translateY(3px); border-bottom-width: 2px; }
+        .option-btn:active { transform: translateY(2px); border-bottom-width: 1px; }
         .option-btn.correct { background: #0EA5E9 !important; border-color: #0284C7 !important; color: white !important; }
+        
+        .prefix-text { color: #0EA5E9; font-weight: 900; }
+        .prefix-glow { background: #BAE6FD; animation: pulse 1s infinite; border-radius: 6px; cursor: pointer; padding: 0 4px; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
     </style>
 </head>
 <body>
 
     <div class="header-section">
+        <div id="mute-btn" class="mute-btn" onclick="toggleMute()">🔊</div>
         <div class="back-btn" onclick="location.href='index.html'">
-            <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg>
+            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg>
         </div>
         <div class="progress-bar"><div id="progress" class="h-full bg-sky-500 w-0 transition-all duration-500"></div></div>
-        <div id="counter" class="font-black text-slate-400 italic text-sm">0/20</div>
+        <div id="counter" class="font-black text-slate-400 italic text-xs">0/20</div>
     </div>
 
     <div class="quiz-body">
-        <div id="hint" class="mb-4 text-sky-600 font-black text-sm bg-sky-50 px-5 py-1.5 rounded-full shadow-sm border border-sky-100">第一步：选择动词变位</div>
+        <div id="hint" class="hint-tag text-sky-600 font-black text-xs bg-sky-50 px-5 py-1.5 rounded-full border border-sky-100">
+            第一步选词，第二步点可分前缀
+        </div>
         
         <div class="verb-card">
-            <div class="text-[2.2rem] font-black">
+            <div class="text-[2rem] font-black">
                 <span id="p-src" class="prefix-text"></span><span id="v-src" class="text-slate-700"></span>
             </div>
-            <p id="mean" class="text-slate-400 font-bold mt-1 italic text-base"></p>
+            <p id="mean" class="text-slate-400 font-bold mt-1 italic text-sm"></p>
         </div>
 
-        <div id="sentence" class="sentence-card">
-            </div>
+        <div id="sentence" class="sentence-card"></div>
     </div>
 
     <div class="footer-section">
@@ -70,74 +82,71 @@
     </div>
 
     <script>
-        const quiz = [
+        const originalQuiz = [
             { p: 'fern', r: 'sehen', m: '看电视', pre: 'Du', post: 'heute Abend', a: 'siehst', o: ['siehst', 'sieht', 'sehen', 'seht'], end: '.', type: 'split' },
-            { p: 'mit', r: 'kommen', m: '一起来吗?', pre: '', post: 'du heute Nachmittag', a: 'Kommst', o: ['Kommst', 'Kommt', 'Kommen', 'Komme'], end: '?', type: 'split' },
+            { p: 'mit', r: 'kommen', m: '一起去', pre: '', post: 'du heute Nachmittag', a: 'Kommst', o: ['Kommst', 'Kommt', 'Kommen', 'Komme'], end: '?', type: 'split' },
             { p: 'auf', r: 'stehen', m: '起床', pre: 'Wann', post: 'du normalerweise', a: 'stehst', o: ['stehst', 'stehe', 'steht', 'stehen'], end: '?', type: 'split' },
             { p: 'an', r: 'rufen', m: '打电话', pre: 'Er', post: 'seine Eltern oft', a: 'ruft', o: ['ruft', 'rufe', 'rufst', 'anruft'], end: '.', type: 'split' },
-            { p: 'ein', r: 'kaufen', m: '购物吗?', pre: '', post: 'ihr im Supermarkt', a: 'Kauft', o: ['Kauft', 'Kaufen', 'Kaufst', 'Kaufet'], end: '?', type: 'split' },
+            { p: 'ein', r: 'kaufen', m: '购物', pre: 'Ihr', post: 'im Supermarkt', a: 'kauft', o: ['kauft', 'kaufen', 'kaufst', 'kaufet'], end: '.', type: 'split' },
             { p: 'aus', r: 'gehen', m: '出去玩', pre: 'Wir', post: 'am Wochenende gerne', a: 'gehen', o: ['gehen', 'geht', 'gehst', 'gehe'], end: '.', type: 'split' },
-            { p: 'auf', r: 'räumen', m: '整理房间吗?', pre: '', post: 'du dein Zimmer', a: 'Räumst', o: ['Räumst', 'Räumt', 'Räumen', 'Räume'], end: '?', type: 'split' },
+            { p: 'auf', r: 'räumen', m: '整理房间', pre: 'Ich', post: 'mein Zimmer', a: 'räume', o: ['räume', 'räumst', 'räumt', 'räumen'], end: '.', type: 'split' },
             { p: 'an', r: 'fangen', m: '开始', pre: 'Wann', post: 'der Film endlich', a: 'fängt', o: ['fängt', 'fangen', 'fangt', 'anfängt'], end: '?', type: 'split' },
             { p: 'mit', r: 'bringen', m: '带上', pre: 'Ich', post: 'einen Salat zur Party', a: 'bringe', o: ['bringe', 'bringst', 'bringt', 'bringen'], end: '.', type: 'split' },
-            { p: 'zu', r: 'hören', m: '听着吗?', pre: '', post: 'du mir überhaupt', a: 'Hörst', o: ['Hörst', 'Hört', 'Hören', 'Hörst'], end: '?', type: 'split' },
+            { p: 'zu', r: 'hören', m: '倾听', pre: 'Du', post: 'mir überhaupt nicht', a: 'hörst', o: ['hörst', 'hört', 'hören', 'höre'], end: '.', type: 'split' },
             { p: 'ein', r: 'laden', m: '邀请', pre: 'Wer', post: 'dich zum Essen', a: 'lädt', o: ['lädt', 'laden', 'lade', 'lädst'], end: '?', type: 'split' },
-            { p: 'vor', r: 'stellen', m: '介绍', pre: 'Ich', post: 'euch meinen Freund', a: 'stelle', o: ['stelle', 'stellst', 'stellt', 'stellen'], end: '.', type: 'split' },
+            { p: 'vor', r: 'stellen', m: '介绍', pre: 'Darf ich', post: 'euch meinen Freund', a: 'vorstellen', o: ['vorstellen', 'stelle vor', 'stellt vor', 'vorstellt'], end: '?', type: 'no-split' },
             { p: 'ab', r: 'holen', m: '接某人', pre: 'Ich', post: 'dich um acht Uhr', a: 'hole', o: ['hole', 'holst', 'holt', 'holen'], end: '.', type: 'split' },
-            // 特殊情况：情态动词不拆分
-            { p: 'um', r: 'steigen', m: '必须换乘吗?', pre: 'Muss ich', post: 'in Hannover', a: 'umsteigen', o: ['umsteigen', 'steige um', 'steigt um', 'umsteige'], end: '?', type: 'no-split' },
+            { p: 'um', r: 'steigen', m: '换乘', pre: 'Muss ich', post: 'hier', a: 'umsteigen', o: ['umsteigen', 'steige um', 'steigt um', 'umsteige'], end: '?', type: 'no-split' },
             { p: 'aus', r: 'füllen', m: '填写', pre: 'Sie', post: 'das Formular bitte', a: 'füllen', o: ['füllen', 'füllt', 'füllst', 'fülle'], end: '.', type: 'split' },
             { p: 'vor', r: 'bereiten', m: '准备', pre: 'Wir', post: 'die Präsentation gemeinsam', a: 'bereiten', o: ['bereiten', 'bereitet', 'bereite', 'vorbereiten'], end: '.', type: 'split' },
             { p: 'an', r: 'kommen', m: '到达', pre: 'Wann', post: 'der Zug in Berlin', a: 'kommt', o: ['kommt', 'kommen', 'kommst', 'ankommt'], end: '?', type: 'split' },
-            { p: 'weg', r: 'gehen', m: '离开吗?', pre: '', post: 'du jetzt schon', a: 'Gehst', o: ['Gehst', 'Geht', 'Gehen', 'Gehe'], end: '?', type: 'split' },
-            { p: 'aus', r: 'machen', m: '关掉吗?', pre: '', post: 'du bitte den Fernseher', a: 'Machst', o: ['Machst', 'Macht', 'Machen', 'Mache'], end: '?', type: 'split' },
+            { p: 'weg', r: 'gehen', m: '离开', pre: 'Warum', post: 'du jetzt schon', a: 'gehst', o: ['gehst', 'geht', 'gehen', 'gehe'], end: '?', type: 'split' },
+            { p: 'aus', r: 'machen', m: '关掉', pre: 'Soll ich', post: 'das Licht', a: 'ausmachen', o: ['ausmachen', 'mache aus', 'macht aus', 'ausmacht'], end: '?', type: 'no-split' },
             { p: 'an', r: 'probieren', m: '试穿', pre: 'Ich', post: 'diese Jacke kurz', a: 'probiere', o: ['probiere', 'probierst', 'probiert', 'probieren'], end: '.', type: 'split' }
         ];
 
-        let idx = 0, phase = 'V';
+        const quiz = [...originalQuiz].sort(() => Math.random() - 0.5);
+        let idx = 0, phase = 'V', muted = false;
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(freq, type, duration) {
+            if (muted) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function toggleMute() { muted = !muted; document.getElementById('mute-btn').innerText = muted ? '🔇' : '🔊'; }
 
         function loadQ() {
             phase = 'V';
             const q = quiz[idx];
             document.getElementById('counter').innerText = `${idx + 1}/20`;
             document.getElementById('progress').style.width = `${(idx / 20) * 100}%`;
-            document.getElementById('hint').innerText = "第一步：选择正确动词形式";
+            document.getElementById('hint').innerText = "第一步选词，第二步点可分前缀";
             
             const pSrc = document.getElementById('p-src');
-            pSrc.innerText = q.p;
-            pSrc.className = "prefix-text";
-            pSrc.onclick = null;
-            pSrc.style.opacity = "1";
-
+            pSrc.innerText = q.p; pSrc.className = "prefix-text"; pSrc.style.opacity = "1"; pSrc.onclick = null;
             document.getElementById('v-src').innerText = q.r;
             document.getElementById('mean').innerText = q.m;
 
-            // 动态构建句子卡片，根据是否拆分渲染结构
             const sentence = document.getElementById('sentence');
             if(q.type === 'split') {
-                sentence.innerHTML = `
-                    <span class="text-slate-800">${q.pre}</span>
-                    <div id="v-target" class="slot-box"></div>
-                    <span class="text-slate-800 text-center">${q.post}</span>
-                    <div id="p-target" class="p-box"></div>
-                    <span class="text-slate-800">${q.end}</span>
-                `;
+                sentence.innerHTML = `<span class="text-slate-800">${q.pre}</span><div id="v-target" class="slot-box"></div><span class="text-slate-800 text-center">${q.post}</span><div class="p-wrap"><div id="p-target" class="p-box"></div><span class="text-slate-800">${q.end}</span></div>`;
             } else {
-                // 不拆分模式 (情态动词等)
-                sentence.innerHTML = `
-                    <span class="text-slate-800">${q.pre}</span>
-                    <span class="text-slate-800 text-center">${q.post}</span>
-                    <div id="v-target" class="slot-box" style="min-width:140px"></div>
-                    <span class="text-slate-800">${q.end}</span>
-                `;
+                sentence.innerHTML = `<span class="text-slate-800">${q.pre}</span><span class="text-slate-800 text-center">${q.post}</span><div id="v-target" class="slot-box" style="min-width:135px"></div><span class="text-slate-800">${q.end}</span>`;
             }
 
             const grid = document.getElementById('options-grid');
             grid.innerHTML = '';
             [...q.o].sort(() => Math.random() - 0.5).forEach(opt => {
                 const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                btn.innerText = opt;
+                btn.className = 'option-btn'; btn.innerText = opt;
                 btn.onclick = () => { if(phase === 'V') checkV(opt, q.a, btn); };
                 grid.appendChild(btn);
             });
@@ -146,71 +155,56 @@
         function checkV(val, ans, btn) {
             const q = quiz[idx];
             if(val === ans) {
+                playSound(880, 'sine', 0.2);
                 btn.classList.add('correct');
                 document.getElementById('v-target').innerText = val;
-                
                 if(q.type === 'split') {
                     phase = 'P';
-                    document.getElementById('hint').innerText = "第二步：点击上方蓝色前缀";
+                    document.getElementById('hint').innerText = "选得好！现在点一下上方的蓝色前缀";
                     const pSrc = document.getElementById('p-src');
                     pSrc.classList.add('prefix-glow');
                     document.getElementById('p-target').classList.add('waiting');
                     pSrc.onclick = moveP;
-                } else {
-                    // 不拆分的情况直接过关
-                    successAction();
-                }
+                } else { successAction(); }
             } else {
+                playSound(150, 'triangle', 0.3);
                 btn.classList.add('bg-rose-50', 'border-rose-200');
                 setTimeout(() => btn.classList.remove('bg-rose-50', 'border-rose-200'), 500);
             }
         }
 
         function moveP() {
+            playSound(600, 'sine', 0.1);
             const q = quiz[idx];
             const pSrc = document.getElementById('p-src');
             const pTgt = document.getElementById('p-target');
-            
             const sr = pSrc.getBoundingClientRect(), tr = pTgt.getBoundingClientRect();
             const fly = document.createElement('div');
             fly.innerText = q.p;
-            fly.style.cssText = `position:fixed; left:${sr.left}px; top:${sr.top}px; font-weight:900; font-size:1.8rem; color:#0EA5E9; transition:all 0.5s cubic-bezier(0.68,-0.55,0.265,1.55); z-index:9999;`;
+            fly.style.cssText = `position:fixed; left:${sr.left}px; top:${sr.top}px; font-weight:900; font-size:2rem; color:#0EA5E9; transition:all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index:9999;`;
             document.body.appendChild(fly);
-            
             pSrc.style.opacity = "0";
-            
+            setTimeout(() => { fly.style.left = tr.left + 'px'; fly.style.top = tr.top + 'px'; }, 10);
             setTimeout(() => {
-                fly.style.left = tr.left + 'px';
-                fly.style.top = tr.top + 'px';
-            }, 10);
-
-            setTimeout(() => {
+                playSound(1200, 'sine', 0.1);
                 if(fly.parentNode) document.body.removeChild(fly);
-                pTgt.innerText = q.p;
-                pTgt.className = "p-box filled";
+                pTgt.innerText = q.p; pTgt.className = "p-box filled";
                 successAction();
             }, 510);
         }
 
         function successAction() {
-            confetti({ particleCount: 60, spread: 50, origin: { y: 0.8 } });
-            document.getElementById('hint').innerText = "太棒了！";
+            confetti({ particleCount: 40, spread: 40, origin: { y: 0.8 } });
             setTimeout(() => {
                 idx++;
-                if(idx < 20 && idx < quiz.length) loadQ();
+                if(idx < quiz.length) loadQ();
                 else finish();
-            }, 1200);
+            }, 3000); 
         }
 
         function finish() {
-            confetti({ particleCount: 200, spread: 100 });
-            document.body.innerHTML = `
-                <div class="flex flex-col items-center justify-center h-full text-center px-6">
-                    <div class="text-8xl mb-6">🏆</div>
-                    <h1 class="text-4xl font-black text-slate-800 mb-2">德语拆拆乐通关！</h1>
-                    <p class="text-slate-500 font-bold mb-8">你已经掌握了可分动词在陈述句、疑问句及情态动词句中的所有用法。</p>
-                    <button onclick="location.href='index.html'" class="px-12 py-4 bg-sky-500 text-white rounded-2xl font-black text-xl shadow-lg active:scale-95 transition-transform">返回主菜单</button>
-                </div>`;
+            playSound(500, 'sine', 0.5);
+            document.body.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-center px-6"><div class="text-7xl mb-6">🎯</div><h1 class="text-3xl font-black text-slate-800 mb-2">太棒了！</h1><p class="text-slate-500 font-bold mb-8">练习已全部完成。</p><button onclick="location.href='index.html'" class="px-10 py-4 bg-sky-500 text-white rounded-2xl font-black text-lg shadow-lg">返回首页</button></div>`;
         }
 
         loadQ();
