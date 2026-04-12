@@ -167,6 +167,13 @@
                     <div id="m12" class="absolute -top-2 -right-2 text-3xl medal-pop"></div>
                 </div>
 
+                <div id="lvl13" onclick="go(13)" class="premium-card p-4 flex flex-col items-center text-center locked-state relative">
+                    <div class="w-12 h-12 bg-[#1E293B] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">13</div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-tight">介词静三动四迷宫</h3>
+                    <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Wechselpräpositionen</p>
+                    <div id="m13" class="absolute -top-2 -right-2 text-3xl medal-pop"></div>
+                </div>
+
             </div>
         </main>
 
@@ -188,8 +195,8 @@
             const unlocked = localStorage.getItem('isUnlocked') === 'true';
             if (unlocked) {
                 document.getElementById('auth-group').style.display = 'none';
-                // 更新关卡列表至 12
-                const levels = ['lvl1', 'lvl2', 'lvl3', 'lvl4', 'lvl5', 'lvl6', 'lvl7', 'lvl8', 'lvl9', 'lvl10', 'lvl11', 'lvl12'];
+                // 更新关卡列表至 13
+                const levels = ['lvl1', 'lvl2', 'lvl3', 'lvl4', 'lvl5', 'lvl6', 'lvl7', 'lvl8', 'lvl9', 'lvl10', 'lvl11', 'lvl12', 'lvl13'];
                 levels.forEach(id => {
                     const el = document.getElementById(id);
                     if(el) el.classList.remove('locked-state');
@@ -211,8 +218,9 @@
             if (localStorage.getItem('level9_cleared') === 'true') document.getElementById('m9').innerText = "🏅";
             if (localStorage.getItem('level10_cleared') === 'true') document.getElementById('m10').innerText = "🎯";
             if (localStorage.getItem('level11_cleared') === 'true') document.getElementById('m11').innerText = "🏅";
-            // 第 12 关奖牌逻辑
             if (localStorage.getItem('level12_cleared') === 'true') document.getElementById('m12').innerText = "🏆";
+            // 第 13 关奖牌逻辑
+            if (localStorage.getItem('level13_cleared') === 'true') document.getElementById('m13').innerText = "🧩";
         }
 
         function unlock() {
@@ -238,7 +246,8 @@
                 9: '09-Perfekt-Master.html',
                 10: '10_Artikel_Check.html',
                 11: '11-dativ.html',
-                12: '12-nodaakk-mix.html' // 新增第 12 关路径
+                12: '12-nodaakk-mix.html',
+                13: '11-praeposition.html' // 关联到第13关文件
             };
             window.location.href = pages[n];
         }
