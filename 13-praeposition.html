@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>13-静三动四：30题随机强化版</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        body { background-color: #F8FAFC; font-family: 'Noto Sans SC', sans-serif; color: #1E293B; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        .header-section { width: 100%; max-width: 500px; margin: 0 auto; padding: 20px 15px; display: flex; justify-content: space-between; align-items: center; }
+        .back-btn { width: 44px; height: 44px; background: white; border-radius: 14px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 0 #E2E8F0; border: 1px solid #F1F5F9; cursor: pointer; }
+        .progress-container { flex: 1; margin: 0 15px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .progress-bar { width: 100%; height: 10px; background: white; border-radius: 10px; border: 2px solid #E2E8F0; overflow: hidden; }
+        .quiz-body { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 0 20px; width: 100%; max-width: 500px; margin: 0 auto; }
+        .meaning-hint { color: #94A3B8; font-weight: 800; font-size: 0.95rem; margin-bottom: 20px; text-align: center; }
+        .sentence-card { width: 100%; min-height: 180px; padding: 35px 25px; background: white; border-radius: 35px; box-shadow: 0 20px 50px rgba(0,0,0,0.04); border: 1px solid #F1F5F9; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px; font-size: 1.6rem; font-weight: 800; line-height: 1.6; text-align: center; }
+        .highlight-prep { color: #6366F1; border-bottom: 3px solid #C7D2FE; padding: 0 4px; }
+        .slot-box { min-width: 120px; border-bottom: 4px solid #F59E0B; color: #F59E0B; height: 46px; display: flex; align-items: center; justify-content: center; }
+        .footer-section { width: 100%; max-width: 500px; margin: 0 auto; padding: 20px 16px 50px; position: relative; }
+        .options-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .option-btn { background: white; border-radius: 22px; border: 2px solid #E2E8F0; border-bottom: 5px solid #E2E8F0; font-size: 1.3rem; font-weight: 800; color: #6366F1; padding: 20px 0; transition: all 0.2s; }
+        .option-btn.correct { background: #10B981 !important; border-color: #059669 !important; color: white !important; transform: translateY(2px); border-bottom-width: 2px; }
+        .option-btn.wrong { background: #FEE2E2; border-color: #FCA5A5; color: #B91C1C; opacity: 0.6; }
+        #feedback-panel { position: absolute; bottom: 0; left: 0; right: 0; background: #1E293B; color: white; padding: 30px 25px 50px; border-radius: 35px 35px 0 0; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 50; }
+        #feedback-panel.show { transform: translateY(0); }
+        .next-btn { width: 100%; background: #F59E0B; color: white; padding: 18px; border-radius: 18px; font-weight: 900; margin-top: 20px; font-size: 1.1rem; }
+    </style>
+</head>
+<body>
+
+    <div class="header-section">
+        <div class="back-btn" onclick="location.href='map.html'"><svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg></div>
+        <div class="progress-container">
+            <div class="progress-bar"><div id="progress" class="h-full bg-indigo-500 w-0 transition-all duration-500"></div></div>
+            <div id="counter" class="font-black text-slate-400 italic text-xs tracking-widest">0 / 30</div>
+        </div>
+        <div id="mute-btn" class="text-right text-xl cursor-pointer" onclick="toggleMute()">🔊</div>
+    </div>
+
+    <div class="quiz-body">
+        <div id="meaning" class="meaning-hint"></div>
+        <div id="sentence" class="sentence-card"></div>
+    </div>
+
+    <div class="footer-section">
+        <div id="options-grid" class="options-grid"></div>
+        <div id="feedback-panel">
+            <div class="flex items-center gap-3 mb-3">
+                <span class="text-3xl">👩‍🏫</span>
+                <span class="font-black text-amber-400 text-lg uppercase">名师纠错</span>
+            </div>
+            <p id="explanation" class="text-sm text-slate-300 font-medium leading-relaxed"></p>
+            <button class="next-btn" onclick="closeFeedback()">懂了，再试一次</button>
+        </div>
+    </div>
+
+    <script>
+        const quizDB = [
+            // 人称代词 (6题)
+            { m: "你要站到我旁边吗？ (Akk.)", s: 'Stellst du dich <span class="highlight-prep">neben</span>', a: 'mich', o: ['mich', 'mir'], t: 'q', exp: '目的地是我，涉及位移过程，用 Akkusativ。' },
+            { m: "你站在我旁边吗？ (Dat.)", s: 'Stehst du <span class="highlight-prep">neben</span>', a: 'mir', o: ['mich', 'mir'], t: 'q', exp: '描述在某人身边的静态位置，用 Dativ。' },
+            { m: "把花瓶放他旁边！ (Akk.)", s: 'Stell die Vase <span class="highlight-prep">neben</span>', a: 'ihn', o: ['ihn', 'ihm'], t: 'ex', exp: '动作瞬间：目的地是他，用 Akkusativ。' },
+            { m: "花瓶在他旁边。 (Dat.)", s: 'Die Vase steht <span class="highlight-prep">neben</span>', a: 'ihm', o: ['ihn', 'ihm'], t: 'p', exp: '静态地点：在他旁边，用 Dativ。' },
+            { m: "猫跳到了你身上吗？ (Akk.)", s: 'Springt die Katze <span class="highlight-prep">auf</span>', a: 'dich', o: ['dich', 'dir'], t: 'q', exp: '跳跃的位移目的地是你，用 Akkusativ。' },
+            { m: "猫在你身上睡觉。 (Dat.)", s: 'Die Katze schläft <span class="highlight-prep">auf</span>', a: 'dir', o: ['dich', 'dir'], t: 'p', exp: '描述睡觉的静态地点，用 Dativ。' },
+
+            // 定冠词 (24题)
+            { m: "把书放桌上！ (Akk.)", s: 'Leg das Buch <span class="highlight-prep">auf</span>', a: 'den Tisch', o: ['den Tisch', 'dem Tisch'], t: 'ex', exp: '位移目的地，用 Akkusativ。' },
+            { m: "书在桌上。 (Dat.)", s: 'Das Buch liegt <span class="highlight-prep">auf</span>', a: 'dem Tisch', o: ['den Tisch', 'dem Tisch'], t: 'p', exp: '静态位置，用 Dativ。' },
+            { m: "你在往墙上挂画吗？ (Akk.)", s: 'Hängst du das Bild <span class="highlight-prep">an</span>', a: 'die Wand', o: ['die Wand', 'der Wand'], t: 'q', exp: '挂画动作的目的地，用 Akkusativ。' },
+            { m: "画挂在墙上吗？ (Dat.)", s: 'Hängt das Bild <span class="highlight-prep">an</span>', a: 'der Wand', o: ['die Wand', 'der Wand'], t: 'q', exp: '画已经在墙上的静态状态，用 Dativ。' },
+            { m: "我们要去电影院。 (Akk.)", s: 'Wir gehen <span class="highlight-prep">in</span>', a: 'das Kino', o: ['das Kino', 'dem Kino'], t: 'p', exp: '去向明确的目的地，用 Akkusativ。' },
+            { m: "我们在电影院里。 (Dat.)", s: 'Wir sind <span class="highlight-prep">in</span>', a: 'dem Kino', o: ['das Kino', 'dem Kino'], t: 'p', exp: '身处其中的地点，用 Dativ。' },
+            { m: "把钥匙放在包里！ (Akk.)", s: 'Steck den Schlüssel <span class="highlight-prep">in</span>', a: 'die Tasche', o: ['die Tasche', 'der Tasche'], t: 'ex', exp: '插/放动作的终点，用 Akkusativ。' },
+            { m: "钥匙在包里。 (Dat.)", s: 'Der Schlüssel ist <span class="highlight-prep">in</span>', a: 'der Tasche', o: ['die Tasche', 'der Tasche'], t: 'p', exp: '钥匙在包内的位置，用 Dativ。' },
+            { m: "老师走进教室。 (Akk.)", s: 'Der Lehrer geht <span class="highlight-prep">in</span>', a: 'das Zimmer', o: ['das Zimmer', 'dem Zimmer'], t: 'p', exp: '进入动作的位移，用 Akkusativ。' },
+            { m: "老师在教室里。 (Dat.)", s: 'Der Lehrer ist <span class="highlight-prep">in</span>', a: 'dem Zimmer', o: ['das Zimmer', 'dem Zimmer'], t: 'p', exp: '老师所在的位置，用 Dativ。' },
+            { m: "把灯挂在桌子上方！ (Akk.)", s: 'Häng die Lampe <span class="highlight-prep">über</span>', a: 'den Tisch', o: ['den Tisch', 'dem Tisch'], t: 'ex', exp: '动作瞬间：目的地是桌子上方，用 Akkusativ。' },
+            { m: "灯挂在桌子上方。 (Dat.)", s: 'Die Lampe hängt <span class="highlight-prep">über</span>', a: 'dem Tisch', o: ['den Tisch', 'dem Tisch'], t: 'p', exp: '描述位置：在桌子上方，用 Dativ。' },
+            { m: "猫跳到了沙发下。 (Akk.)", s: 'Die Katze springt <span class="highlight-prep">unter</span>', a: 'das Sofa', o: ['das Sofa', 'dem Sofa'], t: 'p', exp: '位移终点是沙发下，用 Akkusativ。' },
+            { m: "猫在沙发下睡觉。 (Dat.)", s: 'Die Katze schläft <span class="highlight-prep">unter</span>', a: 'dem Sofa', o: ['das Sofa', 'dem Sofa'], t: 'p', exp: '描述睡觉的静态地点，用 Dativ。' },
+            { m: "把杯子放两本书中间！ (Akk.)", s: 'Stell das Glas <span class="highlight-prep">zwischen</span>', a: 'die Bücher', o: ['die Bücher', 'den Büchern'], t: 'ex', exp: '两物中间的位移目的地，用 Akkusativ。' },
+            { m: "杯子在两本书中间。 (Dat.)", s: 'Das Glas steht <span class="highlight-prep">zwischen</span>', a: 'den Büchern', o: ['die Bücher', 'den Büchern'], t: 'p', exp: '两物中间的静态位置，用 Dativ。' },
+            { m: "车开到了房子后面。 (Akk.)", s: 'Das Auto fährt <span class="highlight-prep">hinter</span>', a: 'das Haus', o: ['das Haus', 'dem Haus'], t: 'p', exp: '目的地是房子后方，用 Akkusativ。' },
+            { m: "车停在房子后面。 (Dat.)", s: 'Das Auto parkt <span class="highlight-prep">hinter</span>', a: 'dem Haus', o: ['das Haus', 'dem Haus'], t: 'p', exp: '停放的静态位置，用 Dativ。' },
+            { m: "走到黑板前面！ (Akk.)", s: 'Geh <span class="highlight-prep">vor</span>', a: 'die Tafel', o: ['die Tafel', 'der Tafel'], t: 'ex', exp: '位移目的地，用 Akkusativ。' },
+            { m: "你站在黑板前吗？ (Dat.)", s: 'Stehst du <span class="highlight-prep">vor</span>', a: 'der Tafel', o: ['die Tafel', 'der Tafel'], t: 'q', exp: '站立的静态地点，用 Dativ。' },
+            { m: "他坐到了沙发上。 (Akk.)", s: 'Er setzt sich <span class="highlight-prep">auf</span>', a: 'das Sofa', o: ['das Sofa', 'dem Sofa'], t: 'p', exp: '坐下动作的位移，用 Akkusativ。' },
+            { m: "他坐在沙发上。 (Dat.)", s: 'Er sitzt <span class="highlight-prep">auf</span>', a: 'dem Sofa', o: ['das Sofa', 'dem Sofa'], t: 'p', exp: '坐着的静态地点，用 Dativ。' },
+            { m: "把垃圾桶放在门后面！ (Akk.)", s: 'Stell den Mülleimer <span class="highlight-prep">hinter</span>', a: 'die Tür', o: ['die Tür', 'der Tür'], t: 'ex', exp: '位移终点是门后，用 Akkusativ。' },
+            { m: "垃圾桶在门后面。 (Dat.)", s: 'Der Mülleimer steht <span class="highlight-prep">hinter</span>', a: 'der Tür', o: ['die Tür', 'der Tür'], t: 'p', exp: '所在的静态位置，用 Dativ。' },
+            { m: "走到窗户那边去！ (Akk.)", s: 'Geh <span class="highlight-prep">an</span>', a: 'das Fenster', o: ['das Fenster', 'dem Fenster'], t: 'ex', exp: '位移目的地用 Akkusativ。' },
+            { m: "他在窗边等候。 (Dat.)", s: 'Er wartet <span class="highlight-prep">an</span>', a: 'dem Fenster', o: ['das Fenster', 'dem Fenster'], t: 'p', exp: '所在的等候地点，用 Dativ。' },
+            { m: "把花瓶放柜子上！ (Akk.)", s: 'Stell die Vase <span class="highlight-prep">auf</span>', a: 'den Schrank', o: ['den Schrank', 'dem Schrank'], t: 'ex', exp: '位移目的地，用 Akkusativ。' },
+            { m: "花瓶在柜子上。 (Dat.)", s: 'Die Vase steht <span class="highlight-prep">auf</span>', a: 'dem Schrank', o: ['den Schrank', 'dem Schrank'], t: 'p', exp: '所在的静态位置，用 Dativ。' },
+            { m: "猫跳到了椅子下面。 (Akk.)", s: 'Die Katze springt <span class="highlight-prep">unter</span>', a: 'den Stuhl', o: ['den Stuhl', 'dem Stuhl'], t: 'p', exp: '跳跃目的地用 Akkusativ。' },
+            { m: "猫在椅子下面睡觉。 (Dat.)", s: 'Die Katze schläft <span class="highlight-prep">unter</span>', a: 'dem Stuhl', o: ['den Stuhl', 'dem Stuhl'], t: 'p', exp: '所在的静态地点用 Dativ。' }
+        ];
+
+        // 全局随机化整组题库
+        let quiz = [...quizDB].sort(() => Math.random() - 0.5);
+        let idx = 0, muted = false, canClick = true;
+        let autoNextTimer = null;
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(f, type, d) {
+            if (muted) return;
+            const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+            o.type = type; o.frequency.setValueAtTime(f, audioCtx.currentTime);
+            g.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            o.connect(g); g.connect(audioCtx.destination);
+            o.start(); o.stop(audioCtx.currentTime + d);
+        }
+
+        function toggleMute() { muted = !muted; document.getElementById('mute-btn').innerText = muted ? '🔇' : '🔊'; }
+
+        function loadQ() {
+            if(autoNextTimer) clearTimeout(autoNextTimer);
+            canClick = true;
+            document.getElementById('feedback-panel').classList.remove('show');
+            const q = quiz[idx];
+            
+            // 严格进度显示
+            document.getElementById('counter').innerText = `${idx + 1} / 30`;
+            document.getElementById('progress').style.width = `${((idx + 1) / 30) * 100}%`;
+            document.getElementById('meaning').innerText = q.m;
+            
+            let punc = q.t === 'q' ? '?' : (q.t === 'ex' ? '!' : '.');
+            document.getElementById('sentence').innerHTML = `${q.s} <div id="target" class="slot-box"></div> ${punc}`;
+
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            [...q.o].sort(() => Math.random() - 0.5).forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn'; btn.innerText = opt;
+                btn.onclick = () => checkAns(opt, btn);
+                grid.appendChild(btn);
+            });
+        }
+
+        function checkAns(val, btn) {
+            if (!canClick) return;
+            const q = quiz[idx];
+            if (val === q.a) {
+                canClick = false;
+                btn.classList.add('correct');
+                playSound(880, 'sine', 0.15);
+                document.getElementById('target').innerText = val;
+                document.getElementById('target').style.borderBottom = "none";
+                confetti({ particleCount: 40, spread: 60, origin: { y: 0.8 } });
+                autoNextTimer = setTimeout(nextQuestion, 3000); 
+            } else {
+                btn.classList.add('wrong');
+                playSound(150, 'triangle', 0.3);
+                document.getElementById('explanation').innerText = q.exp;
+                setTimeout(() => document.getElementById('feedback-panel').classList.add('show'), 300);
+            }
+        }
+
+        function closeFeedback() {
+            document.getElementById('feedback-panel').classList.remove('show');
+            document.querySelectorAll('.option-btn').forEach(b => { if(!b.classList.contains('correct')) b.classList.remove('wrong'); });
+        }
+
+        function nextQuestion() {
+            idx++;
+            if (idx < 30) loadQ();
+            else finish();
+        }
+
+        function finish() {
+            document.body.innerHTML = `
+                <div class="flex flex-col items-center justify-center h-full text-center px-6 bg-slate-50">
+                    <div class="text-8xl mb-6">🏆</div>
+                    <h1 class="text-4xl font-black mb-4 text-slate-800 tracking-tight">特训圆满通关！</h1>
+                    <p class="text-slate-500 font-bold text-lg mb-12">30道混合强化练习已全部完成。<br>代词与冠词的“静三动四”已彻底掌握！</p>
+                    <button onclick="location.href='map.html'" class="px-16 py-5 bg-indigo-600 text-white rounded-3xl font-black shadow-[0_10px_0_#4338CA] active:shadow-none active:translate-y-2 transition-all text-xl">确定</button>
+                </div>`;
+            confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
+        }
+
+        loadQ();
+    </script>
+</body>
+</html>
