@@ -31,7 +31,7 @@
 <body>
 
     <div class="header-section">
-        <div class="back-btn" onclick="location.href='map.html'"><svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg></div>
+        <div class="back-btn" onclick="location.href='index.html'"><svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg></div>
         <div class="progress-container">
             <div class="progress-bar"><div id="progress" class="h-full bg-indigo-500 w-0 transition-all duration-500"></div></div>
             <div id="counter" class="font-black text-slate-400 italic text-xs tracking-widest">0 / 30</div>
@@ -58,15 +58,12 @@
 
     <script>
         const quizDB = [
-            // 人称代词 (6题)
             { m: "你要站到我旁边吗？ (Akk.)", s: 'Stellst du dich <span class="highlight-prep">neben</span>', a: 'mich', o: ['mich', 'mir'], t: 'q', exp: '目的地是我，涉及位移过程，用 Akkusativ。' },
             { m: "你站在我旁边吗？ (Dat.)", s: 'Stehst du <span class="highlight-prep">neben</span>', a: 'mir', o: ['mich', 'mir'], t: 'q', exp: '描述在某人身边的静态位置，用 Dativ。' },
             { m: "把花瓶放他旁边！ (Akk.)", s: 'Stell die Vase <span class="highlight-prep">neben</span>', a: 'ihn', o: ['ihn', 'ihm'], t: 'ex', exp: '动作瞬间：目的地是他，用 Akkusativ。' },
             { m: "花瓶在他旁边。 (Dat.)", s: 'Die Vase steht <span class="highlight-prep">neben</span>', a: 'ihm', o: ['ihn', 'ihm'], t: 'p', exp: '静态地点：在他旁边，用 Dativ。' },
             { m: "猫跳到了你身上吗？ (Akk.)", s: 'Springt die Katze <span class="highlight-prep">auf</span>', a: 'dich', o: ['dich', 'dir'], t: 'q', exp: '跳跃的位移目的地是你，用 Akkusativ。' },
             { m: "猫在你身上睡觉。 (Dat.)", s: 'Die Katze schläft <span class="highlight-prep">auf</span>', a: 'dir', o: ['dich', 'dir'], t: 'p', exp: '描述睡觉的静态地点，用 Dativ。' },
-
-            // 定冠词 (24题)
             { m: "把书放桌上！ (Akk.)", s: 'Leg das Buch <span class="highlight-prep">auf</span>', a: 'den Tisch', o: ['den Tisch', 'dem Tisch'], t: 'ex', exp: '位移目的地，用 Akkusativ。' },
             { m: "书在桌上。 (Dat.)", s: 'Das Buch liegt <span class="highlight-prep">auf</span>', a: 'dem Tisch', o: ['den Tisch', 'dem Tisch'], t: 'p', exp: '静态位置，用 Dativ。' },
             { m: "你在往墙上挂画吗？ (Akk.)", s: 'Hängst du das Bild <span class="highlight-prep">an</span>', a: 'die Wand', o: ['die Wand', 'der Wand'], t: 'q', exp: '挂画动作的目的地，用 Akkusativ。' },
@@ -90,16 +87,9 @@
             { m: "他坐到了沙发上。 (Akk.)", s: 'Er setzt sich <span class="highlight-prep">auf</span>', a: 'das Sofa', o: ['das Sofa', 'dem Sofa'], t: 'p', exp: '坐下动作的位移，用 Akkusativ。' },
             { m: "他坐在沙发上。 (Dat.)", s: 'Er sitzt <span class="highlight-prep">auf</span>', a: 'dem Sofa', o: ['das Sofa', 'dem Sofa'], t: 'p', exp: '坐着的静态地点，用 Dativ。' },
             { m: "把垃圾桶放在门后面！ (Akk.)", s: 'Stell den Mülleimer <span class="highlight-prep">hinter</span>', a: 'die Tür', o: ['die Tür', 'der Tür'], t: 'ex', exp: '位移终点是门后，用 Akkusativ。' },
-            { m: "垃圾桶在门后面。 (Dat.)", s: 'Der Mülleimer steht <span class="highlight-prep">hinter</span>', a: 'der Tür', o: ['die Tür', 'der Tür'], t: 'p', exp: '所在的静态位置，用 Dativ。' },
-            { m: "走到窗户那边去！ (Akk.)", s: 'Geh <span class="highlight-prep">an</span>', a: 'das Fenster', o: ['das Fenster', 'dem Fenster'], t: 'ex', exp: '位移目的地用 Akkusativ。' },
-            { m: "他在窗边等候。 (Dat.)", s: 'Er wartet <span class="highlight-prep">an</span>', a: 'dem Fenster', o: ['das Fenster', 'dem Fenster'], t: 'p', exp: '所在的等候地点，用 Dativ。' },
-            { m: "把花瓶放柜子上！ (Akk.)", s: 'Stell die Vase <span class="highlight-prep">auf</span>', a: 'den Schrank', o: ['den Schrank', 'dem Schrank'], t: 'ex', exp: '位移目的地，用 Akkusativ。' },
-            { m: "花瓶在柜子上。 (Dat.)", s: 'Die Vase steht <span class="highlight-prep">auf</span>', a: 'dem Schrank', o: ['den Schrank', 'dem Schrank'], t: 'p', exp: '所在的静态位置，用 Dativ。' },
-            { m: "猫跳到了椅子下面。 (Akk.)", s: 'Die Katze springt <span class="highlight-prep">unter</span>', a: 'den Stuhl', o: ['den Stuhl', 'dem Stuhl'], t: 'p', exp: '跳跃目的地用 Akkusativ。' },
-            { m: "猫在椅子下面睡觉。 (Dat.)", s: 'Die Katze schläft <span class="highlight-prep">unter</span>', a: 'dem Stuhl', o: ['den Stuhl', 'dem Stuhl'], t: 'p', exp: '所在的静态地点用 Dativ。' }
+            { m: "垃圾桶在门后面。 (Dat.)", s: 'Der Mülleimer steht <span class="highlight-prep">hinter</span>', a: 'der Tür', o: ['die Tür', 'der Tür'], t: 'p', exp: '所在的静态位置，用 Dativ。' }
         ];
 
-        // 全局随机化整组题库
         let quiz = [...quizDB].sort(() => Math.random() - 0.5);
         let idx = 0, muted = false, canClick = true;
         let autoNextTimer = null;
@@ -122,7 +112,6 @@
             document.getElementById('feedback-panel').classList.remove('show');
             const q = quiz[idx];
             
-            // 严格进度显示
             document.getElementById('counter').innerText = `${idx + 1} / 30`;
             document.getElementById('progress').style.width = `${((idx + 1) / 30) * 100}%`;
             document.getElementById('meaning').innerText = q.m;
@@ -150,7 +139,7 @@
                 document.getElementById('target').innerText = val;
                 document.getElementById('target').style.borderBottom = "none";
                 confetti({ particleCount: 40, spread: 60, origin: { y: 0.8 } });
-                autoNextTimer = setTimeout(nextQuestion, 3000); 
+                autoNextTimer = setTimeout(nextQuestion, 1500); 
             } else {
                 btn.classList.add('wrong');
                 playSound(150, 'triangle', 0.3);
@@ -171,12 +160,15 @@
         }
 
         function finish() {
+            // 重要：设置地图关卡图标激活标识
+            localStorage.setItem('level13_cleared', 'true');
+
             document.body.innerHTML = `
                 <div class="flex flex-col items-center justify-center h-full text-center px-6 bg-slate-50">
                     <div class="text-8xl mb-6">🏆</div>
                     <h1 class="text-4xl font-black mb-4 text-slate-800 tracking-tight">特训圆满通关！</h1>
-                    <p class="text-slate-500 font-bold text-lg mb-12">30道混合强化练习已全部完成。<br>代词与冠词的“静三动四”已彻底掌握！</p>
-                    <button onclick="location.href='map.html'" class="px-16 py-5 bg-indigo-600 text-white rounded-3xl font-black shadow-[0_10px_0_#4338CA] active:shadow-none active:translate-y-2 transition-all text-xl">确定</button>
+                    <p class="text-slate-500 font-bold text-lg mb-12">30道混合强化练习已全部完成。<br>地图上的第13关勋章已点亮！</p>
+                    <button onclick="location.href='index.html'" class="px-16 py-5 bg-indigo-600 text-white rounded-3xl font-black shadow-[0_10px_0_#4338CA] active:shadow-none active:translate-y-2 transition-all text-xl">回地图</button>
                 </div>`;
             confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
         }
