@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" style="height: 100%; overflow: hidden;">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -8,21 +8,62 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@500;700;900&display=swap');
-        body { background: #000; font-family: 'Noto Sans SC', sans-serif; margin: 0; width: 100vw; height: 100vh; overflow: hidden; color: #FFF; }
-        .app-container { width: 100%; max-width: 430px; height: 100%; display: flex; flex-direction: column; padding: 0 20px; margin: 0 auto; }
+        
+        /* 关键修复：使用 dvh (动态视口高度) 解决 iOS 遮挡问题 */
+        body { 
+            background: #000; 
+            font-family: 'Noto Sans SC', sans-serif; 
+            margin: 0; 
+            width: 100vw; 
+            min-height: 100dvh; 
+            overflow-y: auto; /* 允许纵向溢出时滚动，防止死锁 */
+            color: #FFF; 
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .app-container { 
+            width: 100%; 
+            max-width: 430px; 
+            min-height: 100dvh; 
+            display: flex; 
+            flex-direction: column; 
+            padding: 0 20px 40px; /* 底部增加内边距 */
+            margin: 0 auto; 
+        }
+
         .nav-bar { display: flex; align-items: center; justify-content: space-between; padding: 20px 5px 10px; }
         .nav-icon { cursor: pointer; opacity: 0.7; transition: opacity 0.2s; }
         
-        #main-card { width: 100%; padding: 40px 20px; background: rgba(255, 255, 255, 0.04); border-radius: 40px; border: 1px solid rgba(255,255,255,0.1); }
-        .sentence-text { font-size: 1.4rem; font-weight: 800; line-height: 2.2; text-align: center; color: #FFFFFF; }
-        
-        .sentence-text b { color: #38BDF8; border-bottom: 3px solid #38BDF8; padding: 0 10px; margin: 0 6px; min-width: 90px; display: inline-block; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .no-break { white-space: nowrap; display: inline-flex; align-items: baseline; }
-        
-        /* 答对后的3秒高亮 */
-        .sentence-text b.correct-active { color: #4ADE80 !important; border-bottom-color: #4ADE80 !important; transform: scale(1.1); text-shadow: 0 0 15px rgba(74, 222, 128, 0.5); }
+        /* 调整卡片大小，适配小屏幕 */
+        #main-card { 
+            width: 100%; 
+            padding: 30px 20px; 
+            background: rgba(255, 255, 255, 0.04); 
+            border-radius: 35px; 
+            border: 1px solid rgba(255,255,255,0.1); 
+        }
 
-        .glass-orb { height: 75px; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; font-size: 1.1rem; font-weight: 900; color: #D4AF37; }
+        .sentence-text { font-size: 1.3rem; font-weight: 800; line-height: 2; text-align: center; color: #FFFFFF; }
+        .sentence-text b { color: #38BDF8; border-bottom: 3px solid #38BDF8; padding: 0 8px; margin: 0 4px; min-width: 80px; display: inline-block; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        
+        .correct-active { color: #4ADE80 !important; border-bottom-color: #4ADE80 !important; transform: scale(1.05); text-shadow: 0 0 15px rgba(74, 222, 128, 0.5); }
+
+        /* 优化选项按钮在 iPad 上的表现 */
+        .glass-orb { 
+            height: 70px; 
+            background: rgba(255, 255, 255, 0.05); 
+            backdrop-filter: blur(10px); 
+            border: 1px solid rgba(212, 175, 55, 0.3); 
+            border-radius: 20px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+            transition: 0.2s; 
+            font-size: 1.1rem; 
+            font-weight: 900; 
+            color: #D4AF37; 
+        }
         .glass-orb.selected { background: #D4AF37; color: #000; border-color: #FFF; }
         .is-checking .glass-orb { opacity: 0.4; cursor: default; }
     </style>
@@ -44,20 +85,22 @@
         
         <div id="cur-step" class="text-center text-xs font-black text-zinc-600 mb-4 tracking-widest">1 / 30</div>
 
-        <div class="flex-grow flex flex-col justify-start pt-2" id="game-body">
-            <div class="text-center mb-8">
+        <div class="flex-grow flex flex-col justify-center" id="game-body">
+            <div class="text-center mb-6">
                 <h1 id="verb-display" class="text-4xl font-black tracking-tight mb-2"></h1>
                 <p id="verb-cn" class="text-zinc-500 font-bold"></p>
             </div>
-            <div id="main-card" class="mb-10">
-                <div id="emoji-icon" class="text-7xl mb-8 text-center"></div>
+
+            <div id="main-card" class="mb-8">
+                <div id="emoji-icon" class="text-6xl mb-6 text-center"></div>
                 <div class="sentence-text" id="sentence-box"></div>
             </div>
-            <div class="grid grid-cols-2 gap-4" id="orb-box"></div>
+
+            <div class="grid grid-cols-2 gap-3" id="orb-box"></div>
         </div>
     </div>
 
-    <div id="congrats-modal" class="hidden fixed inset-0 bg-black/95 z-[5000] flex items-center justify-center p-6 text-center">
+    <div id="congrats-modal" class="hidden fixed inset-0 bg-black/95 z-[9999] flex items-center justify-center p-6 text-center">
         <div class="bg-zinc-900 p-10 rounded-[50px] w-full max-w-[360px] border-2 border-yellow-600/50">
             <div class="text-8xl mb-6">🏆</div>
             <h2 class="text-3xl font-black text-yellow-500 mb-4">通关大吉!</h2>
@@ -66,7 +109,7 @@
         </div>
     </div>
 
-    <div id="error-modal" class="hidden fixed inset-0 bg-black/98 z-[4000] flex items-center justify-center p-6">
+    <div id="error-modal" class="hidden fixed inset-0 bg-black/98 z-[9999] flex items-center justify-center p-6">
         <div class="bg-zinc-900 p-8 rounded-[40px] w-full max-w-[340px] text-center border border-red-900/30">
             <div class="text-5xl mb-4">👩‍🏫</div>
             <p class="text-yellow-500 font-black mb-4 text-xl">哎呀，写错了</p>
@@ -141,23 +184,25 @@
             document.getElementById('emoji-icon').innerText = data.icon;
             
             const parts = data.q.split('[?]');
-            document.getElementById('sentence-box').innerHTML = `<span>${parts[0]}</span><b id="s0">?</b><span>${parts[1]}</span><span class="no-break"><b id="s1">?</b><span>${parts[2]||""}</span></span>`;
+            document.getElementById('sentence-box').innerHTML = `<span>${parts[0]}</span><b id="s0">?</b><span>${parts[1]}</span><span class="inline-block"><b id="s1">?</b><span>${parts[2]||""}</span></span>`;
             
-            // 智能生成干扰项
             const correctAux = data.ans[0];
             const correctPart = data.ans[1];
             
-            // 1. 助动词干扰 (haben <-> sein)
             const wrongAux = correctAux.match(/hab|has|hat/i) ? 
                 (correctAux === "habe" ? "bin" : (correctAux === "hast" ? "bist" : "ist")) : 
                 (correctAux === "bin" ? "habe" : (correctAux === "bist" ? "hast" : "hat"));
 
-            // 2. 分词后缀干扰 (en <-> t)
             let wrongPart = correctPart.endsWith('en') ? correctPart.replace(/en$/, 't') : correctPart.replace(/t$/, 'en');
-            if (!correctPart.startsWith('ge')) wrongPart = "ge" + correctPart; // 针对besucht这种增加ge干扰
+            if (!correctPart.startsWith('ge') && !correctPart.match(/^(be|ver|er|ent|ge|passiert)/)) {
+                wrongPart = "ge" + correctPart;
+            }
 
             const opts = [correctAux, correctPart, wrongAux, wrongPart].sort(() => Math.random() - 0.5);
             document.getElementById('orb-box').innerHTML = opts.map(t => `<div class="glass-orb" onclick="sel('${t}', this)">${t}</div>`).join('');
+            
+            // 每次渲染回到顶部，防止 iPad 滚动错位
+            window.scrollTo(0,0);
         }
 
         window.sel = function(val, el) {
@@ -178,11 +223,10 @@
                 playSound('correct');
                 document.getElementById('s0').classList.add('correct-active');
                 document.getElementById('s1').classList.add('correct-active');
-                // 等待3秒，让学生看清正确组合
                 setTimeout(() => { 
-                    if (curIdx === 29) celebrate(); 
+                    if (curIdx >= 29) celebrate(); 
                     else { curIdx++; render(); } 
-                }, 3000); 
+                }, 2000); 
             } else { 
                 playSound('wrong'); 
                 showError(data); 
