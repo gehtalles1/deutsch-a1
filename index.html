@@ -174,6 +174,13 @@
                     <div id="m13" class="absolute -top-2 -right-2 text-3xl medal-pop"></div>
                 </div>
 
+                <div id="lvl14" onclick="go(14)" class="premium-card p-4 flex flex-col items-center text-center locked-state relative">
+                    <div class="w-12 h-12 bg-[#F59E0B] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">14</div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-tight">物主代词变形记</h3>
+                    <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Possessivpronomen</p>
+                    <div id="m14" class="absolute -top-2 -right-2 text-3xl medal-pop"></div>
+                </div>
+
             </div>
         </main>
 
@@ -191,17 +198,20 @@
     </div>
 
     <script>
+        // 定义关卡列表，方便批量处理
+        const levelIds = ['lvl1', 'lvl2', 'lvl3', 'lvl4', 'lvl5', 'lvl6', 'lvl7', 'lvl8', 'lvl9', 'lvl10', 'lvl11', 'lvl12', 'lvl13', 'lvl14'];
+
         function checkStatus() {
             const unlocked = localStorage.getItem('isUnlocked') === 'true';
             if (unlocked) {
                 document.getElementById('auth-group').style.display = 'none';
-                const levels = ['lvl1', 'lvl2', 'lvl3', 'lvl4', 'lvl5', 'lvl6', 'lvl7', 'lvl8', 'lvl9', 'lvl10', 'lvl11', 'lvl12', 'lvl13'];
-                levels.forEach(id => {
+                levelIds.forEach(id => {
                     const el = document.getElementById(id);
                     if(el) el.classList.remove('locked-state');
                 });
             }
 
+            // 更新通关图标
             const s1Score = localStorage.getItem('stage1_score'); 
             if (s1Score === 'gold') document.getElementById('m1').innerText = "🥇";
             else if (s1Score === 'silver') document.getElementById('m1').innerText = "🥈";
@@ -218,6 +228,8 @@
             if (localStorage.getItem('level11_cleared') === 'true') document.getElementById('m11').innerText = "🏅";
             if (localStorage.getItem('level12_cleared') === 'true') document.getElementById('m12').innerText = "🏆";
             if (localStorage.getItem('level13_cleared') === 'true') document.getElementById('m13').innerText = "🧩";
+            // 第 14 关通关图标
+            if (localStorage.getItem('level14_cleared') === 'true') document.getElementById('m14').innerText = "🙋‍♂️";
         }
 
         function unlock() {
@@ -244,7 +256,8 @@
                 10: '10_Artikel_Check.html',
                 11: '11-dativ.html',
                 12: '12-nodaakk-mix.html',
-                13: '13-praeposition.html' // 修正处：对应仓库中的准确文件名
+                13: '13-praeposition.html',
+                14: '14-Possessivpro.html' // 关联你的新文件
             };
             window.location.href = pages[n];
         }
