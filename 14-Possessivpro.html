@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>物主代词变形记 | 刘老师课堂</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@500;700;900&display=swap');
+        
+        body { background: #F8FAFC; font-family: 'Noto Sans SC', sans-serif; margin: 0; min-height: 100dvh; display: flex; align-items: center; justify-content: center; }
+        .app-container { width: 100%; max-width: 600px; min-height: 100dvh; background: #FFFFFF; position: relative; display: flex; flex-direction: column; overflow-y: auto; border: 6px solid #F1F5F9; }
+        
+        /* 导航 */
+        .header-nav { padding: 25px 20px 10px; display: flex; align-items: center; gap: 15px; }
+        .progress-wrapper { flex: 1; display: flex; align-items: center; gap: 12px; }
+        .progress-info { font-size: 18px; font-weight: 900; color: #94A3B8; min-width: 65px; text-align: center; }
+        .progress-bar-bg { flex: 1; height: 10px; background: #F1F5F9; border-radius: 20px; overflow: hidden; }
+        #progress-fill { width: 0%; height: 100%; background: #F59E0B; transition: width 0.4s ease; }
+
+        /* 舞台区 */
+        .main-stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 20px; }
+        .scene-card { width: 100%; padding: 45px 20px; background: #FFFBEB; border-radius: 40px; text-align: center; border: 2px solid #FEF3C7; position: relative; }
+        
+        /* 动起来的 Emoji */
+        .owner-box { display: flex; flex-direction: column; align-items: center; margin-bottom: 30px; }
+        .owner-emoji { 
+            font-size: 70px; 
+            display: inline-block;
+            animation: emojiJump 2.5s ease-in-out infinite; /* 小人跳动 */
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));
+        }
+        @keyframes emojiJump {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-15px) scale(1.05); }
+        }
+        
+        .owner-label { background: #F59E0B; color: white; padding: 4px 16px; border-radius: 14px; font-size: 1.1rem; font-weight: 900; margin-top: -10px; z-index: 10; }
+        
+        /* 横向句子 */
+        .sentence-area { font-size: 1.6rem; font-weight: 800; color: #1E293B; line-height: 1.4; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 8px; }
+        .drop-zone { min-width: 90px; border-bottom: 4px solid #F59E0B; color: #D97706; text-align: center; transition: all 0.3s; height: 2.2rem; display: inline-flex; align-items: center; justify-content: center; }
+        .drop-zone.correct { color: #059669; border-bottom-color: #059669; transform: scale(1.1); }
+
+        /* 选项：呼吸动画 */
+        .options-grid { padding: 20px 25px 50px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+        .option-btn { 
+            background: white; border: 2px solid #E2E8F0; padding: 20px 5px; border-radius: 24px; 
+            font-size: 1.4rem; font-weight: 900; color: #475569; box-shadow: 0 6px 0 #E2E8F0; 
+            transition: 0.2s; min-height: 75px; display: flex; align-items: center; justify-content: center;
+            animation: btnPulse 3s infinite ease-in-out;
+        }
+        @keyframes btnPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(0.96); opacity: 0.9; }
+        }
+        .option-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #E2E8F0; }
+
+        /* 底部提示 */
+        #teacher-tip { position: fixed; bottom: -100%; left: 0; right: 0; background: white; padding: 35px; border-radius: 45px 45px 0 0; box-shadow: 0 -15px 60px rgba(0,0,0,0.15); transition: 0.5s cubic-bezier(0.17, 0.84, 0.44, 1); z-index: 100; max-width: 600px; margin: 0 auto; }
+        #teacher-tip.active { bottom: 0; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header-nav">
+            <button onclick="location.href='map.html'" class="text-slate-400">
+                <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" /></svg>
+            </button>
+            <div class="progress-wrapper">
+                <div class="progress-info"><span id="cur-num">1</span> / 30</div>
+                <div class="progress-bar-bg"><div id="progress-fill"></div></div>
+                <button id="mute-btn" class="text-slate-400" onclick="toggleMute()">
+                    <svg id="mute-icon" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="main-stage">
+            <div class="scene-card">
+                <div class="owner-box">
+                    <span class="owner-emoji" id="owner-emoji">🙋‍♂️</span>
+                    <span class="owner-label" id="owner-name">我的</span>
+                </div>
+                <div class="sentence-area" id="sentence-box"></div>
+            </div>
+        </div>
+
+        <div class="options-grid" id="options-grid"></div>
+
+        <div id="teacher-tip">
+            <div class="flex items-center gap-4 mb-5">
+                <div class="w-14 h-14 bg-amber-100 rounded-2xl flex items-center justify-center text-3xl">👩‍🏫</div>
+                <h3 class="text-2xl font-black text-slate-800">刘老师提醒</h3>
+            </div>
+            <p id="tip-text" class="text-slate-600 font-bold mb-8 text-lg"></p>
+            <button onclick="closeTip()" class="w-full py-5 bg-amber-500 text-white rounded-2xl font-black text-xl">继续练习</button>
+        </div>
+    </div>
+
+    <audio id="snd-ok" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+    <audio id="snd-err" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
+
+    <script>
+        const rawData = [
+            { o: "🙋‍♂️", n: "我的 (ich)", q1: "Das ist", q2: "Hund (der).", a: "mein", t: "ich -> mein。阳性名词不加词尾。" },
+            { o: "🙋‍♀️", n: "我的 (ich)", q1: "Das ist", q2: "Katze (die).", a: "meine", t: "ich -> meine。阴性加词尾 -e。" },
+            { o: "🫵", n: "你的 (du)", q1: "Ist das", q2: "Buch (das)?", a: "dein", t: "du -> dein。中性原型。" },
+            { o: "👦", n: "他的 (er)", q1: "Das ist", q2: "Vater (der).", a: "sein", t: "er -> sein。阳性不加词尾。" },
+            { o: "👧", n: "她的 (sie)", q1: "Das ist", q2: "Mutter (die).", a: "ihre", t: "她的 sie -> ihr。阴性加词尾 -e。" },
+            { o: "🏠", n: "我们的 (wir)", q1: "Das ist", q2: "Auto (das).", a: "unser", t: "wir -> unser。中性原型。" },
+            { o: "👥", n: "你们的 (ihr)", q1: "Wo ist", q2: "Lehrer (der)?", a: "euer", t: "你们的 ihr -> euer。" },
+            { o: "👥", n: "你们的 (ihr)", q1: "Wo ist", q2: "Schule (die)?", a: "eure", t: "注意：euer 加 -e 会变成 eure。" },
+            { o: "👔", n: "您的 (Sie)", q1: "Ist das", q2: "Tasche (die)?", a: "Ihre", t: "尊称 Sie 对应首字母大写的 Ihre。" },
+            { o: "👫", n: "他们的 (sie)", q1: "Das sind", q2: "Kinder (Pl.).", a: "ihre", t: "复数词尾加 -e。" },
+            { o: "👦", n: "他的 (er)", q1: "Er mag", q2: "Hobby (das).", a: "sein", t: "中性名词 er -> sein。" },
+            { o: "🫵", n: "你的 (du)", q1: "Ist das", q2: "Brille (die)?", a: "deine", t: "你的 du -> dein。阴性加 -e。" },
+            { o: "🙋‍♂️", n: "我的 (ich)", q1: "Das sind", q2: "Stifte (Pl.).", a: "meine", t: "复数 Pl. 结尾加 -e。" },
+            { o: "👧", n: "她的 (sie)", q1: "Wo ist", q2: "Handy (das)?", a: "ihr", t: "她的 sie -> ihr。中性不变。" },
+            { o: "🏠", n: "我们的 (wir)", q1: "Das ist", q2: "Haus (das).", a: "unser", t: "中性名词不加词尾。" },
+            { o: "👦", n: "他的 (er)", q1: "Wo sind", q2: "Schuhe (Pl.)?", a: "seine", t: "复数 Pl. 加词尾 -e。" },
+            { o: "🫵", n: "你的 (du)", q1: "Das ist", q2: "Freund (der).", a: "dein", t: "阳性不加词尾。" },
+            { o: "🙋‍♀️", n: "我的 (ich)", q1: "Das ist", q2: "Zimmer (das).", a: "mein", t: "中性原型。" },
+            { o: "👔", n: "您的 (Sie)", q1: "Wie heißt", q2: "Sohn (der)?", a: "Ihr", t: "尊称首字母大写！" },
+            { o: "👫", n: "他们的 (sie)", q1: "Wie heißt", q2: "Tochter (die)?", a: "ihre", t: "阴性名词加词尾 -e。" },
+            { o: "👦", n: "他的 (er)", q1: "Das ist", q2: "Kuli (der).", a: "sein", t: "阳性不加词尾。" },
+            { o: "🙋‍♂️", n: "我的 (ich)", q1: "Hier ist", q2: "Eis (das).", a: "mein", t: "中性原型。" },
+            { o: "🫵", n: "你的 (du)", q1: "Wo ist", q2: "Uhr (die)?", a: "deine", t: "阴性加 -e。" },
+            { o: "🏠", n: "我们的 (wir)", q1: "Das sind", q2: "Eltern (Pl.).", a: "unsere", t: "复数加 -e。" },
+            { o: "👧", n: "她的 (sie)", q1: "Das ist", q2: "Fahrrad (das).", a: "ihr", t: "中性原型。" },
+            { o: "👥", n: "你们的 (ihr)", q1: "Ist das", q2: "Pizza (die)?", a: "eure", t: "euer 变位成 eure。" },
+            { o: "👔", n: "您的 (Sie)", q1: "Sind das", q2: "Koffer (Pl.)?", a: "Ihre", t: "尊称复数变位为 Ihre。" },
+            { o: "👫", n: "他们的 (sie)", q1: "Das ist", q2: "Garten (der).", a: "ihr", t: "他们的对应 ihr。阳性不变。" },
+            { o: "🙋‍♀️", n: "我的 (ich)", q1: "Wo ist", q2: "Lampe (die)?", a: "meine", t: "我的+阴性 = meine。" },
+            { o: "👦", n: "他的 (er)", q1: "Das ist", q2: "Bruder (der).", a: "sein", t: "阳性原型。" }
+        ];
+
+        let quizData = [];
+        let currentIndex = 0;
+        let isMuted = false;
+        let canClick = true;
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            document.getElementById('mute-icon').innerHTML = isMuted ? 
+                '<path d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />' :
+                '<path d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />';
+        }
+
+        function playSound(id) {
+            if (isMuted) return;
+            const s = document.getElementById(id);
+            if(s) { s.currentTime = 0; s.play().catch(()=>{}); }
+        }
+
+        function renderQuestion() {
+            if (currentIndex >= quizData.length) {
+                showFinal();
+                return;
+            }
+            canClick = true;
+            const data = quizData[currentIndex];
+            
+            document.getElementById('owner-emoji').innerText = data.o;
+            document.getElementById('owner-name').innerText = data.n;
+            
+            // 句子横向对齐
+            document.getElementById('sentence-box').innerHTML = `
+                <span>${data.q1}</span>
+                <span class="drop-zone" id="dz"></span>
+                <span>${data.q2}</span>
+            `;
+
+            document.getElementById('cur-num').innerText = currentIndex + 1;
+            document.getElementById('progress-fill').style.width = ((currentIndex + 1) / quizData.length * 100) + '%';
+            
+            const options = generateOptions(data.a);
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(opt, data.a, data.t);
+                grid.appendChild(btn);
+            });
+        }
+
+        function generateOptions(correct) {
+            const pool = ["mein", "meine", "dein", "deine", "sein", "seine", "ihr", "ihre", "unser", "unsere", "eure", "Ihr", "Ihre"];
+            let opts = [correct];
+            while(opts.length < 4) {
+                let r = pool[Math.floor(Math.random()*pool.length)];
+                if(!opts.includes(r)) opts.push(r);
+            }
+            return opts.sort(() => Math.random() - 0.5);
+        }
+
+        function checkAnswer(selected, correct, tip) {
+            if(!canClick) return;
+            if(selected === correct) {
+                canClick = false;
+                playSound('snd-ok');
+                
+                // 烟花
+                confetti({
+                    particleCount: 120,
+                    spread: 80,
+                    origin: { y: 0.6 },
+                    colors: ['#F59E0B', '#10B981', '#3B82F6']
+                });
+
+                const dz = document.getElementById('dz');
+                dz.innerText = selected;
+                dz.classList.add('correct');
+
+                // 停留3秒进入下一题
+                setTimeout(() => {
+                    currentIndex++;
+                    renderQuestion();
+                }, 3000);
+            } else {
+                playSound('snd-err');
+                showTip(tip);
+            }
+        }
+
+        function showTip(text) {
+            document.getElementById('tip-text').innerText = text;
+            document.getElementById('teacher-tip').classList.add('active');
+            canClick = false;
+        }
+
+        function closeTip() {
+            document.getElementById('teacher-tip').classList.remove('active');
+            canClick = true;
+        }
+
+        function showFinal() {
+            document.querySelector('.main-stage').innerHTML = `
+                <div class="text-center">
+                    <div class="text-8xl mb-6">🏆</div>
+                    <h2 class="text-4xl font-black text-amber-500">闯关成功！</h2>
+                    <p class="text-slate-500 font-bold mt-4 text-xl">你已经完美掌握了物主代词</p>
+                    <button onclick="location.href='map.html'" class="mt-12 px-12 py-5 bg-amber-500 text-white rounded-3xl font-black text-2xl shadow-xl">完成</button>
+                </div>
+            `;
+            confetti({ particleCount: 300, spread: 120, origin: { y: 0.5 } });
+        }
+
+        // 随机乱序并初始化
+        quizData = [...rawData].sort(() => Math.random() - 0.5);
+        renderQuestion();
+    </script>
+</body>
+</html>
