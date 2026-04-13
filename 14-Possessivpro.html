@@ -23,12 +23,12 @@
         .main-stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 20px; }
         .scene-card { width: 100%; padding: 45px 20px; background: #FFFBEB; border-radius: 40px; text-align: center; border: 2px solid #FEF3C7; position: relative; }
         
-        /* 动起来的 Emoji */
+        /* 动画小人 */
         .owner-box { display: flex; flex-direction: column; align-items: center; margin-bottom: 30px; }
         .owner-emoji { 
             font-size: 70px; 
             display: inline-block;
-            animation: emojiJump 2.5s ease-in-out infinite; /* 小人跳动 */
+            animation: emojiJump 2.5s ease-in-out infinite;
             filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));
         }
         @keyframes emojiJump {
@@ -38,12 +38,11 @@
         
         .owner-label { background: #F59E0B; color: white; padding: 4px 16px; border-radius: 14px; font-size: 1.1rem; font-weight: 900; margin-top: -10px; z-index: 10; }
         
-        /* 横向句子 */
         .sentence-area { font-size: 1.6rem; font-weight: 800; color: #1E293B; line-height: 1.4; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 8px; }
         .drop-zone { min-width: 90px; border-bottom: 4px solid #F59E0B; color: #D97706; text-align: center; transition: all 0.3s; height: 2.2rem; display: inline-flex; align-items: center; justify-content: center; }
         .drop-zone.correct { color: #059669; border-bottom-color: #059669; transform: scale(1.1); }
 
-        /* 选项：呼吸动画 */
+        /* 选项按钮 */
         .options-grid { padding: 20px 25px 50px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
         .option-btn { 
             background: white; border: 2px solid #E2E8F0; padding: 20px 5px; border-radius: 24px; 
@@ -65,7 +64,7 @@
 <body>
     <div class="app-container">
         <div class="header-nav">
-            <button onclick="location.href='map.html'" class="text-slate-400">
+            <button onclick="location.href='index.html'" class="text-slate-400">
                 <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" /></svg>
             </button>
             <div class="progress-wrapper">
@@ -167,7 +166,6 @@
             document.getElementById('owner-emoji').innerText = data.o;
             document.getElementById('owner-name').innerText = data.n;
             
-            // 句子横向对齐
             document.getElementById('sentence-box').innerHTML = `
                 <span>${data.q1}</span>
                 <span class="drop-zone" id="dz"></span>
@@ -206,7 +204,6 @@
                 canClick = false;
                 playSound('snd-ok');
                 
-                // 烟花
                 confetti({
                     particleCount: 120,
                     spread: 80,
@@ -218,11 +215,10 @@
                 dz.innerText = selected;
                 dz.classList.add('correct');
 
-                // 停留3秒进入下一题
                 setTimeout(() => {
                     currentIndex++;
                     renderQuestion();
-                }, 3000);
+                }, 1500); // 缩短等待时间提高节奏感
             } else {
                 playSound('snd-err');
                 showTip(tip);
@@ -241,14 +237,18 @@
         }
 
         function showFinal() {
+            // 【关键修改】存储通关状态，触发地图图标
+            localStorage.setItem('level14_cleared', 'true');
+
             document.querySelector('.main-stage').innerHTML = `
                 <div class="text-center">
                     <div class="text-8xl mb-6">🏆</div>
                     <h2 class="text-4xl font-black text-amber-500">闯关成功！</h2>
                     <p class="text-slate-500 font-bold mt-4 text-xl">你已经完美掌握了物主代词</p>
-                    <button onclick="location.href='map.html'" class="mt-12 px-12 py-5 bg-amber-500 text-white rounded-3xl font-black text-2xl shadow-xl">完成</button>
+                    <button onclick="location.href='index.html'" class="mt-12 px-12 py-5 bg-amber-500 text-white rounded-3xl font-black text-2xl shadow-xl">完成</button>
                 </div>
             `;
+            document.getElementById('options-grid').innerHTML = ''; // 清空选项
             confetti({ particleCount: 300, spread: 120, origin: { y: 0.5 } });
         }
 
