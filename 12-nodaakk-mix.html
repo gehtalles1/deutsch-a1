@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>12-定冠词变格全掌握 | 刘老师课堂</title>
+    <title>定冠词变格全掌握 | 刘老师课堂</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
@@ -46,7 +46,7 @@
         <div class="header-nav">
             <button onclick="window.location.href='map.html'" class="back-btn"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" /></svg></button>
             <div class="progress-container">
-                <div class="progress-info">LEVEL 12: <span id="cur-num">1</span> / 40</div>
+                <div class="progress-info"><span id="cur-num">1</span> / 40</div>
                 <div class="progress-bar-bg"><div id="progress-fill"></div></div>
             </div>
             <button onclick="toggleMute()" class="mute-btn" id="mute-trigger">
@@ -69,7 +69,7 @@
                 <div><h3 class="text-lg font-black text-indigo-900">重点笔记</h3></div>
             </div>
             <div id="tip-text" class="text-slate-700 font-bold mb-6 text-md bg-slate-50 p-5 rounded-xl border-l-4 border-indigo-500"></div>
-            <button onclick="closeTip()" class="w-full py-4 bg-indigo-600 text-white rounded-xl font-black text-lg shadow-lg">记住了，下一题</button>
+            <button onclick="closeTip()" class="w-full py-4 bg-indigo-600 text-white rounded-xl font-black text-lg shadow-lg">记住了</button>
         </div>
 
         <div id="finish-modal">
@@ -157,7 +157,6 @@
             const grid = document.getElementById('options-grid');
             grid.innerHTML = '';
             
-            // 4选项混淆逻辑
             let correct = data.a.toLowerCase();
             let others = ["der", "die", "das", "den", "dem"].filter(o => o !== correct).sort(() => Math.random() - 0.5);
             let options = [correct, ...others.slice(0, 3)].sort(() => Math.random() - 0.5);
@@ -165,7 +164,6 @@
             options.forEach(opt => {
                 const btn = document.createElement('button');
                 btn.className = 'option-btn';
-                // 处理句首大写
                 const displayOpt = data.s.startsWith("____") ? opt.charAt(0).toUpperCase() + opt.slice(1) : opt;
                 btn.innerText = displayOpt;
                 
@@ -196,9 +194,7 @@
         }
 
         function showFinal() {
-            // 设置地图勋章标记
             localStorage.setItem('level12_cleared', 'true');
-            
             document.getElementById('finish-modal').style.display = 'flex';
             confetti({ 
                 particleCount: 200, 
