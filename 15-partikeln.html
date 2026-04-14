@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>15-跨越小品词 | A1 语气强化版</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@500;700;900&display=swap');
+        body { background: #F8FAFC; font-family: 'Noto Sans SC', sans-serif; margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .app-container { width: 100%; max-width: 600px; height: 95vh; max-height: 850px; background: #FFFFFF; border-radius: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); position: relative; display: flex; flex-direction: column; overflow: hidden; border: 8px solid white; }
+        .header-nav { padding: 25px 25px 15px; display: flex; align-items: center; gap: 15px; }
+        .back-btn, .mute-btn { background: #F1F5F9; padding: 12px; border-radius: 18px; color: #64748B; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+        .progress-container { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+        .progress-info { font-size: 14px; font-weight: 900; color: #94A3B8; text-align: center; }
+        .progress-bar-bg { width: 100%; height: 10px; background: #E2E8F0; border-radius: 20px; overflow: hidden; }
+        #progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #F59E0B, #FB923C); transition: width 0.4s ease-out; }
+        .main-stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 30px; }
+        .mood-card { width: 100%; padding: 40px 20px; background: #FFFBF0; border-radius: 35px; text-align: center; border: 2px solid #FEF3C7; }
+        @keyframes floatEmoji { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+        .mood-emoji { font-size: 80px; margin-bottom: 15px; display: inline-block; animation: floatEmoji 2.5s infinite ease-in-out; }
+        .sentence-area { font-size: 1.6rem; font-weight: 800; color: #451A03; line-height: 1.4; margin-bottom: 10px; }
+        .translation-area { font-size: 1.1rem; font-weight: 700; color: #B45309; opacity: 0.8; min-height: 1.5em; }
+        .drop-zone { display: inline-block; min-width: 60px; border-bottom: 4px solid #F59E0B; margin: 0 5px; color: transparent; vertical-align: baseline; }
+        .drop-zone.filled { color: #10B981; border-bottom-color: #10B981; }
+        .options-area { padding: 20px 25px 40px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .option-btn { background: #F59E0B; border: 2px solid #D97706; padding: 18px 0; border-radius: 22px; font-size: 1.4rem; font-weight: 900; color: white; box-shadow: 0 6px 0 #92400E; transition: 0.1s; }
+        .option-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #92400E; }
+        #teacher-tip { position: absolute; bottom: -100%; left: 0; right: 0; background: white; padding: 35px; border-radius: 40px 40px 0 0; box-shadow: 0 -15px 50px rgba(0,0,0,0.1); transition: 0.5s; z-index: 100; border-top: 6px solid #F59E0B; }
+        #teacher-tip.active { bottom: 0; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header-nav">
+            <button onclick="window.location.href='index.html'" class="back-btn"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" /></svg></button>
+            <div class="progress-container">
+                <div class="progress-info"><span id="cur-num">1</span> / 30</div>
+                <div class="progress-bar-bg"><div id="progress-fill"></div></div>
+            </div>
+            <button onclick="toggleMute()" class="mute-btn"><svg id="mute-icon" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg></button>
+        </div>
+        <div class="main-stage">
+            <div class="mood-card">
+                <span class="mood-emoji" id="mood-emoji">😊</span>
+                <div class="sentence-area" id="sentence-box"></div>
+                <div class="translation-area" id="translation-box"></div>
+            </div>
+        </div>
+        <div class="options-area" id="options-grid"></div>
+        <div id="teacher-tip">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center text-2xl">👩‍🏫</div>
+                <h3 class="text-lg font-black text-amber-900">语气解析</h3>
+            </div>
+            <div id="tip-text" class="text-slate-700 font-bold mb-6 text-md bg-amber-50 p-5 rounded-xl border-l-4 border-amber-500"></div>
+            <button onclick="closeTip()" class="w-full py-4 bg-amber-600 text-white rounded-xl font-black text-lg">记住了</button>
+        </div>
+    </div>
+
+    <audio id="snd-ok" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+    <audio id="snd-err" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
+
+    <script>
+        const rawData = [
+            // mal 专题 (包含“一下/一次”注释)
+            { s: "Komm ____ her!", a: "mal", e: "🏃", cn: "过来一下呗！", t: "mal 相当于‘一下’。让命令听起来更像是一个随意的请求，不那么生硬。" },
+            { s: "Helfen Sie mir ____?", a: "mal", e: "🙏", cn: "能帮我个忙吗？", t: "mal 表示‘一下’。使请求听起来客气、随意且非正式。" },
+            { s: "Warten Sie ____!", a: "mal", e: "⏳", cn: "请等一下哦！", t: "mal 这里译为‘一下’。这是固定的客气用语，缩短心理距离。" },
+            { s: "Schau ____ das Foto!", a: "mal", e: "📸", cn: "快看一眼这张照片！", t: "mal 表示‘一下/一次’。用于吸引注意力，语气非常轻松。" },
+            { s: "Hör ____ Musik!", a: "mal", e: "🎧", cn: "听一下这首歌看！", t: "mal 译为‘一下’。用于建议对方尝试做某事。" },
+            { s: "Frag ____ den Lehrer!", a: "mal", e: "👨‍🏫", cn: "去问一下老师看嘛！", t: "mal 表示‘一下’。给出一个非强制性的试探性建议。" },
+            { s: "Trink ____ einen Kaffee!", a: "mal", e: "☕", cn: "喝杯咖啡（一下）呗！", t: "mal 译为‘一下’。让邀请听起来更亲切自然。" },
+            { s: "Probier ____ das Brot!", a: "mal", e: "🥖", cn: "尝一下这个面包！", t: "mal 译为‘一下’。用于友好地鼓励对方尝试。" },
+            { s: "Zeig mir ____ den Weg.", a: "mal", e: "🗺️", cn: "给我指一下路呗。", t: "mal 表示‘一下’。让寻求帮助的语气更柔和。" },
+            { s: "Sag ____, wie viel Uhr ist es?", a: "mal", e: "⌚", cn: "嘿说一下，几点啦？", t: "Sag mal 是固定搭配，意为‘（跟我）说一下/请问’。" },
+            
+            // denn (疑问句)
+            { s: "Wie heißt du ____?", a: "denn", e: "🧐", cn: "你到底叫什么呀？", t: "denn 在疑问句中加强语气，表示说话人真的很想知道答案。" },
+            { s: "Woher kommst du ____?", a: "denn", e: "🌍", cn: "那你到底是哪国人呀？", t: "denn 柔化了提问，表现出对对方背景的友善兴趣。" },
+            { s: "Was machst du ____ hier?", a: "denn", e: "😲", cn: "你究竟在这儿干嘛呢？", t: "denn 在问句中可以表达一种意外或惊讶。" },
+            { s: "Wie alt bist du ____?", a: "denn", e: "🎂", cn: "那你到底几岁了呀？", t: "denn 常用在闲谈中，表示顺着话题的自然追问。" },
+            { s: "Wo ist ____ mein Handy?", a: "denn", e: "📱", cn: "我的手机究竟在哪儿啊？", t: "denn 表达寻找丢失物品时的焦急和困惑。" },
+            
+            // doch (加强/催促)
+            { s: "Komm ____ rein!", a: "doch", e: "🏠", cn: "快进来嘛！(别客气)", t: "doch 消除对方的顾虑，传达出热情的邀请。" },
+            { s: "Essen Sie ____!", a: "doch", e: "🍕", cn: "快吃嘛！(多吃点)", t: "doch 在招待客人时使用，显得主方非常慷慨友好。" },
+            { s: "Das ist ____ falsch!", a: "doch", e: "❌", cn: "这明明是错的呀！", t: "doch 用于强调自己的立场，带有一种纠正对方的感觉。" },
+            { s: "Geh ____ nach Hause!", a: "doch", e: "🚶", cn: "你还是快回家吧！", t: "doch 给出一个迫切的建议，带有某种‘理应如此’的语气。" },
+            { s: "Nimm ____ ein Taxi!", a: "doch", e: "🚕", cn: "那你坐出租车嘛！", t: "doch 在对话中给出一个显而易见的解决方案。" },
+            
+            // ja (感叹)
+            { s: "Das ist ____ billig!", a: "ja", e: "🏷️", cn: "这可真是便宜呀！", t: "ja 用于感叹，表达对眼前事实的惊讶。" },
+            { s: "Du bist ____ müde!", a: "ja", e: "🥱", cn: "你确实很累了呀。(显而易见)", t: "ja 用于强调一个彼此都看得见的事实。" },
+            { s: "Heute ist ____ Sonntag!", a: "ja", e: "🗓️", cn: "今天可是周日呀！(别忘了)", t: "ja 提醒对方一个不应忽视的基本事实。" },
+            
+            // schon (打气/回应)
+            { s: "Das geht ____.", a: "schon", e: "👌", cn: "那倒也行。(还可以吧)", t: "schon 表示一种基本的满意或勉强的接受。" },
+            { s: "Ich komme ____!", a: "schon", e: "🏃‍♂️", cn: "我这就来了！(已经在路上了)", t: "schon 强调动作的即时性，回应对方的催促。" },
+            { s: "Wir finden das ____.", a: "schon", e: "🔎", cn: "我们总能找到的嘛。(别担心)", t: "schon 用于安抚，表达对未来结果的确定感。" },
+            
+            // 混合 A1 核心句型
+            { s: "Wo wohnst du ____?", a: "denn", e: "🏘️", cn: "那你到底是住在哪儿呢？", t: "denn 增加提问的温度，让对话更像聊天。" },
+            { s: "Lies ____ den Text!", a: "mal", e: "📖", cn: "读一下这段话吧！", t: "mal 相当于‘一下’。用于课堂或日常中随意的建议。" },
+            { s: "Das ist ____ super!", a: "ja", e: "✨", cn: "这可真是太棒了！", t: "ja 表达真诚的赞美和发现。" },
+            { s: "Frag ____ die Frau!", a: "mal", e: "👩", cn: "去问一下那位女士呗！", t: "mal 相当于‘一下’。让语气轻松，不给对方压力。" }
+        ];
+
+        let quizData = [...rawData].sort(() => Math.random() - 0.5);
+        let currentIndex = 0; let isMuted = false; let canClick = true;
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            document.getElementById('mute-icon').innerHTML = isMuted ? 
+                '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />' : 
+                '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />';
+        }
+
+        function playSound(type) {
+            if (isMuted) return;
+            const s = document.getElementById(type === 'ok' ? 'snd-ok' : 'snd-err');
+            s.currentTime = 0; s.play().catch(()=>{});
+        }
+
+        function renderQuestion() {
+            if (currentIndex >= quizData.length) { 
+                confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
+                setTimeout(() => window.location.href='index.html', 3000);
+                return; 
+            }
+            canClick = true;
+            const data = quizData[currentIndex];
+            document.getElementById('mood-emoji').innerText = data.e;
+            document.getElementById('sentence-box').innerHTML = data.s.replace("____", `<span class="drop-zone">____</span>`);
+            document.getElementById('translation-box').innerText = data.cn;
+            document.getElementById('cur-num').innerText = currentIndex + 1;
+            document.getElementById('progress-fill').style.width = ((currentIndex + 1) / quizData.length * 100) + '%';
+            
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            
+            const pool = ["denn", "doch", "ja", "mal", "schon"];
+            let options = [data.a];
+            let others = pool.filter(p => p !== data.a).sort(() => Math.random() - 0.5);
+            options.push(...others.slice(0, 3));
+            options.sort(() => Math.random() - 0.5);
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    if(!canClick) return;
+                    if(opt === data.a) {
+                        canClick = false; playSound('ok');
+                        const dz = document.querySelector('.drop-zone');
+                        dz.innerText = opt; dz.classList.add('filled');
+                        setTimeout(() => { currentIndex++; renderQuestion(); }, 3000);
+                    } else {
+                        playSound('err');
+                        document.getElementById('tip-text').innerText = data.t;
+                        document.getElementById('teacher-tip').classList.add('active');
+                        canClick = false;
+                    }
+                };
+                grid.appendChild(btn);
+            });
+        }
+
+        function closeTip() { document.getElementById('teacher-tip').classList.remove('active'); canClick = true; }
+        renderQuestion();
+    </script>
+</body>
+</html>
