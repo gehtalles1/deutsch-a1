@@ -64,36 +64,36 @@
 
     <script>
         const rawData = [
-            { s: "Komm ____ her!", a: "mal", e: "🏃", cn: "过来一下呗！", t: "mal 相当于‘一下’。让命令听起来更像是一个随意的请求，不那么生硬。" },
-            { s: "Helfen Sie mir ____?", a: "mal", e: "🙏", cn: "能帮我个忙吗？", t: "mal 表示‘一下’。使请求听起来客气、随意且非正式。" },
-            { s: "Warten Sie ____!", a: "mal", e: "⏳", cn: "请等一下哦！", t: "mal 这里译为‘一下’。这是固定的客气用语，缩短心理距离。" },
-            { s: "Schau ____ das Foto!", a: "mal", e: "📸", cn: "快看一眼这张照片！", t: "mal 表示‘一下/一次’。用于吸引注意力，语气非常轻松。" },
-            { s: "Hör ____ Musik!", a: "mal", e: "🎧", cn: "听一下这首歌看！", t: "mal 译为‘一下’。用于建议对方尝试做某事。" },
-            { s: "Frag ____ den Lehrer!", a: "mal", e: "👨‍🏫", cn: "去问一下老师看嘛！", t: "mal 表示‘一下’。给出一个非强制性的试探性建议。" },
-            { s: "Trink ____ einen Kaffee!", a: "mal", e: "☕", cn: "喝杯咖啡（一下）呗！", t: "mal 译为‘一下’。让邀请听起来更亲切自然。" },
-            { s: "Probier ____ das Brot!", a: "mal", e: "🥖", cn: "尝一下这个面包！", t: "mal 译为‘一下’。用于友好地鼓励对方尝试。" },
-            { s: "Zeig mir ____ den Weg.", a: "mal", e: "🗺️", cn: "给我指一下路呗。", t: "mal 表示‘一下’。让寻求帮助的语气更柔和。" },
-            { s: "Sag ____, wie viel Uhr ist es?", a: "mal", e: "⌚", cn: "嘿说一下，几点啦？", t: "Sag mal 是固定搭配，意为‘（跟我）说一下/请问’。" },
-            { s: "Wie heißt du ____?", a: "denn", e: "🧐", cn: "你到底叫什么呀？", t: "denn 在疑问句中加强语气，表示说话人真的很想知道答案。" },
-            { s: "Woher kommst du ____?", a: "denn", e: "🌍", cn: "那你到底是哪国人呀？", t: "denn 柔化了提问，表现出对对方背景的友善兴趣。" },
-            { s: "Was machst du ____ hier?", a: "denn", e: "😲", cn: "你究竟在这儿干嘛呢？", t: "denn 在问句中可以表达一种意外或惊讶。" },
-            { s: "Wie alt bist du ____?", a: "denn", e: "🎂", cn: "那你到底几岁了呀？", t: "denn 常用在闲谈中，表示顺着话题的自然追问。" },
-            { s: "Wo ist ____ mein Handy?", a: "denn", e: "📱", cn: "我的手机究竟在哪儿啊？", t: "denn 表达寻找丢失物品时的焦急和困惑。" },
-            { s: "Komm ____ rein!", a: "doch", e: "🏠", cn: "快进来嘛！(别客气)", t: "doch 消除对方的顾虑，传达出热情的邀请。" },
-            { s: "Essen Sie ____!", a: "doch", e: "🍕", cn: "快吃嘛！(多吃点)", t: "doch 在招待客人时使用，显得主方非常慷慨友好。" },
-            { s: "Das ist ____ falsch!", a: "doch", e: "❌", cn: "这明明是错的呀！", t: "doch 用于强调自己的立场，带有一种纠正对方的感觉。" },
-            { s: "Geh ____ nach Hause!", a: "doch", e: "🚶", cn: "你还是快回家吧！", t: "doch 给出一个迫切的建议，带有某种‘理应如此’的语气。" },
-            { s: "Nimm ____ ein Taxi!", a: "doch", e: "🚕", cn: "那你坐出租车嘛！", t: "doch 在对话中给出一个显而易见的解决方案。" },
-            { s: "Das ist ____ billig!", a: "ja", e: "🏷️", cn: "这可真是便宜呀！", t: "ja 用于感叹，表达对眼前事实的惊讶。" },
-            { s: "Du bist ____ müde!", a: "ja", e: "🥱", cn: "你确实很累了呀。(显而易见)", t: "ja 用于强调一个彼此都看得见的事实。" },
-            { s: "Heute ist ____ Sonntag!", a: "ja", e: "🗓️", cn: "今天可是周日呀！(别忘了)", t: "ja 提醒对方一个不应忽视的基本事实。" },
-            { s: "Das geht ____.", a: "schon", e: "👌", cn: "那倒也行。(还可以吧)", t: "schon 表示一种基本的满意或勉强的接受。" },
-            { s: "Ich komme ____!", a: "schon", e: "🏃‍♂️", cn: "我这就来了！(已经在路上了)", t: "schon 强调动作的即时性，回应对方的催促。" },
-            { s: "Wir finden das ____.", a: "schon", e: "🔎", cn: "我们总能找到的嘛。(别担心)", t: "schon 用于安抚，表达对未来结果的确定感。" },
-            { s: "Wo wohnst du ____?", a: "denn", e: "🏘️", cn: "那你到底是住在哪儿呢？", t: "denn 增加提问的温度，让对话更像聊天。" },
-            { s: "Lies ____ den Text!", a: "mal", e: "📖", cn: "读一下这段话吧！", t: "mal 相当于‘一下’。用于课堂或日常中随意的建议。" },
-            { s: "Das ist ____ super!", a: "ja", e: "✨", cn: "这可真是太棒了！", t: "ja 表达真诚的赞美和发现。" },
-            { s: "Frag ____ die Frau!", a: "mal", e: "👩", cn: "去问一下那位女士呗！", t: "mal 相当于‘一下’。让语气轻松，不给对方压力。" }
+            { s: "Komm ____ her!", a: "mal", e: "🏃", cn: "过来一下呗！", t: "mal 使命令语气变温和，相当于中文的‘……一下呗’。" },
+            { s: "Helfen Sie mir ____?", a: "mal", e: "🙏", cn: "能帮我个忙吗？", t: "mal 让求助听起来更客气、随意，没有强迫感。" },
+            { s: "Warten Sie ____!", a: "mal", e: "⏳", cn: "请等一下哦！", t: "mal 缩短了心理距离，让对方觉得等待不那么枯燥。" },
+            { s: "Schau ____ das Foto!", a: "mal", e: "📸", cn: "快看一眼这照片！", t: "mal 用于吸引对方注意力，语气非常轻松。" },
+            { s: "Hör ____ Musik!", a: "mal", e: "🎧", cn: "听点音乐呗！", t: "mal 用于给出随意的建议，表示‘试着做某事’。" },
+            { s: "Frag ____ den Lehrer!", a: "mal", e: "👨‍🏫", cn: "去问问老师看嘛！", t: "mal 降低了建议的严肃性，相当于中文的‘……看看’。" },
+            { s: "Trink ____ einen Kaffee!", a: "mal", e: "☕", cn: "喝杯咖啡休息下呗！", t: "mal 让邀请显得亲切且顺便，不给对方压力。" },
+            { s: "Probier ____ das Brot!", a: "mal", e: "🥖", cn: "尝一下这个面包吧！", t: "mal 鼓励尝试，语气非常友好。" },
+            { s: "Zeig mir ____ den Weg.", a: "mal", e: "🗺️", cn: "给我指下路呗。", t: "mal 柔化了寻求帮助的语气，显得有礼貌。" },
+            { s: "Sag ____, wie viel Uhr ist es?", a: "mal", e: "⌚", cn: "嘿说一下，几点啦？", t: "Sag mal 是固定的开场白，类似‘哎，请问’。" },
+            { s: "Wie heißt du ____?", a: "denn", e: "🧐", cn: "你到底叫什么呀？", t: "denn 在疑问句中体现出说话人强烈的好奇心。" },
+            { s: "Woher kommst du ____?", a: "denn", e: "🌍", cn: "那你到底是哪国人呀？", t: "denn 表现出对对方背景真诚的、自然的关注。" },
+            { s: "Was machst du ____ hier?", a: "denn", e: "😲", cn: "你究竟在这儿干嘛呢？", t: "denn 表达看到意料之外情况时的惊讶。" },
+            { s: "Wie alt bist du ____?", a: "denn", e: "🎂", cn: "那你到底几岁了呀？", t: "denn 顺着话题自然追问，显得更有温度。" },
+            { s: "Wo ist ____ mein Handy?", a: "denn", e: "📱", cn: "我的手机究竟在哪儿啊？", t: "denn 表达找不到东西时的焦虑或纳闷。" },
+            { s: "Komm ____ rein!", a: "doch", e: "🏠", cn: "快进来嘛！", t: "doch 消除对方的拘束感，表示热情的邀请。" },
+            { s: "Essen Sie ____!", a: "doch", e: "🍕", cn: "快吃嘛，别客气！", t: "doch 表现主人的慷慨和真诚建议。" },
+            { s: "Das ist ____ falsch!", a: "doch", e: "❌", cn: "这明明是错的呀！", t: "doch 用于反驳或纠正，带有‘事实本就如此’的强调。" },
+            { s: "Geh ____ nach Hause!", a: "doch", e: "🚶", cn: "你还是快回家吧！", t: "doch 给出迫切的建议，暗示这是显而易见的决定。" },
+            { s: "Nimm ____ ein Taxi!", a: "doch", e: "🚕", cn: "那你坐出租车嘛！", t: "doch 指出一个显而易见的解决办法。" },
+            { s: "Das ist ____ billig!", a: "ja", e: "🏷️", cn: "这可真是便宜呀！", t: "ja 表示感叹，强调自己对眼前情况的惊讶。" },
+            { s: "Du bist ____ müde!", a: "ja", e: "🥱", cn: "你确实很累了呀。", t: "ja 用于确认一个显而易见、双方公认的事实。" },
+            { s: "Heute ist ____ Sonntag!", a: "ja", e: "🗓️", cn: "今天可是周日呀！", t: "ja 提醒对方一个被忽略的基本常识。" },
+            { s: "Das geht ____.", a: "schon", e: "👌", cn: "那倒也行。", t: "schon 表示一种基本的满意、认可或勉强的接受。" },
+            { s: "Ich komme ____!", a: "schon", e: "🏃‍♂️", cn: "我这就来了！", t: "schon 强调动作正在进行，用来回应对方的催促。" },
+            { s: "Wir finden das ____.", a: "schon", e: "🔎", cn: "我们总能找到的嘛。", t: "schon 用于宽慰，表达对结果的信心。" },
+            { s: "Wo wohnst du ____?", a: "denn", e: "🏘️", cn: "那你到底是住在哪儿呢？", t: "denn 让提问显得更亲切，更像朋友间的闲聊。" },
+            { s: "Lies ____ den Text!", a: "mal", e: "📖", cn: "读一下这段话吧！", t: "mal 语气轻松，常用于课堂或日常指令的柔化。" },
+            { s: "Das ist ____ super!", a: "ja", e: "✨", cn: "这可真是太棒了！", t: "ja 表达由衷的赞叹，带有发现惊喜的意味。" },
+            { s: "Frag ____ die Frau!", a: "mal", e: "👩", cn: "去问一下那位女士呗！", t: "mal 减轻压力，让提议听起来非常随意。" }
         ];
 
         let quizData = [...rawData].sort(() => Math.random() - 0.5);
@@ -113,11 +113,8 @@
         }
 
         function renderQuestion() {
-            // 通关判定逻辑更新
             if (currentIndex >= quizData.length) { 
-                // 核心：设置 localStorage 标记，通知地图页面
                 localStorage.setItem('level15_cleared', 'true');
-                
                 confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
                 setTimeout(() => window.location.href='index.html', 3000);
                 return; 
