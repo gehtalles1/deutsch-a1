@@ -181,6 +181,13 @@
                     <div id="m14" class="absolute -top-2 -right-2 text-3xl medal-pop"></div>
                 </div>
 
+                <div id="lvl15" onclick="go(15)" class="premium-card p-4 flex flex-col items-center text-center locked-state relative">
+                    <div class="w-12 h-12 bg-[#D97706] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">15</div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-tight">跨越小品词</h3>
+                    <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Modalpartikeln</p>
+                    <div id="m15" class="absolute -top-2 -right-2 text-3xl medal-pop"></div>
+                </div>
+
             </div>
         </main>
 
@@ -198,8 +205,8 @@
     </div>
 
     <script>
-        // 定义关卡列表，方便批量处理
-        const levelIds = ['lvl1', 'lvl2', 'lvl3', 'lvl4', 'lvl5', 'lvl6', 'lvl7', 'lvl8', 'lvl9', 'lvl10', 'lvl11', 'lvl12', 'lvl13', 'lvl14'];
+        // 更新关卡 ID 列表
+        const levelIds = ['lvl1', 'lvl2', 'lvl3', 'lvl4', 'lvl5', 'lvl6', 'lvl7', 'lvl8', 'lvl9', 'lvl10', 'lvl11', 'lvl12', 'lvl13', 'lvl14', 'lvl15'];
 
         function checkStatus() {
             const unlocked = localStorage.getItem('isUnlocked') === 'true';
@@ -211,7 +218,7 @@
                 });
             }
 
-            // 更新通关图标
+            // 通关图标逻辑
             const s1Score = localStorage.getItem('stage1_score'); 
             if (s1Score === 'gold') document.getElementById('m1').innerText = "🥇";
             else if (s1Score === 'silver') document.getElementById('m1').innerText = "🥈";
@@ -228,8 +235,10 @@
             if (localStorage.getItem('level11_cleared') === 'true') document.getElementById('m11').innerText = "🏅";
             if (localStorage.getItem('level12_cleared') === 'true') document.getElementById('m12').innerText = "🏆";
             if (localStorage.getItem('level13_cleared') === 'true') document.getElementById('m13').innerText = "🧩";
-            // 第 14 关通关图标
             if (localStorage.getItem('level14_cleared') === 'true') document.getElementById('m14').innerText = "🙋‍♂️";
+            
+            // 第 15 关通关图标：彩虹，象征语气变幻莫测
+            if (localStorage.getItem('level15_cleared') === 'true') document.getElementById('m15').innerText = "🌈";
         }
 
         function unlock() {
@@ -257,7 +266,8 @@
                 11: '11-dativ.html',
                 12: '12-nodaakk-mix.html',
                 13: '13-praeposition.html',
-                14: '14-Possessivpro.html' // 关联你的新文件
+                14: '14-Possessivpro.html',
+                15: '15-partikeln.html' // 新关卡链接
             };
             window.location.href = pages[n];
         }
