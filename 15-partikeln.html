@@ -13,7 +13,9 @@
             background: #F8FAFC; 
             font-family: 'Noto Sans SC', sans-serif; 
             margin: 0; 
-            height: 100vh; 
+            /* 适配移动端高度的关键：优先使用 svh，回退使用 100vh */
+            height: 100vh;
+            height: 100svh; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
@@ -23,20 +25,20 @@
         .app-container { 
             width: 100%; 
             max-width: 600px; 
-            height: 100vh; /* 适配移动端全屏 */
+            height: 100%;
             background: #FFFFFF; 
             position: relative; 
             display: flex; 
             flex-direction: column; 
             overflow: hidden;
-            /* 适配 iOS 安全区域 */
+            /* 适配底部小黑条 */
             padding-bottom: env(safe-area-inset-bottom);
         }
 
-        /* 针对桌面端的圆角装饰 */
-        @media (min-height: 800px) and (min-width: 600px) {
+        /* 仅在屏幕足够大时显示卡片边框效果 */
+        @media (min-height: 750px) and (min-width: 600px) {
             .app-container {
-                height: 95vh;
+                height: 92vh;
                 max-height: 850px;
                 border-radius: 40px;
                 box-shadow: 0 20px 50px rgba(0,0,0,0.1);
@@ -44,14 +46,30 @@
             }
         }
 
-        .header-nav { padding: 20px 20px 10px; display: flex; align-items: center; gap: 15px; flex-shrink: 0; }
-        .back-btn, .mute-btn { background: #F1F5F9; padding: 10px; border-radius: 15px; color: #64748B; cursor: pointer; display: flex; align-items: center; }
+        .header-nav { 
+            padding: 15px 20px 5px; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            flex-shrink: 0; /* 禁止页头被压缩 */
+        }
         
-        .progress-container { flex: 1; display: flex; flex-direction: column; gap: 4px; }
-        .progress-info { font-size: 13px; font-weight: 900; color: #94A3B8; text-align: center; }
-        .progress-bar-bg { width: 100%; height: 8px; background: #E2E8F0; border-radius: 20px; overflow: hidden; }
-        #progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #F59E0B, #FB923C); transition: width 0.4s; }
+        .back-btn, .mute-btn { 
+            background: #F1F5F9; 
+            padding: 10px; 
+            border-radius: 15px; 
+            color: #64748B; 
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
 
+        .progress-container { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .progress-info { font-size: 12px; font-weight: 900; color: #94A3B8; text-align: center; }
+        .progress-bar-bg { width: 100%; height: 8px; background: #E2E8F0; border-radius: 20px; overflow: hidden; }
+        #progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #F59E0B, #FB923C); transition: width 0.4s ease-out; }
+
+        /* 中间核心区：自动伸缩且内容居中 */
         .main-stage { 
             flex: 1; 
             display: flex; 
@@ -59,63 +77,65 @@
             align-items: center; 
             justify-content: center; 
             padding: 10px 25px; 
-            min-height: 0; /* 允许在空间不足时收缩 */
+            min-height: 0; /* 允许内部元素在空间不足时收缩 */
         }
 
         .mood-card { 
             width: 100%; 
-            padding: 30px 20px; 
+            padding: 35px 20px; 
             background: #FFFBF0; 
-            border-radius: 30px; 
+            border-radius: 35px; 
             text-align: center; 
             border: 2px solid #FEF3C7;
-            max-height: 100%;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            gap: 15px;
         }
 
-        @keyframes floatEmoji { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        .mood-emoji { font-size: 60px; margin-bottom: 10px; animation: floatEmoji 2.5s infinite ease-in-out; }
+        @keyframes floatEmoji { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+        .mood-emoji { font-size: 70px; display: inline-block; animation: floatEmoji 2.5s infinite ease-in-out; }
         
-        .sentence-area { font-size: 1.4rem; font-weight: 800; color: #451A03; line-height: 1.3; margin-bottom: 8px; }
-        .translation-area { font-size: 1rem; font-weight: 700; color: #B45309; opacity: 0.8; }
+        .sentence-area { font-size: 1.5rem; font-weight: 800; color: #451A03; line-height: 1.4; }
+        .translation-area { font-size: 1.1rem; font-weight: 700; color: #B45309; opacity: 0.8; }
         
-        .drop-zone { display: inline-block; min-width: 50px; border-bottom: 3px solid #F59E0B; margin: 0 4px; color: transparent; }
+        .drop-zone { display: inline-block; min-width: 55px; border-bottom: 4px solid #F59E0B; margin: 0 5px; color: transparent; }
         .drop-zone.filled { color: #10B981; border-bottom-color: #10B981; }
 
+        /* 选项区：固定在底部，不参与压缩 */
         .options-area { 
-            padding: 15px 20px 30px; 
+            padding: 10px 25px 30px; 
             display: grid; 
             grid-template-columns: repeat(2, 1fr); 
             gap: 12px; 
-            flex-shrink: 0; /* 确保按钮区域不被压缩 */
+            flex-shrink: 0; 
         }
 
         .option-btn { 
             background: #F59E0B; 
             border: 2px solid #D97706; 
-            padding: 15px 0; 
-            border-radius: 20px; 
-            font-size: 1.2rem; 
+            padding: 16px 0; 
+            border-radius: 22px; 
+            font-size: 1.3rem; 
             font-weight: 900; 
             color: white; 
-            box-shadow: 0 5px 0 #92400E; 
+            box-shadow: 0 6px 0 #92400E; 
             transition: 0.1s; 
         }
 
-        .option-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #92400E; }
+        .option-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #92400E; }
 
+        /* 语气解析弹窗：高度自适应并适配安全区 */
         #teacher-tip { 
             position: absolute; 
             bottom: -100%; left: 0; right: 0; 
             background: white; 
             padding: 30px 25px calc(30px + env(safe-area-inset-bottom)); 
-            border-radius: 35px 35px 0 0; 
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.1); 
-            transition: 0.4s ease-out; 
+            border-radius: 40px 40px 0 0; 
+            box-shadow: 0 -15px 50px rgba(0,0,0,0.1); 
+            transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); 
             z-index: 100; 
-            border-top: 5px solid #F59E0B; 
+            border-top: 6px solid #F59E0B; 
         }
         #teacher-tip.active { bottom: 0; }
     </style>
@@ -123,14 +143,18 @@
 <body>
     <div class="app-container">
         <div class="header-nav">
-            <button onclick="window.location.href='index.html'" class="back-btn"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" /></svg></button>
+            <button onclick="window.location.href='index.html'" class="back-btn">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" /></svg>
+            </button>
             <div class="progress-container">
                 <div class="progress-info"><span id="cur-num">1</span> / 30</div>
                 <div class="progress-bar-bg"><div id="progress-fill"></div></div>
             </div>
-            <button onclick="toggleMute()" class="mute-btn"><svg id="mute-icon" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg></button>
+            <button onclick="toggleMute()" class="mute-btn">
+                <svg id="mute-icon" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+            </button>
         </div>
-        
+
         <div class="main-stage">
             <div class="mood-card">
                 <span class="mood-emoji" id="mood-emoji">😊</span>
@@ -143,10 +167,10 @@
 
         <div id="teacher-tip">
             <div class="flex items-center gap-4 mb-4">
-                <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center text-xl">👩‍🏫</div>
-                <h3 class="text-md font-black text-amber-900">语气解析</h3>
+                <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center text-2xl">👩‍🏫</div>
+                <h3 class="text-lg font-black text-amber-900">语气解析</h3>
             </div>
-            <div id="tip-text" class="text-slate-700 font-bold mb-6 text-sm bg-amber-50 p-4 rounded-xl border-l-4 border-amber-500"></div>
+            <div id="tip-text" class="text-slate-700 font-bold mb-6 text-md bg-amber-50 p-5 rounded-xl border-l-4 border-amber-500"></div>
             <button onclick="closeTip()" class="w-full py-4 bg-amber-600 text-white rounded-xl font-black text-lg">记住了</button>
         </div>
     </div>
@@ -177,4 +201,81 @@
             { s: "Geh ____ nach Hause!", a: "doch", e: "🚶", cn: "你还是快回家吧！", t: "doch 给出迫切的建议，暗示这是显而易见的决定。" },
             { s: "Nimm ____ ein Taxi!", a: "doch", e: "🚕", cn: "那你坐出租车嘛！", t: "doch 指出一个显而易见的解决办法。" },
             { s: "Das ist ____ billig!", a: "ja", e: "🏷️", cn: "这可真是便宜呀！", t: "ja 表示感叹，强调自己对眼前情况的惊讶。" },
-            { s: "Du bist ____ müde!", a: "ja", e:
+            { s: "Du bist ____ müde!", a: "ja", e: "🥱", cn: "你确实很累了呀。", t: "ja 用于确认一个显而易见、双方公认的事实。" },
+            { s: "Heute ist ____ Sonntag!", a: "ja", e: "🗓️", cn: "今天可是周日呀！", t: "ja 提醒对方一个被忽略的基本常识。" },
+            { s: "Das geht ____.", a: "schon", e: "👌", cn: "那倒也行。", t: "schon 表示一种基本的满意、认可或勉强的接受。" },
+            { s: "Ich komme ____!", a: "schon", e: "🏃‍♂️", cn: "我这就来了！", t: "schon 强调动作正在进行，用来回应对方的催促。" },
+            { s: "Wir findend das ____.", a: "schon", e: "🔎", cn: "我们总能找到的嘛。", t: "schon 用于宽慰，表达对结果的信心。" },
+            { s: "Wo wohnst du ____?", a: "denn", e: "🏘️", cn: "那你到底是住在哪儿呢？", t: "denn 让提问显得更亲切，更像朋友间的闲聊。" },
+            { s: "Lies ____ den Text!", a: "mal", e: "📖", cn: "读一下这段话吧！", t: "mal 语气轻松，常用于课堂或日常指令的柔化。" },
+            { s: "Das ist ____ super!", a: "ja", e: "✨", cn: "这可真是太棒了！", t: "ja 表达由衷的赞叹，带有发现惊喜的意味。" },
+            { s: "Frag ____ die Frau!", a: "mal", e: "👩", cn: "去问一下那位女士呗！", t: "mal 减轻压力，让提议听起来非常随意。" }
+        ];
+
+        let quizData = [...rawData].sort(() => Math.random() - 0.5);
+        let currentIndex = 0; let isMuted = false; let canClick = true;
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            document.getElementById('mute-icon').innerHTML = isMuted ? 
+                '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />' : 
+                '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />';
+        }
+
+        function playSound(type) {
+            if (isMuted) return;
+            const s = document.getElementById(type === 'ok' ? 'snd-ok' : 'snd-err');
+            s.currentTime = 0; s.play().catch(()=>{});
+        }
+
+        function renderQuestion() {
+            if (currentIndex >= quizData.length) { 
+                localStorage.setItem('level15_cleared', 'true');
+                confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
+                setTimeout(() => window.location.href='index.html', 3000);
+                return; 
+            }
+            canClick = true;
+            const data = quizData[currentIndex];
+            document.getElementById('mood-emoji').innerText = data.e;
+            document.getElementById('sentence-box').innerHTML = data.s.replace("____", `<span class="drop-zone">____</span>`);
+            document.getElementById('translation-box').innerText = data.cn;
+            document.getElementById('cur-num').innerText = currentIndex + 1;
+            document.getElementById('progress-fill').style.width = ((currentIndex + 1) / quizData.length * 100) + '%';
+            
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            
+            const pool = ["denn", "doch", "ja", "mal", "schon"];
+            let options = [data.a];
+            let others = pool.filter(p => p !== data.a).sort(() => Math.random() - 0.5);
+            options.push(...others.slice(0, 3));
+            options.sort(() => Math.random() - 0.5);
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    if(!canClick) return;
+                    if(opt === data.a) {
+                        canClick = false; playSound('ok');
+                        const dz = document.querySelector('.drop-zone');
+                        dz.innerText = opt; dz.classList.add('filled');
+                        setTimeout(() => { currentIndex++; renderQuestion(); }, 2500);
+                    } else {
+                        playSound('err');
+                        document.getElementById('tip-text').innerText = data.t;
+                        document.getElementById('teacher-tip').classList.add('active');
+                        canClick = false;
+                    }
+                };
+                grid.appendChild(btn);
+            });
+        }
+
+        function closeTip() { document.getElementById('teacher-tip').classList.remove('active'); canClick = true; }
+        renderQuestion();
+    </script>
+</body>
+</html>
