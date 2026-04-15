@@ -25,7 +25,7 @@
         
         .progress-section { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .progress-bar-bg { width: 100%; height: 8px; background: #E2E8F0; border-radius: 20px; overflow: hidden; }
-        #progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #3B82F6, #2DD4BF); transition: 0.4s; }
+        #progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #334155, #94A3B8); transition: 0.4s; }
         .progress-num { font-size: 12px; font-weight: 900; color: #94A3B8; letter-spacing: 1px; }
 
         .main-stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 25px; min-height: 0; }
@@ -42,10 +42,10 @@
         @keyframes swing { 0%, 100% { transform: rotate(-10deg); } 50% { transform: rotate(10deg); } }
 
         .sentence-area { font-size: 1.6rem; font-weight: 800; color: #1E293B; line-height: 1.4; margin-bottom: 15px; }
-        .translation-area { font-size: 1.1rem; font-weight: 700; color: #3B82F6; background: #EBF4FF; display: inline-block; padding: 4px 12px; border-radius: 10px; }
+        .translation-area { font-size: 1.1rem; font-weight: 700; color: #475569; background: #F1F5F9; display: inline-block; padding: 4px 12px; border-radius: 10px; }
 
-        .drop-zone { display: inline-block; min-width: 70px; border-bottom: 4px solid #3B82F6; color: transparent; margin: 0 4px; }
-        .drop-zone.filled { color: #2563EB; border-bottom-color: #2563EB; animation: correctPop 0.4s; }
+        .drop-zone { display: inline-block; min-width: 70px; border-bottom: 4px solid #334155; color: transparent; margin: 0 4px; }
+        .drop-zone.filled { color: #334155; border-bottom-color: #334155; animation: correctPop 0.4s; }
 
         .options-grid { padding: 10px 25px 40px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; flex-shrink: 0; }
         .word-btn { background: #FFFFFF; border: 2px solid #E2E8F0; padding: 18px 0; border-radius: 20px; font-size: 1.3rem; font-weight: 900; color: #334155; box-shadow: 0 4px 0 #CBD5E1; }
@@ -54,7 +54,7 @@
         #finish-modal { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.8); display: none; align-items: center; justify-content: center; z-index: 200; padding: 20px; }
         .modal-content { background: white; width: 100%; border-radius: 35px; padding: 40px 25px; text-align: center; }
 
-        #teacher-tip { position: absolute; bottom: -100%; left: 0; right: 0; background: white; padding: 30px 25px calc(25px + env(safe-area-inset-bottom)); border-radius: 40px 40px 0 0; box-shadow: 0 -10px 40px rgba(0,0,0,0.1); transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); z-index: 100; border-top: 6px solid #3B82F6; }
+        #teacher-tip { position: absolute; bottom: -100%; left: 0; right: 0; background: white; padding: 30px 25px calc(25px + env(safe-area-inset-bottom)); border-radius: 40px 40px 0 0; box-shadow: 0 -10px 40px rgba(0,0,0,0.1); transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); z-index: 100; border-top: 6px solid #334155; }
         #teacher-tip.active { bottom: 0; }
         @keyframes correctPop { 0% { transform: scale(1); } 50% { transform: scale(1.2); color: #10B981; } 100% { transform: scale(1); } }
     </style>
@@ -62,7 +62,7 @@
 <body>
     <div class="app-container">
         <div class="header-nav">
-            <button onclick="history.back()" class="nav-btn"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
+            <button onclick="window.location.href='index.html'" class="nav-btn"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
             <div class="progress-section">
                 <div class="progress-bar-bg"><div id="progress-fill"></div></div>
                 <div class="progress-num"><span id="cur-num">1</span> / 30</div>
@@ -82,16 +82,16 @@
 
         <div id="teacher-tip">
             <div class="flex items-center gap-3 mb-4"><span class="text-3xl">📝</span><h3 class="text-xl font-black">语法纠偏</h3></div>
-            <div id="tip-text" class="text-slate-600 font-bold mb-6 bg-blue-50 p-5 rounded-2xl border-l-8 border-blue-400"></div>
+            <div id="tip-text" class="text-slate-600 font-bold mb-6 bg-slate-50 p-5 rounded-2xl border-l-8 border-slate-400"></div>
             <button onclick="closeTip()" class="w-full py-4 bg-slate-800 text-white rounded-2xl font-black text-lg">记住了</button>
         </div>
 
         <div id="finish-modal">
             <div class="modal-content">
-                <div class="text-6xl mb-4">🏆</div>
+                <div class="text-6xl mb-4">🕰️</div>
                 <h2 class="text-2xl font-black mb-2 text-slate-800">Präteritum 达人!</h2>
                 <p class="text-slate-500 font-bold mb-8">你已经成功掌握了过去时的基础核心！</p>
-                <button onclick="window.location.href='index.html'" class="w-full py-4 bg-blue-600 text-white rounded-2xl font-black text-lg shadow-xl active:scale-95 transition">收下奖励并返回地图</button>
+                <button onclick="window.location.href='index.html'" class="w-full py-4 bg-slate-700 text-white rounded-2xl font-black text-lg shadow-xl active:scale-95 transition">收下奖励并返回地图</button>
             </div>
         </div>
     </div>
@@ -141,6 +141,9 @@
 
         function renderQuestion() {
             if (currentIndex >= quizData.length) {
+                // 核心：通关标记
+                localStorage.setItem('level16_cleared', 'true');
+                
                 confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
                 document.getElementById('finish-modal').style.display = 'flex';
                 return;
@@ -175,7 +178,7 @@
                         canClick = false; playSound('ok');
                         const dz = document.querySelector('.drop-zone');
                         dz.innerText = opt; dz.classList.add('filled');
-                        setTimeout(() => { currentIndex++; renderQuestion(); }, 3000);
+                        setTimeout(() => { currentIndex++; renderQuestion(); }, 1500);
                     } else {
                         playSound('err');
                         document.getElementById('tip-text').innerText = data.t;
