@@ -35,7 +35,7 @@
 
         /* 中文提示 */
         .translation-hint { 
-            font-size: 2.4rem; font-weight: 900; color: #1E293B; text-align: center; 
+            font-size: 2.2rem; font-weight: 900; color: #1E293B; text-align: center; 
             margin: 20px 0 35px; line-height: 1.2;
         }
 
@@ -78,7 +78,7 @@
 <body>
     <div class="app-container">
         <div class="header-nav">
-            <button onclick="location.reload()" class="nav-btn"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
+            <button onclick="window.location.href='index.html'" class="nav-btn"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
             <div class="progress-section">
                 <div class="progress-bar-bg"><div id="progress-fill"></div></div>
                 <div class="progress-num"><span id="cur-num">1</span> / 30</div>
@@ -108,10 +108,10 @@
 
         <div id="finish-modal">
             <div class="text-center p-10 max-w-sm">
-                <div class="text-9xl mb-6">🍾</div>
+                <div class="text-9xl mb-6">🏗️</div>
                 <h2 class="text-4xl font-black mb-4">顶级工程师！</h2>
                 <p class="text-slate-400 font-bold mb-10 text-xl">你成功交付了 30 座句式大楼。刘老师为你感到骄傲！</p>
-                <button onclick="window.location.href='index.html'" class="w-full py-5 bg-amber-500 text-white rounded-[32px] font-black text-2xl shadow-2xl active:scale-95 transition">确定并返回地图</button>
+                <button onclick="goBack()" class="w-full py-5 bg-amber-500 text-white rounded-[32px] font-black text-2xl shadow-2xl active:scale-95 transition">确定并返回地图</button>
             </div>
         </div>
     </div>
@@ -142,7 +142,7 @@
             { cn: "你的电话号码是多少？", icons: ["📱", "❓"], answer: "Wie ist deine Telefonnummer ?", type: "WV2" },
             { cn: "我们在写作业。", icons: ["✍️", "🏠"], answer: "Wir machen die Hausaufgaben .", type: "V2" },
             { cn: "你需要帮助吗？", icons: ["🆘", "❓"], answer: "Brauchst du Hilfe ?", type: "V1" },
-            { cn: "苹果很好吃。", icons: ["🍎", "😋"], answer: "Der Apfel ist lecker .", type: "V2" },
+            { cn: "苹果很好吃。", icons: ["🍎", "😋"], answer: "Der Apple ist lecker .", type: "V2" },
             { cn: "你要买什么？", icons: ["🛒", "❓"], answer: "Was kaufst du ?", type: "WV2" },
             { cn: "音乐很大声。", icons: ["🎵", "📢"], answer: "Die Musik ist laut .", type: "V2" },
             { cn: "你累了吗？", icons: ["🥱", "❓"], answer: "Bist du müde ?", type: "V1" },
@@ -166,8 +166,7 @@
         function playSound(id) {
             if (isMuted) return;
             const s = document.getElementById(id);
-            s.currentTime = 0;
-            s.play().catch(()=>{});
+            if(s) { s.currentTime = 0; s.play().catch(()=>{}); }
         }
 
         function initLevel() {
@@ -241,8 +240,13 @@
                 setTimeout(() => {
                     document.getElementById('target-zone').classList.remove('correct');
                     currentIndex++;
-                    if (currentIndex < quizData.length) initLevel();
-                    else document.getElementById('finish-modal').style.display = 'flex';
+                    if (currentIndex < quizData.length) {
+                        initLevel();
+                    } else {
+                        // 标记通关，以便地图页显示图标
+                        localStorage.setItem('level17_cleared', 'true');
+                        document.getElementById('finish-modal').style.display = 'flex';
+                    }
                 }, 1500);
             } else {
                 showSmartFeedback(userSatz, correctSatz);
@@ -273,6 +277,10 @@
         }
 
         function closeTip() { document.getElementById('teacher-tip').classList.remove('active'); }
+        
+        function goBack() {
+            window.location.href = 'index.html';
+        }
 
         initLevel();
     </script>
