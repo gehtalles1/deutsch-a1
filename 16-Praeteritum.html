@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>16-初见过去时 | Präteritum 30关</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@500;700;900&display=swap');
+        
+        body { 
+            background: #F1F5F9; font-family: 'Noto Sans SC', sans-serif; 
+            margin: 0; height: 100svh; display: flex; align-items: center; justify-content: center; overflow: hidden; 
+        }
+
+        .app-container { 
+            width: 100%; max-width: 600px; height: 100%; background: #FFFFFF; 
+            position: relative; display: flex; flex-direction: column; 
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .header-nav { padding: 15px 20px 5px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+        .nav-btn { background: #F8FAFC; padding: 10px; border-radius: 12px; color: #64748B; cursor: pointer; }
+        
+        .progress-section { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .progress-bar-bg { width: 100%; height: 8px; background: #E2E8F0; border-radius: 20px; overflow: hidden; }
+        #progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #3B82F6, #2DD4BF); transition: 0.4s; }
+        .progress-num { font-size: 12px; font-weight: 900; color: #94A3B8; letter-spacing: 1px; }
+
+        .main-stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 25px; min-height: 0; }
+        .scene-card { width: 100%; padding: 40px 20px; background: #F8FAFC; border-radius: 35px; text-align: center; border: 2px solid #E2E8F0; }
+
+        .icon-story { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; height: 60px; align-items: center; }
+        .story-emoji { font-size: 45px; }
+        
+        .anim-float { animation: float 2s infinite ease-in-out; }
+        .anim-pulse { animation: pulse 1.5s infinite ease-in-out; }
+        .anim-swing { animation: swing 2s infinite ease-in-out; transform-origin: top center; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+        @keyframes swing { 0%, 100% { transform: rotate(-10deg); } 50% { transform: rotate(10deg); } }
+
+        .sentence-area { font-size: 1.6rem; font-weight: 800; color: #1E293B; line-height: 1.4; margin-bottom: 15px; }
+        .translation-area { font-size: 1.1rem; font-weight: 700; color: #3B82F6; background: #EBF4FF; display: inline-block; padding: 4px 12px; border-radius: 10px; }
+
+        .drop-zone { display: inline-block; min-width: 70px; border-bottom: 4px solid #3B82F6; color: transparent; margin: 0 4px; }
+        .drop-zone.filled { color: #2563EB; border-bottom-color: #2563EB; animation: correctPop 0.4s; }
+
+        .options-grid { padding: 10px 25px 40px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; flex-shrink: 0; }
+        .word-btn { background: #FFFFFF; border: 2px solid #E2E8F0; padding: 18px 0; border-radius: 20px; font-size: 1.3rem; font-weight: 900; color: #334155; box-shadow: 0 4px 0 #CBD5E1; }
+        .word-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #CBD5E1; }
+
+        #finish-modal { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.8); display: none; align-items: center; justify-content: center; z-index: 200; padding: 20px; }
+        .modal-content { background: white; width: 100%; border-radius: 35px; padding: 40px 25px; text-align: center; }
+
+        #teacher-tip { position: absolute; bottom: -100%; left: 0; right: 0; background: white; padding: 30px 25px calc(25px + env(safe-area-inset-bottom)); border-radius: 40px 40px 0 0; box-shadow: 0 -10px 40px rgba(0,0,0,0.1); transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); z-index: 100; border-top: 6px solid #3B82F6; }
+        #teacher-tip.active { bottom: 0; }
+        @keyframes correctPop { 0% { transform: scale(1); } 50% { transform: scale(1.2); color: #10B981; } 100% { transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header-nav">
+            <button onclick="history.back()" class="nav-btn"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
+            <div class="progress-section">
+                <div class="progress-bar-bg"><div id="progress-fill"></div></div>
+                <div class="progress-num"><span id="cur-num">1</span> / 30</div>
+            </div>
+            <button onclick="toggleMute()" class="nav-btn"><svg id="mute-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg></button>
+        </div>
+
+        <div class="main-stage">
+            <div class="scene-card">
+                <div class="icon-story" id="icon-story"></div>
+                <div class="sentence-area" id="sentence-box"></div>
+                <div class="translation-area" id="translation-box"></div>
+            </div>
+        </div>
+
+        <div class="options-grid" id="options-grid"></div>
+
+        <div id="teacher-tip">
+            <div class="flex items-center gap-3 mb-4"><span class="text-3xl">📝</span><h3 class="text-xl font-black">语法纠偏</h3></div>
+            <div id="tip-text" class="text-slate-600 font-bold mb-6 bg-blue-50 p-5 rounded-2xl border-l-8 border-blue-400"></div>
+            <button onclick="closeTip()" class="w-full py-4 bg-slate-800 text-white rounded-2xl font-black text-lg">记住了</button>
+        </div>
+
+        <div id="finish-modal">
+            <div class="modal-content">
+                <div class="text-6xl mb-4">🏆</div>
+                <h2 class="text-2xl font-black mb-2 text-slate-800">Präteritum 达人!</h2>
+                <p class="text-slate-500 font-bold mb-8">你已经成功掌握了过去时的基础核心！</p>
+                <button onclick="window.location.href='index.html'" class="w-full py-4 bg-blue-600 text-white rounded-2xl font-black text-lg shadow-xl active:scale-95 transition">收下奖励并返回地图</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="snd-ok" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+    <audio id="snd-err" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
+
+    <script>
+        const rawData = [
+            { s: "Ich ____ gestern krank.", a: "war", opts: ["bin", "war", "warst", "wart"], icons: ["🤒", "🛌"], cn: "我昨天病了。", t: "Gestern(昨天)决定了要用过去时。Ich 对应 war。" },
+            { s: "____ du am Montag da?", a: "Warst", opts: ["Bist", "War", "Warst", "Wart"], icons: ["📅", "📍"], cn: "你周一在那儿吗？", t: "询问过去。Du 变位需在 war 词干后加 -st。" },
+            { s: "Wir ____ keine Zeit.", a: "hatten", opts: ["haben", "hatte", "hast", "hatten"], icons: ["⏰", "🏃‍♂️"], cn: "我们当时没时间。", t: "Wir 的过去时变位是 hatten，和动词原形长得一样。" },
+            { s: "Wo ____ ihr im Urlaub?", a: "wart", opts: ["seid", "war", "wart", "waren"], icons: ["🏖️", "✈️"], cn: "你们度假时在哪儿？", t: "你们(ihr) 对应的过去时是 wart。seid 是现在时。" },
+            { s: "Er ____ ein Handy.", a: "hatte", opts: ["hat", "hatte", "hatten", "hast"], icons: ["📱", "⌛"], cn: "他以前有一部手机。", t: "过去时里 er 和 ich 的变位永远一样：hatte。" },
+            { s: "Es ____ sehr kalt.", a: "war", opts: ["ist", "war", "waren", "wart"], icons: ["❄️", "🌬️"], cn: "当时天气非常冷。", t: "es 对应单数过去时 war。描述过去的天气。" },
+            { s: "____ Sie in Berlin?", a: "Waren", opts: ["Sind", "War", "Waren", "Wart"], icons: ["🏢", "🇩🇪"], cn: "您当时在柏林吗？", t: "尊称 Sie 的过去时变位是 waren。" },
+            { s: "Ich ____ viel Glück!", a: "hatte", opts: ["habe", "hatte", "hattest", "hatten"], icons: ["🍀", "🎉"], cn: "我那时运气超好！", t: "表达‘我当时有运气’用 hatten 的 ich 变位。" },
+            { s: "____ du Hunger?", a: "Hattest", opts: ["Hast", "Hatte", "Hattest", "Haben"], icons: ["🍕", "🤤"], cn: "你当时饿了吗？", t: "Hattest du... 是询问过去状态的常用句式。" },
+            { s: "Sie (pl.) ____ im Kino.", a: "waren", opts: ["sind", "war", "waren", "wart"], icons: ["🎬", "🍿"], cn: "他们当时在电影院。", t: "复数“他们”对应 waren。" },
+            { s: "Letztes Jahr ____ ich 20.", a: "war", opts: ["bin", "war", "bist", "warst"], icons: ["🎂", "⏪"], cn: "去年我20岁。", t: "年龄的过去状态用 war。" },
+            { s: "____ ihr am Samstag fit?", a: "Wart", opts: ["Seid", "Warst", "Wart", "Waren"], icons: ["💪", "⚡"], cn: "你们周六那天状态好吗？", t: "你们(ihr) 对应的过去时变位是 wart。" },
+            { s: "Das ____ so lustig!", a: "war", opts: ["ist", "war", "sind", "waren"], icons: ["😂", "✨"], cn: "那件事当时太搞笑了！", t: "指代单数事物时用 war。" },
+            { s: "Wir ____ gestern Hunger.", a: "hatten", opts: ["haben", "hatte", "hattest", "hatten"], icons: ["😋", "🍔"], cn: "我们昨天饿坏了。", t: "我们(wir) 对应 hatten。" },
+            { s: "____ du gestern müde?", a: "Warst", opts: ["Bist", "War", "Warst", "Wart"], icons: ["😴", "🌙"], cn: "你昨天累了吗？", t: "du 变位加 -st。" },
+            { s: "Früher ____ ich Lehrer.", a: "war", opts: ["bin", "war", "warst", "ist"], icons: ["👨‍🏫", "📜"], cn: "以前我是一名老师。", t: "职业的过去状态用 war。" },
+            { s: "Sie (sg.) ____ im Garten.", a: "war", opts: ["ist", "war", "warst", "waren"], icons: ["🌳", "🌷"], cn: "她当时在花园里。", t: "她(sie) 是单数，变位是 war。" },
+            { s: "____ Sie gestern frei?", a: "Hatten", opts: ["Haben", "Hatte", "Hatten", "Hattest"], icons: ["🔓", "🏖️"], cn: "您昨天有空吗？", t: "您(Sie) 有空吗？用 hatten。" },
+            { s: "Ihr ____ im Museum.", a: "wart", opts: ["seid", "wart", "waren", "warst"], icons: ["🖼️", "🏛️"], cn: "你们当时在博物馆。", t: "注意复数变位识别。" },
+            { s: "Es ____ ein Problem.", a: "gab", opts: ["gibt", "gab", "gaben", "gabst"], icons: ["⚠️", "🧩"], cn: "以前有一个问题。", t: "Es gab 是 es gibt 的过去时，意为‘以前有’。" },
+            { s: "____ du das Buch?", a: "hattest", opts: ["hast", "hatte", "hattest", "hatten"], icons: ["📖", "✅"], cn: "你当时有那本书吗？", t: "过去是否拥有某物。" },
+            { s: "Wir ____ am See.", a: "waren", opts: ["sind", "waren", "wart", "war"], icons: ["🌊", "🌲"], cn: "我们当时在湖边。", t: "我们在湖边。复数 waren。" },
+            { s: "____ er gestern dort?", a: "War", opts: ["Ist", "War", "Warst", "Wart"], icons: ["🚶", "❓"], cn: "他昨天在那儿吗？", t: "他(er) 的过去时是 war。" },
+            { s: "Ich ____ Angst.", a: "hatte", opts: ["habe", "hatte", "hattest", "hatten"], icons: ["😨", "🌑"], cn: "我当时很害怕。", t: "我当时害怕。Ich hatte..." },
+            { s: "____ ihr gestern zu Hause?", a: "Wart", opts: ["Seid", "War", "Wart", "Waren"], icons: ["🏠", "🛋️"], cn: "你们昨天在家吗？", t: "你们昨天在家吗？" },
+            { s: "Das Wetter ____ super.", a: "war", opts: ["ist", "war", "waren", "sind"], icons: ["☀️", "😎"], cn: "当时天气棒极了。", t: "天气是单数，用 war。" },
+            { s: "Sie (pl.) ____ Recht.", a: "hatten", opts: ["haben", "hatte", "hattest", "hatten"], icons: ["🤝", "💡"], cn: "他们当时是对的。", t: "他们当时是对的。" },
+            { s: "____ du am Freitag weg?", a: "Warst", opts: ["Bist", "War", "Warst", "Wart"], icons: ["🚶", "🚪"], cn: "你周五那天不在家吗？", t: "你周五那天不在家吗？" },
+            { s: "Wir ____ so viel Spaß!", a: "hatten", opts: ["haben", "hatte", "hatten", "hast"], icons: ["🥳", "🎈"], cn: "我们当时玩得很开心！", t: "我们当时玩得很开心。" },
+            { s: "Wo ____ das Auto?", a: "war", opts: ["ist", "war", "waren", "wart"], icons: ["🚗", "🔎"], cn: "那辆车当时在哪儿？", t: "车（单数）当时在哪儿？" }
+        ];
+
+        let quizData = [...rawData].sort(() => Math.random() - 0.5).slice(0, 30);
+        let currentIndex = 0; let isMuted = false; let canClick = true;
+
+        function toggleMute() { isMuted = !isMuted; document.getElementById('mute-icon').style.color = isMuted ? '#EF4444' : '#64748B'; }
+        function playSound(type) { if (isMuted) return; const s = document.getElementById(type === 'ok' ? 'snd-ok' : 'snd-err'); s.currentTime = 0; s.play().catch(()=>{}); }
+
+        function renderQuestion() {
+            if (currentIndex >= quizData.length) {
+                confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
+                document.getElementById('finish-modal').style.display = 'flex';
+                return;
+            }
+            canClick = true;
+            const data = quizData[currentIndex];
+            const iconWrap = document.getElementById('icon-story');
+            iconWrap.innerHTML = '';
+            const animations = ["anim-float", "anim-pulse", "anim-swing"];
+            data.icons.forEach((icon, i) => {
+                const span = document.createElement('span');
+                span.className = `story-emoji ${animations[i % 3]}`;
+                span.innerText = icon;
+                iconWrap.appendChild(span);
+            });
+
+            document.getElementById('sentence-box').innerHTML = data.s.replace("____", `<span class="drop-zone">____</span>`);
+            document.getElementById('translation-box').innerText = data.cn;
+            document.getElementById('cur-num').innerText = currentIndex + 1;
+            document.getElementById('progress-fill').style.width = ((currentIndex + 1) / quizData.length * 100) + '%';
+            
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            
+            data.opts.sort(() => Math.random() - 0.5).forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'word-btn';
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    if(!canClick) return;
+                    if(opt.toLowerCase() === data.a.toLowerCase()) {
+                        canClick = false; playSound('ok');
+                        const dz = document.querySelector('.drop-zone');
+                        dz.innerText = opt; dz.classList.add('filled');
+                        setTimeout(() => { currentIndex++; renderQuestion(); }, 3000);
+                    } else {
+                        playSound('err');
+                        document.getElementById('tip-text').innerText = data.t;
+                        document.getElementById('teacher-tip').classList.add('active');
+                        canClick = false;
+                    }
+                };
+                grid.appendChild(btn);
+            });
+        }
+
+        function closeTip() { document.getElementById('teacher-tip').classList.remove('active'); canClick = true; }
+        renderQuestion();
+    </script>
+</body>
+</html>
