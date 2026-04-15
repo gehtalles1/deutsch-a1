@@ -195,6 +195,13 @@
                     <div id="m16" class="absolute -top-2 -right-2 text-3xl medal-pop"></div>
                 </div>
 
+                <div id="lvl17" onclick="go(17)" class="premium-card p-4 flex flex-col items-center text-center locked-state relative">
+                    <div class="w-12 h-12 bg-[#475569] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">17</div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-tight">句式组装车间</h3>
+                    <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Satzbau Master</p>
+                    <div id="m17" class="absolute -top-2 -right-2 text-3xl medal-pop"></div>
+                </div>
+
             </div>
         </main>
 
@@ -212,8 +219,8 @@
     </div>
 
     <script>
-        // 更新关卡 ID 列表，加入 lvl16
-        const levelIds = ['lvl1', 'lvl2', 'lvl3', 'lvl4', 'lvl5', 'lvl6', 'lvl7', 'lvl8', 'lvl9', 'lvl10', 'lvl11', 'lvl12', 'lvl13', 'lvl14', 'lvl15', 'lvl16'];
+        // 更新关卡 ID 列表，加入 lvl17
+        const levelIds = ['lvl1', 'lvl2', 'lvl3', 'lvl4', 'lvl5', 'lvl6', 'lvl7', 'lvl8', 'lvl9', 'lvl10', 'lvl11', 'lvl12', 'lvl13', 'lvl14', 'lvl15', 'lvl16', 'lvl17'];
 
         function checkStatus() {
             const unlocked = localStorage.getItem('isUnlocked') === 'true';
@@ -244,9 +251,10 @@
             if (localStorage.getItem('level13_cleared') === 'true') document.getElementById('m13').innerText = "🧩";
             if (localStorage.getItem('level14_cleared') === 'true') document.getElementById('m14').innerText = "🙋‍♂️";
             if (localStorage.getItem('level15_cleared') === 'true') document.getElementById('m15').innerText = "🌈";
-            
-            // 第 16 关通关图标：时钟，代表过去
             if (localStorage.getItem('level16_cleared') === 'true') document.getElementById('m16').innerText = "🕰️";
+            
+            // 第 17 关通关图标：建筑起重机，代表句式建造
+            if (localStorage.getItem('level17_cleared') === 'true') document.getElementById('m17').innerText = "🏗️";
         }
 
         function unlock() {
@@ -276,7 +284,8 @@
                 13: '13-praeposition.html',
                 14: '14-Possessivpro.html',
                 15: '15-partikeln.html',
-                16: '16-Praeteritum.html' // 过去时关卡链接
+                16: '16-Praeteritum.html',
+                17: '17-satzbau.html' // 指向新创建的 17 关文件
             };
             window.location.href = pages[n];
         }
