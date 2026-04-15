@@ -188,6 +188,13 @@
                     <div id="m15" class="absolute -top-2 -right-2 text-3xl medal-pop"></div>
                 </div>
 
+                <div id="lvl16" onclick="go(16)" class="premium-card p-4 flex flex-col items-center text-center locked-state relative">
+                    <div class="w-12 h-12 bg-[#334155] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">16</div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-tight">初见过去时</h3>
+                    <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Präteritum</p>
+                    <div id="m16" class="absolute -top-2 -right-2 text-3xl medal-pop"></div>
+                </div>
+
             </div>
         </main>
 
@@ -205,8 +212,8 @@
     </div>
 
     <script>
-        // 更新关卡 ID 列表
-        const levelIds = ['lvl1', 'lvl2', 'lvl3', 'lvl4', 'lvl5', 'lvl6', 'lvl7', 'lvl8', 'lvl9', 'lvl10', 'lvl11', 'lvl12', 'lvl13', 'lvl14', 'lvl15'];
+        // 更新关卡 ID 列表，加入 lvl16
+        const levelIds = ['lvl1', 'lvl2', 'lvl3', 'lvl4', 'lvl5', 'lvl6', 'lvl7', 'lvl8', 'lvl9', 'lvl10', 'lvl11', 'lvl12', 'lvl13', 'lvl14', 'lvl15', 'lvl16'];
 
         function checkStatus() {
             const unlocked = localStorage.getItem('isUnlocked') === 'true';
@@ -236,9 +243,10 @@
             if (localStorage.getItem('level12_cleared') === 'true') document.getElementById('m12').innerText = "🏆";
             if (localStorage.getItem('level13_cleared') === 'true') document.getElementById('m13').innerText = "🧩";
             if (localStorage.getItem('level14_cleared') === 'true') document.getElementById('m14').innerText = "🙋‍♂️";
-            
-            // 第 15 关通关图标：彩虹，象征语气变幻莫测
             if (localStorage.getItem('level15_cleared') === 'true') document.getElementById('m15').innerText = "🌈";
+            
+            // 第 16 关通关图标：时钟，代表过去
+            if (localStorage.getItem('level16_cleared') === 'true') document.getElementById('m16').innerText = "🕰️";
         }
 
         function unlock() {
@@ -267,7 +275,8 @@
                 12: '12-nodaakk-mix.html',
                 13: '13-praeposition.html',
                 14: '14-Possessivpro.html',
-                15: '15-partikeln.html' // 新关卡链接
+                15: '15-partikeln.html',
+                16: '16-Praeteritum.html' // 过去时关卡链接
             };
             window.location.href = pages[n];
         }
