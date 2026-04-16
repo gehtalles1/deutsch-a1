@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>18-德语命令式挑战 | Imperativ Factory</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@500;700;900&display=swap');
+        body { background: #F8FAFC; font-family: 'Noto Sans SC', sans-serif; height: 100svh; display: flex; align-items: center; justify-content: center; overflow: hidden; color: #1E293B; margin: 0; }
+        .app-container { width: 100%; max-width: 600px; height: 100%; background: white; position: relative; display: flex; flex-direction: column; }
+        
+        /* 顶部导航 */
+        .header-nav { padding: 20px; display: flex; align-items: center; gap: 12px; }
+        .nav-btn { font-size: 1.4rem; cursor: pointer; color: #94A3B8; }
+        .progress-bar-bg { flex: 1; height: 10px; background: #F1F5F9; border-radius: 20px; overflow: hidden; }
+        #progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #6366F1, #A855F7); transition: 0.6s; }
+        .counter { font-weight: 800; color: #6366F1; font-size: 0.9rem; min-width: 45px; text-align: center; }
+
+        .main-content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .motion-icon { font-size: 5.5rem; margin-bottom: 25px; height: 110px; display: flex; align-items: center; justify-content: center; animation: floatIcon 2s infinite ease-in-out; }
+        @keyframes floatIcon { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+
+        .target-persona { background: #EEF2FF; color: #4F46E5; padding: 4px 16px; border-radius: 50px; font-weight: 700; font-size: 0.9rem; margin-bottom: 30px; border: 1.2px solid #E0E7FF; }
+        .german-sentence { font-size: 2.2rem; font-weight: 800; color: #0F172A; line-height: 1.5; margin-bottom: 15px; text-align: center; display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: 8px; }
+        
+        /* 下划线填空 */
+        .underline-gap { min-width: 130px; border-bottom: 5px solid #E2E8F0; padding: 0 10px; color: #6366F1; transition: 0.3s; height: 3.2rem; display: flex; align-items: center; justify-content: center; }
+        .underline-gap.active { border-color: #6366F1; border-bottom-width: 0; }
+        
+        .chinese-hint { font-size: 1.15rem; color: #94A3B8; font-weight: 500; margin-bottom: 50px; }
+
+        /* 选项按钮 */
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width: 100%; padding: 0 24px 40px; }
+        .option-btn { background: #FFFFFF; border: 2.5px solid #F1F5F9; padding: 18px; border-radius: 22px; font-size: 1.3rem; font-weight: 800; color: #334155; transition: 0.2s; cursor: pointer; }
+        .option-btn.correct { background: #10B981 !important; border-color: #10B981; color: white; transform: scale(1.05); }
+        .option-btn.wrong { background: #EF4444 !important; border-color: #EF4444; color: white; animation: shake 0.4s; }
+
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+        
+        .overlay { position: absolute; inset: 0; background: rgba(255,255,255,0.98); display: none; flex-direction: column; align-items: center; justify-content: center; padding: 40px; z-index: 100; text-align: center; }
+        .modal-card { background: #FFFFFF; border: 2px solid #F1F5F9; border-radius: 36px; padding: 35px; width: 100%; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.05); }
+        .primary-btn { width: 100%; padding: 18px; background: #1E293B; color: white; border-radius: 22px; font-weight: 900; font-size: 1.2rem; }
+    </style>
+</head>
+<body>
+    <audio id="snd-right" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+    <audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2101/2101-preview.mp3"></audio>
+
+    <div class="app-container">
+        <div class="header-nav">
+            <div class="nav-btn" onclick="location.href='index.html'">🔙</div>
+            <div class="progress-bar-bg"><div id="progress-fill"></div></div>
+            <div class="counter" id="progress-text">1 / 20</div>
+            <div id="mute-btn" class="nav-btn" onclick="toggleMute()">🔊</div>
+        </div>
+
+        <div class="main-content">
+            <div id="icon-box" class="motion-icon">🥳</div>
+            <div id="target-ui" class="target-persona">对 (du) 说</div>
+            <div class="german-sentence">
+                <span id="prefix-text"></span>
+                <span class="underline-gap" id="gap-line"></span>
+                <span id="suffix-text"></span>
+            </div>
+            <div id="cn-hint" class="chinese-hint">...</div>
+            <div class="options-grid" id="options-grid"></div>
+        </div>
+
+        <div id="tip-overlay" class="overlay">
+            <div class="modal-card">
+                <div class="text-4xl mb-4">💡</div>
+                <h3 class="text-xl font-black text-rose-500 mb-2">语法纠偏</h3>
+                <p id="tip-content" class="text-slate-600 font-medium mb-10 leading-relaxed px-2"></p>
+                <button onclick="closeTip()" class="primary-btn">重新尝试</button>
+            </div>
+        </div>
+
+        <div id="finish-overlay" class="overlay">
+            <div class="modal-card">
+                <div class="text-7xl mb-6">👑</div>
+                <h3 class="text-2xl font-black text-indigo-600 mb-2">挑战达成！</h3>
+                <p class="text-slate-500 font-medium mb-10">你已掌握了命令式核心变位。<br>德语水平更进一阶！</p>
+                <button onclick="location.href='index.html'" class="primary-btn" style="background: #6366F1;">返回主页</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const rawData = [
+            // 重点修正：现在考察动词变位
+            { cn: "你们坐下。", prefix: "", suffix: "euch!", target: "ihr", opts: ["Setzt", "Setzen", "Setz", "Setze"], ans: "Setzt", icon: "🪑", tip: "考察动词变位：ihr 形式的命令式使用动词变位（Setzt）并省略 ihr。" },
+            { cn: "咱们走吧。", prefix: "", suffix: "wir!", target: "wir", opts: ["Gehen", "Gehst", "Geht", "Gehe"], ans: "Gehen", icon: "🏃", tip: "考察动词变位：wir 形式使用动词原形（Gehen）。" },
+            { cn: "请您在这里签名。", prefix: "", suffix: "Sie bitte hier.", target: "Sie", opts: ["Unterschreiben", "Schreiben", "Unterschreibt", "Unterschreib"], ans: "Unterschreiben", icon: "✍️", tip: "考察动词变位：尊称 Sie 格式使用动词原形。" },
+            { cn: "请出示您的护照。", prefix: "", suffix: "Sie Ihren Pass!", target: "Sie", opts: ["Zeigen", "Zeig", "Zeigt", "Zeigst"], ans: "Zeigen", icon: "🛂", tip: "考察动词变位：Sie 命令式动词不发生变化。" },
+            { cn: "多吃点蔬菜。", prefix: "", suffix: "mehr Gemüse!", target: "du", opts: ["Iss", "Ess", "Esst", "Isst"], ans: "Iss", icon: "🥗", tip: "考察强变化：essen 在 du 变位时 e->i，命令式为 Iss。" },
+            { cn: "快点！", prefix: "", suffix: "schnell!", target: "du", opts: ["Sei", "Bist", "Seid", "Seien"], ans: "Sei", icon: "⚡", tip: "考察特殊变位：sein 的 du 命令式是 Sei。" },
+            { cn: "祝你玩得开心！", prefix: "", suffix: "viel Spaß!", target: "du", opts: ["Hab", "Habe", "Hast", "Habt"], ans: "Hab", icon: "🥳", tip: "考察动词变位：haben 的 du 命令式通常省略 -e。" },
+            { cn: "别忘了我。", prefix: "", suffix: "mich nicht!", target: "du", opts: ["Vergiss", "Vergess", "Vergisst", "Vergesse"], ans: "Vergiss", icon: "🧠", tip: "考察强变化：vergessen 变位为 du vergisst，命令式为 Vergiss。" },
+            { cn: "关上窗户。", prefix: "", suffix: "das Fenster zu!", target: "du", opts: ["Mach", "Mache", "Machst", "Macht"], ans: "Mach", icon: "🪟", tip: "考察可分动词：句首填入词干 Mach。" },
+            { cn: "你们开慢点。", prefix: "", suffix: "langsam!", target: "ihr", opts: ["Fahrt", "Fahren", "Fahr", "Fährst"], ans: "Fahrt", icon: "🚗", tip: "考察变音规则：ihr 的命令式不需要变音点（Fahrt）。" },
+            { cn: "帮帮我。", prefix: "", suffix: "mir!", target: "du", opts: ["Hilf", "Helf", "Hilfst", "Helft"], ans: "Hilf", icon: "🆘", tip: "考察强变化：helfen 的 du 命令式保留 i 变为 Hilf。" },
+            { cn: "请告诉我。", prefix: "", suffix: "Sie es mir!", target: "Sie", opts: ["Sagen", "Sag", "Sagt", "Sagens"], ans: "Sagen", icon: "💬", tip: "考察尊称变位：Sie 对应原形 Sagen。" },
+            { cn: "洗澡去。", prefix: "", suffix: "!", target: "du", opts: ["Bade", "Bad", "Badst", "Badet"], ans: "Bade", icon: "🛁", tip: "词干以 d 结尾，建议保留 -e 以便发音。" },
+            { cn: "读出声来。", prefix: "", suffix: "laut vor!", target: "du", opts: ["Lies", "Les", "Liest", "Lese"], ans: "Lies", icon: "📖", tip: "考察强变化：lesen (ie) 命令式为 Lies。" },
+            { cn: "保持安静。", prefix: "", suffix: "ruhig!", target: "ihr", opts: ["Seid", "Sei", "Seien", "Wart"], ans: "Seid", icon: "🤫", tip: "考察 sein 的 ihr 变位形式为 Seid。" },
+            { cn: "带上雨伞。", prefix: "", suffix: "den Schirm mit!", target: "du", opts: ["Nimm", "Nehme", "Nimmst", "Nehmt"], ans: "Nimm", icon: "☂️", tip: "考察强变化：nehmen 变为 Nimm。" },
+            { cn: "别害怕。", prefix: "", suffix: "keine Angst!", target: "ihr", opts: ["Habt", "Haben", "Hab", "Hast"], ans: "Habt", icon: "😨", tip: "考察 ihr 命令式直接使用变位 Habt。" },
+            { cn: "睡个好觉。", prefix: "", suffix: "gut!", target: "du", opts: ["Schlaf", "Schläfst", "Schlafe", "Schläf"], ans: "Schlaf", icon: "🛌", tip: "考察变音规则：du 命令式不带变音点（Schlaf）。" },
+            { cn: "把它带走。", prefix: "", suffix: "es weg!", target: "du", opts: ["Bring", "Bringe", "Bringst", "Bringt"], ans: "Bring", icon: "📦", tip: "规则动词词干变位。" },
+            { cn: "别跑太快。", prefix: "", suffix: "nicht so schnell!", target: "du", opts: ["Lauf", "Läufst", "Laufe", "Lauft"], ans: "Lauf", icon: "🏃‍♂️", tip: "考察强变化：laufen 命令式去掉变音点。" }
+        ];
+
+        let cur = 0, shuffledQuests = [], muted = false;
+        const sndRight = document.getElementById('snd-right');
+        const sndWrong = document.getElementById('snd-wrong');
+
+        function shuffle(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function init() {
+            if(cur === 0) shuffledQuests = shuffle([...rawData]);
+            const d = shuffledQuests[cur];
+            
+            document.getElementById('progress-fill').style.width = ((cur + 1) / 20 * 100) + '%';
+            document.getElementById('progress-text').innerText = `${cur + 1} / 20`;
+            document.getElementById('icon-box').innerText = d.icon;
+            document.getElementById('target-ui').innerText = `对 (${d.target}) 说`;
+            document.getElementById('cn-hint').innerText = d.cn;
+            
+            document.getElementById('prefix-text').innerText = d.prefix;
+            document.getElementById('suffix-text').innerText = d.suffix;
+            
+            const gap = document.getElementById('gap-line');
+            gap.innerText = "";
+            gap.classList.remove('active');
+            gap.style.borderBottom = '5px solid #E2E8F0';
+
+            const g = document.getElementById('options-grid');
+            g.innerHTML = '';
+            shuffle([...d.opts]).forEach(o => {
+                const b = document.createElement('button');
+                b.className = 'option-btn';
+                b.innerText = o;
+                b.onclick = () => {
+                    if(o === d.ans) {
+                        if(!muted) sndRight.play();
+                        b.classList.add('correct');
+                        gap.innerText = o;
+                        gap.classList.add('active');
+                        confetti({ particleCount: 35, spread: 70, origin: { y: 0.75 } });
+                        document.querySelectorAll('.option-btn').forEach(btn => btn.onclick = null);
+                        setTimeout(() => {
+                            cur++;
+                            if(cur < 20) init();
+                            else document.getElementById('finish-overlay').style.display = 'flex';
+                        }, 3000);
+                    } else {
+                        if(!muted) sndWrong.play();
+                        b.classList.add('wrong');
+                        setTimeout(() => {
+                            document.getElementById('tip-content').innerText = d.tip;
+                            document.getElementById('tip-overlay').style.display = 'flex';
+                        }, 500);
+                    }
+                };
+                g.appendChild(b);
+            });
+        }
+
+        function toggleMute() { muted = !muted; document.getElementById('mute-btn').innerText = muted ? "🔇" : "🔊"; }
+        function closeTip() { document.getElementById('tip-overlay').style.display = 'none'; document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('wrong')); }
+        
+        init();
+    </script>
+</body>
+</html>
