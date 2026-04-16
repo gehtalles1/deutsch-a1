@@ -79,37 +79,36 @@
 
         <div id="finish-overlay" class="overlay">
             <div class="modal-card">
-                <div class="text-7xl mb-6">👑</div>
-                <h3 class="text-2xl font-black text-indigo-600 mb-2">挑战达成！</h3>
-                <p class="text-slate-500 font-medium mb-10">你已掌握了命令式核心变位。<br>德语水平更进一阶！</p>
-                <button onclick="location.href='index.html'" class="primary-btn" style="background: #6366F1;">返回主页</button>
+                <div class="text-7xl mb-6">✨</div>
+                <h3 class="text-2xl font-black text-indigo-600 mb-2">魔法手册解锁！</h3>
+                <p class="text-slate-500 font-medium mb-10">你已掌握了命令式核心变位。<br>现在可以指挥自如了！</p>
+                <button onclick="handleFinish()" class="primary-btn" style="background: #6366F1;">领取勋章并返回</button>
             </div>
         </div>
     </div>
 
     <script>
         const rawData = [
-            // 重点修正：现在考察动词变位
-            { cn: "你们坐下。", prefix: "", suffix: "euch!", target: "ihr", opts: ["Setzt", "Setzen", "Setz", "Setze"], ans: "Setzt", icon: "🪑", tip: "考察动词变位：ihr 形式的命令式使用动词变位（Setzt）并省略 ihr。" },
-            { cn: "咱们走吧。", prefix: "", suffix: "wir!", target: "wir", opts: ["Gehen", "Gehst", "Geht", "Gehe"], ans: "Gehen", icon: "🏃", tip: "考察动词变位：wir 形式使用动词原形（Gehen）。" },
-            { cn: "请您在这里签名。", prefix: "", suffix: "Sie bitte hier.", target: "Sie", opts: ["Unterschreiben", "Schreiben", "Unterschreibt", "Unterschreib"], ans: "Unterschreiben", icon: "✍️", tip: "考察动词变位：尊称 Sie 格式使用动词原形。" },
-            { cn: "请出示您的护照。", prefix: "", suffix: "Sie Ihren Pass!", target: "Sie", opts: ["Zeigen", "Zeig", "Zeigt", "Zeigst"], ans: "Zeigen", icon: "🛂", tip: "考察动词变位：Sie 命令式动词不发生变化。" },
-            { cn: "多吃点蔬菜。", prefix: "", suffix: "mehr Gemüse!", target: "du", opts: ["Iss", "Ess", "Esst", "Isst"], ans: "Iss", icon: "🥗", tip: "考察强变化：essen 在 du 变位时 e->i，命令式为 Iss。" },
-            { cn: "快点！", prefix: "", suffix: "schnell!", target: "du", opts: ["Sei", "Bist", "Seid", "Seien"], ans: "Sei", icon: "⚡", tip: "考察特殊变位：sein 的 du 命令式是 Sei。" },
-            { cn: "祝你玩得开心！", prefix: "", suffix: "viel Spaß!", target: "du", opts: ["Hab", "Habe", "Hast", "Habt"], ans: "Hab", icon: "🥳", tip: "考察动词变位：haben 的 du 命令式通常省略 -e。" },
-            { cn: "别忘了我。", prefix: "", suffix: "mich nicht!", target: "du", opts: ["Vergiss", "Vergess", "Vergisst", "Vergesse"], ans: "Vergiss", icon: "🧠", tip: "考察强变化：vergessen 变位为 du vergisst，命令式为 Vergiss。" },
-            { cn: "关上窗户。", prefix: "", suffix: "das Fenster zu!", target: "du", opts: ["Mach", "Mache", "Machst", "Macht"], ans: "Mach", icon: "🪟", tip: "考察可分动词：句首填入词干 Mach。" },
-            { cn: "你们开慢点。", prefix: "", suffix: "langsam!", target: "ihr", opts: ["Fahrt", "Fahren", "Fahr", "Fährst"], ans: "Fahrt", icon: "🚗", tip: "考察变音规则：ihr 的命令式不需要变音点（Fahrt）。" },
-            { cn: "帮帮我。", prefix: "", suffix: "mir!", target: "du", opts: ["Hilf", "Helf", "Hilfst", "Helft"], ans: "Hilf", icon: "🆘", tip: "考察强变化：helfen 的 du 命令式保留 i 变为 Hilf。" },
-            { cn: "请告诉我。", prefix: "", suffix: "Sie es mir!", target: "Sie", opts: ["Sagen", "Sag", "Sagt", "Sagens"], ans: "Sagen", icon: "💬", tip: "考察尊称变位：Sie 对应原形 Sagen。" },
-            { cn: "洗澡去。", prefix: "", suffix: "!", target: "du", opts: ["Bade", "Bad", "Badst", "Badet"], ans: "Bade", icon: "🛁", tip: "词干以 d 结尾，建议保留 -e 以便发音。" },
-            { cn: "读出声来。", prefix: "", suffix: "laut vor!", target: "du", opts: ["Lies", "Les", "Liest", "Lese"], ans: "Lies", icon: "📖", tip: "考察强变化：lesen (ie) 命令式为 Lies。" },
-            { cn: "保持安静。", prefix: "", suffix: "ruhig!", target: "ihr", opts: ["Seid", "Sei", "Seien", "Wart"], ans: "Seid", icon: "🤫", tip: "考察 sein 的 ihr 变位形式为 Seid。" },
-            { cn: "带上雨伞。", prefix: "", suffix: "den Schirm mit!", target: "du", opts: ["Nimm", "Nehme", "Nimmst", "Nehmt"], ans: "Nimm", icon: "☂️", tip: "考察强变化：nehmen 变为 Nimm。" },
-            { cn: "别害怕。", prefix: "", suffix: "keine Angst!", target: "ihr", opts: ["Habt", "Haben", "Hab", "Hast"], ans: "Habt", icon: "😨", tip: "考察 ihr 命令式直接使用变位 Habt。" },
-            { cn: "睡个好觉。", prefix: "", suffix: "gut!", target: "du", opts: ["Schlaf", "Schläfst", "Schlafe", "Schläf"], ans: "Schlaf", icon: "🛌", tip: "考察变音规则：du 命令式不带变音点（Schlaf）。" },
-            { cn: "把它带走。", prefix: "", suffix: "es weg!", target: "du", opts: ["Bring", "Bringe", "Bringst", "Bringt"], ans: "Bring", icon: "📦", tip: "规则动词词干变位。" },
-            { cn: "别跑太快。", prefix: "", suffix: "nicht so schnell!", target: "du", opts: ["Lauf", "Läufst", "Laufe", "Lauft"], ans: "Lauf", icon: "🏃‍♂️", tip: "考察强变化：laufen 命令式去掉变音点。" }
+            { cn: "你们坐下。", prefix: "", suffix: "euch!", target: "ihr", opts: ["Setzt", "Setzen", "Setz", "Setze"], ans: "Setzt", icon: "🪑", tip: "ihr 的命令式直接使用 ihr 对应的动词变位（去掉-t后面的ihr）。" },
+            { cn: "咱们走吧。", prefix: "", suffix: "wir!", target: "wir", opts: ["Gehen", "Gehst", "Geht", "Gehe"], ans: "Gehen", icon: "🏃", tip: "wir 形式的命令式使用动词原形 + wir。" },
+            { cn: "请您在这里签名。", prefix: "", suffix: "Sie bitte hier.", target: "Sie", opts: ["Unterschreiben", "Schreiben", "Unterschreibt", "Unterschreib"], ans: "Unterschreiben", icon: "✍️", tip: "尊称 Sie 形式使用动词原形 + Sie。" },
+            { cn: "请出示您的护照。", prefix: "", suffix: "Sie Ihren Pass!", target: "Sie", opts: ["Zeigen", "Zeig", "Zeigt", "Zeigst"], ans: "Zeigen", icon: "🛂", tip: "Sie 命令式动词不发生词尾变化。" },
+            { cn: "多吃点蔬菜。", prefix: "", suffix: "mehr Gemüse!", target: "du", opts: ["Iss", "Ess", "Esst", "Isst"], ans: "Iss", icon: "🥗", tip: "重点：essen 在 du 命令式中 e 变 i，且去掉词尾 -st。" },
+            { cn: "快点！", prefix: "", suffix: "schnell!", target: "du", opts: ["Sei", "Bist", "Seid", "Seien"], ans: "Sei", icon: "⚡", tip: "特殊变位：sein 的 du 命令式是 Sei。" },
+            { cn: "祝你玩得开心！", prefix: "", suffix: "viel Spaß!", target: "du", opts: ["Hab", "Habe", "Hast", "Habt"], ans: "Hab", icon: "🥳", tip: "haben 的 du 命令式通常直接使用词干 Hab。" },
+            { cn: "别忘了我。", prefix: "", suffix: "mich nicht!", target: "du", opts: ["Vergiss", "Vergess", "Vergisst", "Vergesse"], ans: "Vergiss", icon: "🧠", tip: "vergessen 在 du 命令式中 e 变 i 变为 Vergiss。" },
+            { cn: "关上窗户。", prefix: "", suffix: "das Fenster zu!", target: "du", opts: ["Mach", "Mache", "Machst", "Macht"], ans: "Mach", icon: "🪟", tip: "规则动词 du 命令式去掉词尾 -st 和主语。" },
+            { cn: "你们开慢点。", prefix: "", suffix: "langsam!", target: "ihr", opts: ["Fahrt", "Fahren", "Fahr", "Fährst"], ans: "Fahrt", icon: "🚗", tip: "注意：ihr 的命令式不需要变音（Umlaut）。" },
+            { cn: "帮帮我。", prefix: "", suffix: "mir!", target: "du", opts: ["Hilf", "Helf", "Hilfst", "Helft"], ans: "Hilf", icon: "🆘", tip: "helfen 在 du 命令式中 e 变 i 变为 Hilf。" },
+            { cn: "请告诉我。", prefix: "", suffix: "Sie es mir!", target: "Sie", opts: ["Sagen", "Sag", "Sagt", "Sagens"], ans: "Sagen", icon: "💬", tip: "尊称 Sie 使用动词原形。" },
+            { cn: "洗澡去。", prefix: "", suffix: "!", target: "du", opts: ["Bade", "Bad", "Badst", "Badet"], ans: "Bade", icon: "🛁", tip: "词干以 -d/-t 结尾时，du 命令式通常保留 -e。" },
+            { cn: "读出声来。", prefix: "", suffix: "laut vor!", target: "du", opts: ["Lies", "Les", "Liest", "Lese"], ans: "Lies", icon: "📖", tip: "lesen 在 du 命令式中 e 变 ie 变为 Lies。" },
+            { cn: "保持安静。", prefix: "", suffix: "ruhig!", target: "ihr", opts: ["Seid", "Sei", "Seien", "Wart"], ans: "Seid", icon: "🤫", tip: "特殊变位：sein 的 ihr 命令式是 Seid。" },
+            { cn: "带上雨伞。", prefix: "", suffix: "den Schirm mit!", target: "du", opts: ["Nimm", "Nehme", "Nimmst", "Nehmt"], ans: "Nimm", icon: "☂️", tip: "nehmen 在 du 命令式中变为 Nimm。" },
+            { cn: "别害怕。", prefix: "", suffix: "keine Angst!", target: "ihr", opts: ["Habt", "Haben", "Hab", "Hast"], ans: "Habt", icon: "😨", tip: "ihr 的命令式直接使用变位词 Habt。" },
+            { cn: "睡个好觉。", prefix: "", suffix: "gut!", target: "du", opts: ["Schlaf", "Schläfst", "Schlafe", "Schläf"], ans: "Schlaf", icon: "🛌", tip: "重要：du 命令式不保留动词变位里的变音点。" },
+            { cn: "把它带走。", prefix: "", suffix: "es weg!", target: "du", opts: ["Bring", "Bringe", "Bringst", "Bringt"], ans: "Bring", icon: "📦", tip: "规则词干直接作为命令式使用。" },
+            { cn: "别跑太快。", prefix: "", suffix: "nicht so schnell!", target: "du", opts: ["Lauf", "Läufst", "Laufe", "Lauft"], ans: "Lauf", icon: "🏃‍♂️", tip: "laufen 的 du 命令式要去掉变音点。" }
         ];
 
         let cur = 0, shuffledQuests = [], muted = false;
@@ -160,7 +159,7 @@
                             cur++;
                             if(cur < 20) init();
                             else document.getElementById('finish-overlay').style.display = 'flex';
-                        }, 3000);
+                        }, 1200);
                     } else {
                         if(!muted) sndWrong.play();
                         b.classList.add('wrong');
@@ -172,6 +171,12 @@
                 };
                 g.appendChild(b);
             });
+        }
+
+        // 处理通关后的地图亮起逻辑
+        function handleFinish() {
+            localStorage.setItem('level18_cleared', 'true'); // 设置通关标志
+            location.href = 'index.html'; // 返回地图
         }
 
         function toggleMute() { muted = !muted; document.getElementById('mute-btn').innerText = muted ? "🔇" : "🔊"; }
