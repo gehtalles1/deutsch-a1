@@ -62,12 +62,12 @@
 <body>
     <div class="app-container">
         <div class="header-nav">
-            <button onclick="window.location.href='index.html'" class="nav-btn"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
+            <button onclick="window.location.href='index.html'" class="nav-btn">✖</button>
             <div class="progress-section">
                 <div class="progress-bar-bg"><div id="progress-fill"></div></div>
                 <div class="progress-num"><span id="cur-num">1</span> / 30</div>
             </div>
-            <button onclick="toggleMute()" class="nav-btn"><svg id="mute-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg></button>
+            <button onclick="toggleMute()" class="nav-btn">🔊</button>
         </div>
 
         <div class="main-stage">
@@ -81,7 +81,7 @@
         <div class="options-grid" id="options-grid"></div>
 
         <div id="teacher-tip">
-            <div class="flex items-center gap-3 mb-4"><span class="text-3xl">📝</span><h3 class="text-xl font-black">语法纠偏</h3></div>
+            <div class="flex items-center gap-3 mb-4"><span class="text-3xl">📝</span><h3 class="text-xl font-black">老师的批注</h3></div>
             <div id="tip-text" class="text-slate-600 font-bold mb-6 bg-slate-50 p-5 rounded-2xl border-l-8 border-slate-400"></div>
             <button onclick="closeTip()" class="w-full py-4 bg-slate-800 text-white rounded-2xl font-black text-lg">记住了</button>
         </div>
@@ -90,7 +90,7 @@
             <div class="modal-content">
                 <div class="text-6xl mb-4">🕰️</div>
                 <h2 class="text-2xl font-black mb-2 text-slate-800">Präteritum 达人!</h2>
-                <p class="text-slate-500 font-bold mb-8">你已经成功掌握了过去时的基础核心！</p>
+                <p class="text-slate-500 font-bold mb-8">你已经成功掌握了“过去时”的核心变位！</p>
                 <button onclick="window.location.href='index.html'" class="w-full py-4 bg-slate-700 text-white rounded-2xl font-black text-lg shadow-xl active:scale-95 transition">收下奖励并返回地图</button>
             </div>
         </div>
@@ -101,42 +101,55 @@
 
     <script>
         const rawData = [
-            { s: "Ich ____ gestern krank.", a: "war", opts: ["bin", "war", "warst", "wart"], icons: ["🤒", "🛌"], cn: "我昨天病了。", t: "Gestern(昨天)决定了要用过去时。Ich 对应 war。" },
-            { s: "____ du am Montag da?", a: "Warst", opts: ["Bist", "War", "Warst", "Wart"], icons: ["📅", "📍"], cn: "你周一在那儿吗？", t: "询问过去。Du 变位需在 war 词干后加 -st。" },
-            { s: "Wir ____ keine Zeit.", a: "hatten", opts: ["haben", "hatte", "hast", "hatten"], icons: ["⏰", "🏃‍♂️"], cn: "我们当时没时间。", t: "Wir 的过去时变位是 hatten，和动词原形长得一样。" },
-            { s: "Wo ____ ihr im Urlaub?", a: "wart", opts: ["seid", "war", "wart", "waren"], icons: ["🏖️", "✈️"], cn: "你们度假时在哪儿？", t: "你们(ihr) 对应的过去时是 wart。seid 是现在时。" },
-            { s: "Er ____ ein Handy.", a: "hatte", opts: ["hat", "hatte", "hatten", "hast"], icons: ["📱", "⌛"], cn: "他以前有一部手机。", t: "过去时里 er 和 ich 的变位永远一样：hatte。" },
-            { s: "Es ____ sehr kalt.", a: "war", opts: ["ist", "war", "waren", "wart"], icons: ["❄️", "🌬️"], cn: "当时天气非常冷。", t: "es 对应单数过去时 war。描述过去的天气。" },
-            { s: "____ Sie in Berlin?", a: "Waren", opts: ["Sind", "War", "Waren", "Wart"], icons: ["🏢", "🇩🇪"], cn: "您当时在柏林吗？", t: "尊称 Sie 的过去时变位是 waren。" },
-            { s: "Ich ____ viel Glück!", a: "hatte", opts: ["habe", "hatte", "hattest", "hatten"], icons: ["🍀", "🎉"], cn: "我那时运气超好！", t: "表达‘我当时有运气’用 hatten 的 ich 变位。" },
-            { s: "____ du Hunger?", a: "Hattest", opts: ["Hast", "Hatte", "Hattest", "Haben"], icons: ["🍕", "🤤"], cn: "你当时饿了吗？", t: "Hattest du... 是询问过去状态的常用句式。" },
-            { s: "Sie (pl.) ____ im Kino.", a: "waren", opts: ["sind", "war", "waren", "wart"], icons: ["🎬", "🍿"], cn: "他们当时在电影院。", t: "复数“他们”对应 waren。" },
-            { s: "Letztes Jahr ____ ich 20.", a: "war", opts: ["bin", "war", "bist", "warst"], icons: ["🎂", "⏪"], cn: "去年我20岁。", t: "年龄的过去状态用 war。" },
-            { s: "____ ihr am Samstag fit?", a: "Wart", opts: ["Seid", "Warst", "Wart", "Waren"], icons: ["💪", "⚡"], cn: "你们周六那天状态好吗？", t: "你们(ihr) 对应的过去时变位是 wart。" },
-            { s: "Das ____ so lustig!", a: "war", opts: ["ist", "war", "sind", "waren"], icons: ["😂", "✨"], cn: "那件事当时太搞笑了！", t: "指代单数事物时用 war。" },
-            { s: "Wir ____ gestern Hunger.", a: "hatten", opts: ["haben", "hatte", "hattest", "hatten"], icons: ["😋", "🍔"], cn: "我们昨天饿坏了。", t: "我们(wir) 对应 hatten。" },
-            { s: "____ du yesterday müde?", a: "Warst", opts: ["Bist", "War", "Warst", "Wart"], icons: ["😴", "🌙"], cn: "你昨天累了吗？", t: "du 变位加 -st。" },
-            { s: "Früher ____ ich Lehrer.", a: "war", opts: ["bin", "war", "warst", "ist"], icons: ["👨‍🏫", "📜"], cn: "以前我是一名老师。", t: "职业的过去状态用 war。" },
-            { s: "Sie (sg.) ____ im Garten.", a: "war", opts: ["ist", "war", "warst", "waren"], icons: ["🌳", "🌷"], cn: "她当时在花园里。", t: "她(sie) 是单数，变位是 war。" },
-            { s: "____ Sie gestern frei?", a: "Hatten", opts: ["Haben", "Hatte", "Hatten", "Hattest"], icons: ["🔓", "🏖️"], cn: "您昨天有空吗？", t: "您(Sie) 有空吗？用 hatten。" },
-            { s: "Ihr ____ im Museum.", a: "wart", opts: ["seid", "wart", "waren", "warst"], icons: ["🖼️", "🏛️"], cn: "你们当时在博物馆。", t: "注意复数变位识别。" },
-            { s: "Es ____ ein Problem.", a: "gab", opts: ["gibt", "gab", "gaben", "gabst"], icons: ["⚠️", "🧩"], cn: "以前有一个问题。", t: "Es gab 是 es gibt 的过去时，意为‘以前有’。" },
-            { s: "____ du das Buch?", a: "hattest", opts: ["hast", "hatte", "hattest", "hatten"], icons: ["📖", "✅"], cn: "你当时有那本书吗？", t: "过去是否拥有某物。" },
-            { s: "Wir ____ am See.", a: "waren", opts: ["sind", "waren", "wart", "war"], icons: ["🌊", "🌲"], cn: "我们当时在湖边。", t: "我们在湖边。复数 waren。" },
-            { s: "____ er gestern dort?", a: "War", opts: ["Ist", "War", "Warst", "Wart"], icons: ["🚶", "❓"], cn: "他昨天在那儿吗？", t: "他(er) 的过去时是 war。" },
-            { s: "Ich ____ Angst.", a: "hatte", opts: ["habe", "hatte", "hattest", "hatten"], icons: ["😨", "🌑"], cn: "我当时很害怕。", t: "我当时害怕。Ich hatte..." },
-            { s: "____ ihr yesterday zu Hause?", a: "Wart", opts: ["Seid", "War", "Wart", "Waren"], icons: ["🏠", "🛋️"], cn: "你们昨天在家吗？", t: "你们昨天在家吗？" },
-            { s: "Das Wetter ____ super.", a: "war", opts: ["ist", "war", "waren", "sind"], icons: ["☀️", "😎"], cn: "当时天气棒极了。", t: "天气是单数，用 war。" },
-            { s: "Sie (pl.) ____ Recht.", a: "hatten", opts: ["haben", "hatte", "hattest", "hatten"], icons: ["🤝", "💡"], cn: "他们当时是对的。", t: "他们当时是对的。" },
-            { s: "____ du am Freitag weg?", a: "Warst", opts: ["Bist", "War", "Warst", "Wart"], icons: ["🚶", "🚪"], cn: "你周五那天不在家吗？", t: "你周五那天不在家吗？" },
-            { s: "Wir ____ so viel Spaß!", a: "hatten", opts: ["haben", "hatte", "hatten", "hast"], icons: ["🥳", "🎈"], cn: "我们当时玩得很开心！", t: "我们当时玩得很开心。" },
-            { s: "Wo ____ das Auto?", a: "war", opts: ["ist", "war", "waren", "wart"], icons: ["🚗", "🔎"], cn: "那辆车当时在哪儿？", t: "车（单数）当时在哪儿？" }
+            { s: "Ich ____ gestern krank.", a: "war", opts: ["bin", "war", "warst", "wart"], icons: ["🤒", "🛌"], cn: "我昨天病了。", t: "ich 对应的过去时变位是 war。注意：过去时中 ich 和 er/sie/es 的变位是一样的！" },
+            { s: "____ du am Montag da?", a: "Warst", opts: ["Bist", "War", "Warst", "Wart"], icons: ["📅", "📍"], cn: "你周一在那儿吗？", t: "du 对应的过去时是在词干 war 后面加 -st，即 Warst。" },
+            { s: "Wir ____ keine Zeit.", a: "hatten", icons: ["⏰", "🏃‍♂️"], cn: "我们当时没时间。", t: "wir 的过去时变位是 hatten。注意它保留了动词原形般的 -en 结尾。" },
+            { s: "Wo ____ ihr im Urlaub?", a: "wart", icons: ["🏖️", "✈️"], cn: "你们度假时在哪儿？", t: "ihr 对应的过去时变位是 wart。记住：ihr 变位总是以 -t 结尾。" },
+            { s: "Er ____ ein Handy.", a: "hatte", icons: ["📱", "⌛"], cn: "他以前有一部手机。", t: "er 是单数第三人称，在过去时中变位是 hatte，不带任何词尾。" },
+            { s: "Es ____ sehr kalt.", a: "war", icons: ["❄️", "🌬️"], cn: "当时天气非常冷。", t: "es 对应单数过去时 war。用来描述过去的状态或天气。" },
+            { s: "____ Sie in Berlin?", a: "Waren", icons: ["🏢", "🇩🇪"], cn: "您当时在柏林吗？", t: "尊称 Sie 的过去时变位是 waren，与复数 sie (他们) 的形式一致。" },
+            { s: "Ich ____ viel Glück!", a: "hatte", icons: ["🍀", "🎉"], cn: "我那时运气超好！", t: "haben 的过去时词干是 hatt-。ich 变位就是 hatte。" },
+            { s: "____ du Hunger?", a: "Hattest", icons: ["🍕", "🤤"], cn: "你当时饿了吗？", t: "du 对应的 hatten 变位要加 -st，所以是 Hattest。" },
+            { s: "Sie (pl.) ____ im Kino.", a: "waren", icons: ["🎬", "🍿"], cn: "他们当时在电影院。", t: "sie (复数他们) 对应的过去时变位是 waren。" },
+            { s: "Letztes Jahr ____ ich 20.", a: "war", icons: ["🎂", "⏪"], cn: "去年我20岁。", t: "描述过去的年龄、职业或身份，都要用 sein 的过去时 war。" },
+            { s: "____ ihr am Samstag fit?", a: "Wart", icons: ["💪", "⚡"], cn: "你们周六那天状态好吗？", t: "ihr 对应的过去时变位是 wart。注意不要和现在时的 seid 搞混了。" },
+            { s: "Das ____ so lustig!", a: "war", icons: ["😂", "✨"], cn: "那件事当时太搞笑了！", t: "Das 指代一件单数的事物，对应第三人称单数变位 war。" },
+            { s: "Wir ____ gestern Hunger.", a: "hatten", icons: ["😋", "🍔"], cn: "我们昨天饿坏了。", t: "wir 对应 hatten。在德语中“饥饿”是用“拥有(haben)”来表达的。" },
+            { s: "____ du gestern müde?", a: "Warst", icons: ["😴", "🌙"], cn: "你昨天累了吗？", t: "du 变位必须保留 -st 结尾，即 Warst。" },
+            { s: "Früher ____ ich Lehrer.", a: "war", icons: ["👨‍🏫", "📜"], cn: "以前我是一名老师。", t: "Früher(以前)是一个典型的过去时信号词，ich 对应 war。" },
+            { s: "Sie (sg.) ____ im Garten.", a: "war", icons: ["🌳", "🌷"], cn: "她当时在花园里。", t: "Sie (单数她) 对应的过去时变位是 war。" },
+            { s: "____ Sie gestern frei?", a: "Hatten", icons: ["🔓", "🏖️"], cn: "您昨天有空吗？", t: "“有空”用 haben 表示，尊称 Sie 对应的过去时是 Hatten。" },
+            { s: "Ihr ____ im Museum.", a: "wart", icons: ["🖼️", "🏛️"], cn: "你们当时在博物馆。", t: "ihr 的变位 wart 是常考点，记得词尾是 -t。" },
+            { s: "Es ____ ein Problem.", a: "gab", icons: ["⚠️", "🧩"], cn: "以前有一个问题。", t: "Es gab 是 es gibt 的过去时，意为‘以前存在/有’，是不规则变位。" },
+            { s: "____ du das Buch?", a: "hattest", icons: ["📖", "✅"], cn: "你当时有那本书吗？", t: "询问过去的所属关系，du 对应 hattest。" },
+            { s: "Wir ____ am See.", a: "waren", icons: ["🌊", "🌲"], cn: "我们当时在湖边。", t: "wir 对应的过去时是 waren。" },
+            { s: "____ er gestern dort?", a: "War", icons: ["🚶", "❓"], cn: "他昨天在那儿吗？", t: "er 对应的过去时变位是 war。" },
+            { s: "Ich ____ Angst.", a: "hatte", icons: ["😨", "🌑"], cn: "我当时很害怕。", t: "“害怕”在德语中也是“拥有(haben)恐惧”，ich 对应 hatte。" },
+            { s: "____ ihr gestern zu Hause?", a: "Wart", icons: ["🏠", "🛋️"], cn: "你们昨天在家吗？", t: "ihr 对应的过去时变位是 wart。" },
+            { s: "Das Wetter ____ super.", a: "war", icons: ["☀️", "😎"], cn: "当时天气棒极了。", t: "Wetter 是中性单数名词，对应变位 war。" },
+            { s: "Sie (pl.) ____ Recht.", a: "hatten", icons: ["🤝", "💡"], cn: "他们当时是对的。", t: "“是对的”用 haben Recht 表示，复数 sie 对应 hatten。" },
+            { s: "____ du am Freitag weg?", a: "Warst", icons: ["🚶", "🚪"], cn: "你周五那天不在家吗？", t: "weg sein 表示不在/离开。du 对应变位 warst。" },
+            { s: "Wir ____ so viel Spaß!", a: "hatten", icons: ["🥳", "🎈"], cn: "我们当时玩得很开心！", t: "Spaß haben 是固定搭配，wir 对应 hatten。" },
+            { s: "Wo ____ das Auto?", a: "war", icons: ["🚗", "🔎"], cn: "那辆车当时在哪儿？", t: "Auto 是单数，对应的过去时变位是 war。" }
         ];
 
-        let quizData = [...rawData].sort(() => Math.random() - 0.5).slice(0, 30);
+        // 自动补全选项逻辑，确保每题都有四个干扰项
+        const allWarOpts = ["bin", "war", "warst", "wart", "waren", "ist", "sind"];
+        const allHatOpts = ["habe", "hatte", "hattest", "hatten", "habt", "hat", "hast"];
+
+        let quizData = rawData.map(item => {
+            if(!item.opts) {
+                const isWarType = ["war", "warst", "wart", "waren", "Waren", "Warst", "Wart", "War"].includes(item.a);
+                const pool = isWarType ? allWarOpts : allHatOpts;
+                let others = pool.filter(o => o.toLowerCase() !== item.a.toLowerCase());
+                item.opts = [item.a, ...others.sort(() => Math.random() - 0.5).slice(0, 3)];
+            }
+            return item;
+        }).sort(() => Math.random() - 0.5);
+
         let currentIndex = 0; let isMuted = false; let canClick = true;
 
-        function toggleMute() { isMuted = !isMuted; document.getElementById('mute-icon').style.color = isMuted ? '#EF4444' : '#64748B'; }
+        function toggleMute() { isMuted = !isMuted; }
         function playSound(type) { if (isMuted) return; const s = document.getElementById(type === 'ok' ? 'snd-ok' : 'snd-err'); s.currentTime = 0; s.play().catch(()=>{}); }
 
         function renderQuestion() {
@@ -176,7 +189,6 @@
                         canClick = false; playSound('ok');
                         const dz = document.querySelector('.drop-zone');
                         dz.innerText = opt; dz.classList.add('filled');
-                        // 答对停留时间改为 3000ms (3秒)
                         setTimeout(() => { currentIndex++; renderQuestion(); }, 3000);
                     } else {
                         playSound('err');
