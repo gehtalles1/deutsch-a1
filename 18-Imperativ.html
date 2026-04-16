@@ -155,11 +155,13 @@
                         gap.classList.add('active');
                         confetti({ particleCount: 35, spread: 70, origin: { y: 0.75 } });
                         document.querySelectorAll('.option-btn').forEach(btn => btn.onclick = null);
+                        
+                        // 答对后等待 3 秒进入下一题或完成界面
                         setTimeout(() => {
                             cur++;
                             if(cur < 20) init();
                             else document.getElementById('finish-overlay').style.display = 'flex';
-                        }, 1200);
+                        }, 3000);
                     } else {
                         if(!muted) sndWrong.play();
                         b.classList.add('wrong');
@@ -173,10 +175,9 @@
             });
         }
 
-        // 处理通关后的地图亮起逻辑
         function handleFinish() {
-            localStorage.setItem('level18_cleared', 'true'); // 设置通关标志
-            location.href = 'index.html'; // 返回地图
+            localStorage.setItem('level18_cleared', 'true');
+            location.href = 'index.html';
         }
 
         function toggleMute() { muted = !muted; document.getElementById('mute-btn').innerText = muted ? "🔇" : "🔊"; }
