@@ -19,59 +19,77 @@
             position: relative; display: flex; flex-direction: column; 
         }
 
-        /* 顶部导航 */
-        .header-nav { padding: 15px 20px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
-        .nav-btn { background: #F8FAFC; padding: 10px; border-radius: 15px; color: #94A3B8; cursor: pointer; border: none; }
+        /* 顶部导航 - 紧凑化 */
+        .header-nav { padding: 10px 20px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+        .nav-btn { background: #F8FAFC; padding: 8px; border-radius: 12px; color: #94A3B8; cursor: pointer; border: none; }
         
-        .progress-section { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .progress-bar-bg { width: 100%; height: 8px; background: #E2E8F0; border-radius: 20px; overflow: hidden; }
+        .progress-section { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+        .progress-bar-bg { width: 100%; height: 6px; background: #E2E8F0; border-radius: 20px; overflow: hidden; }
         #progress-fill { width: 0%; height: 100%; background: #334155; transition: 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .progress-num { font-size: 13px; font-weight: 900; color: #CBD5E1; letter-spacing: 1px; }
+        .progress-num { font-size: 11px; font-weight: 900; color: #CBD5E1; letter-spacing: 1px; }
 
-        /* 动态图标 */
-        .icon-group { display: flex; justify-content: center; gap: 12px; min-height: 80px; align-items: flex-end; }
-        .icon-anim { font-size: 50px; animation: bounce 2.5s infinite ease-in-out; }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+        /* 动态图标 - 缩小高度 */
+        .icon-group { display: flex; justify-content: center; gap: 10px; height: 60px; align-items: center; flex-shrink: 0; }
+        .icon-anim { font-size: 40px; animation: bounce 2.5s infinite ease-in-out; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 
-        /* 中文提示 */
+        /* 中文提示 - 减小外边距 */
         .translation-hint { 
-            font-size: 2.2rem; font-weight: 900; color: #1E293B; text-align: center; 
-            margin: 20px 0 35px; line-height: 1.2;
+            font-size: 1.8rem; font-weight: 900; color: #1E293B; text-align: center; 
+            margin: 10px 0 15px; line-height: 1.2; flex-shrink: 0;
         }
 
-        /* 拼句区 */
+        /* 主舞台 - 弹性布局防止溢出 */
+        .main-stage {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 0 20px;
+        }
+
+        /* 拼句区 - 动态占比 */
         .assembly-line {
-            min-height: 180px; background: #F8FAFC; border: 2px solid #F1F5F9;
-            border-radius: 35px; display: flex; flex-wrap: wrap; align-content: center; justify-content: center;
-            padding: 25px; gap: 12px; transition: 0.3s;
+            flex: 2;
+            min-height: 120px; background: #F8FAFC; border: 2px solid #F1F5F9;
+            border-radius: 25px; display: flex; flex-wrap: wrap; align-content: center; justify-content: center;
+            padding: 15px; gap: 8px; transition: 0.3s;
         }
         .assembly-line.correct { background: #F0FDF4; border-color: #22C55E; }
 
-        /* 单词砖块 */
+        /* 单词砖块 - 略微缩小 */
         .word-brick {
-            background: #FFFFFF; border: 2px solid #E2E8F0; padding: 12px 22px;
-            border-radius: 18px; font-size: 1.4rem; font-weight: 800; color: #334155;
-            box-shadow: 0 5px 0 #E2E8F0; cursor: pointer; transition: 0.1s;
+            background: #FFFFFF; border: 2px solid #E2E8F0; padding: 10px 18px;
+            border-radius: 15px; font-size: 1.2rem; font-weight: 800; color: #334155;
+            box-shadow: 0 4px 0 #E2E8F0; cursor: pointer; transition: 0.1s;
         }
         .word-brick:active { transform: translateY(2px); box-shadow: 0 1px 0 #E2E8F0; }
         .word-brick.used { opacity: 0; pointer-events: none; }
-        .word-brick.placed { background: #334155; color: white; border-color: #1E293B; box-shadow: 0 5px 0 #0F172A; }
+        .word-brick.placed { background: #334155; color: white; border-color: #1E293B; box-shadow: 0 4px 0 #0F172A; }
 
-        /* 刘老师批注卡 */
+        /* 单词池 - 自动填满剩余空间 */
+        .word-pool { 
+            flex: 3;
+            display: flex; flex-wrap: wrap; justify-content: center; align-content: flex-start;
+            gap: 10px; padding: 20px 0; overflow-y: auto;
+        }
+
+        /* 按钮区 */
+        .footer-action { padding: 15px 20px calc(15px + env(safe-area-inset-bottom)); flex-shrink: 0; }
+        .check-btn {
+            width: 100%; height: 65px; background: #F1F5F9; color: #94A3B8; border-radius: 24px;
+            font-size: 1.4rem; font-weight: 900; transition: 0.3s;
+        }
+        .check-btn.active { background: #10B981; color: white; box-shadow: 0 6px 0 #059669; transform: translateY(-2px); }
+
         #teacher-tip { 
             position: absolute; bottom: -100%; left: 0; right: 0; background: white; 
-            padding: 35px 25px calc(35px + env(safe-area-inset-bottom)); 
-            border-radius: 45px 45px 0 0; box-shadow: 0 -20px 60px rgba(0,0,0,0.15); 
-            transition: 0.6s cubic-bezier(0.19, 1, 0.22, 1); z-index: 100; border-top: 10px solid #FB7185; 
+            padding: 30px 25px calc(30px + env(safe-area-inset-bottom)); 
+            border-radius: 35px 35px 0 0; box-shadow: 0 -20px 60px rgba(0,0,0,0.15); 
+            transition: 0.6s cubic-bezier(0.19, 1, 0.22, 1); z-index: 100; border-top: 8px solid #FB7185; 
         }
         #teacher-tip.active { bottom: 0; }
-
-        .check-btn {
-            width: 100%; height: 75px; background: #F1F5F9; color: #94A3B8; border-radius: 28px;
-            font-size: 1.6rem; font-weight: 900; transition: 0.3s;
-        }
-        .check-btn.active { background: #10B981; color: white; box-shadow: 0 8px 0 #059669; transform: translateY(-4px); }
-
+        
         #finish-modal { position: absolute; inset: 0; background: rgba(255, 255, 255, 0.98); display: none; align-items: center; justify-content: center; z-index: 200; }
     </style>
 </head>
@@ -88,30 +106,30 @@
             </button>
         </div>
 
-        <div class="main-stage overflow-y-auto px-6">
+        <div class="main-stage">
             <div class="icon-group" id="icon-stage"></div>
             <div class="translation-hint" id="cn-hint"></div>
             <div class="assembly-line" id="target-zone" onclick="undoLast()"></div>
-            <p class="text-center text-slate-300 font-bold text-xs mt-2">点击单词可撤回 ↩️</p>
-            <div class="word-pool flex flex-wrap justify-center gap-3 p-5" id="source-pool"></div>
+            <p class="text-center text-slate-300 font-bold text-[10px] mt-1">点击单词可撤回 ↩️</p>
+            <div class="word-pool" id="source-pool"></div>
         </div>
 
-        <div class="p-6 mt-auto">
+        <div class="footer-action">
             <button id="check-btn" class="check-btn" onclick="checkSentence()" disabled>完成建造</button>
         </div>
 
         <div id="teacher-tip">
-            <div class="flex items-center gap-4 mb-5"><div class="text-4xl">👨‍🏫</div><h3 class="text-2xl font-black text-rose-600">刘老师的批注</h3></div>
-            <div id="tip-text" class="text-slate-700 font-bold text-xl leading-relaxed mb-10 bg-rose-50 p-6 rounded-3xl border-l-[10px] border-rose-400"></div>
-            <button onclick="closeTip()" class="w-full py-5 bg-slate-800 text-white rounded-3xl font-black text-xl shadow-xl active:scale-95 transition">再试一次</button>
+            <div class="flex items-center gap-4 mb-4"><div class="text-3xl">👨‍🏫</div><h3 class="text-xl font-black text-rose-600">刘老师的批注</h3></div>
+            <div id="tip-text" class="text-slate-700 font-bold text-lg leading-relaxed mb-8 bg-rose-50 p-5 rounded-2xl border-l-[8px] border-rose-400"></div>
+            <button onclick="closeTip()" class="w-full py-4 bg-slate-800 text-white rounded-2xl font-black text-lg shadow-xl active:scale-95 transition">再试一次</button>
         </div>
 
         <div id="finish-modal">
             <div class="text-center p-10 max-w-sm">
-                <div class="text-9xl mb-6">🏗️</div>
-                <h2 class="text-4xl font-black mb-4">顶级工程师！</h2>
-                <p class="text-slate-400 font-bold mb-10 text-xl">你成功交付了 30 座句式大楼。刘老师为你感到骄傲！</p>
-                <button onclick="goBack()" class="w-full py-5 bg-amber-500 text-white rounded-[32px] font-black text-2xl shadow-2xl active:scale-95 transition">确定并返回地图</button>
+                <div class="text-8xl mb-6">🏗️</div>
+                <h2 class="text-3xl font-black mb-4">顶级工程师！</h2>
+                <p class="text-slate-400 font-bold mb-8 text-lg">你成功交付了 30 座句式大楼。刘老师为你感到骄傲！</p>
+                <button onclick="goBack()" class="w-full py-4 bg-amber-500 text-white rounded-[28px] font-black text-xl shadow-2xl active:scale-95 transition">确定并返回地图</button>
             </div>
         </div>
     </div>
@@ -120,10 +138,12 @@
     <audio id="snd-success" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
 
     <script>
+        // 修正事实错误：他住在二楼（1.Stock）
         const rawData = [
             { cn: "我今天去上班。", icons: ["🚶", "🏢"], answer: "Ich gehe heute zur Arbeit .", type: "V2" },
             { cn: "你今天去上班吗？", icons: ["❓", "💼"], answer: "Gehst du heute zur Arbeit ?", type: "V1" },
             { cn: "他在喝咖啡。", icons: ["👨", "☕"], answer: "Er trinkt einen Kaffee .", type: "V2" },
+            { cn: "他住在二楼。", icons: ["🏢", "🛌"], answer: "Er wohnt im ersten Stock .", type: "V2" },
             { cn: "你叫什么名字？", icons: ["❓", "🆔"], answer: "Wie heißt du ?", type: "WV2" },
             { cn: "电影 20 点开始。", icons: ["🎬", "🕗"], answer: "Der Film beginnt um 20 Uhr .", type: "V2" },
             { cn: "你住在柏林吗？", icons: ["🏠", "🇩🇪"], answer: "Wohnst du in Berlin ?", type: "V1" },
@@ -135,24 +155,24 @@
             { cn: "你为什么哭？", icons: ["❓", "😢"], answer: "Warum weinst du ?", type: "WV2" },
             { cn: "我的朋友叫 Max。", icons: ["👦", "👋"], answer: "Mein Freund heißt Max .", type: "V2" },
             { cn: "你什么时候来？", icons: ["❓", "🕒"], answer: "Wann kommst du ?", type: "WV2" },
-            { cn: "这是一本书。", icons: ["📖", "✨"], answer: "Das ist ein Buch .", type: "V2" },
+            { cn: "这是一本书。", icons: ["📖", "✨"], answer: "Das ist ein适配 Buch .", type: "V2" },
             { cn: "我喜欢游泳。", icons: ["🏊", "💙"], answer: "Ich schwimme sehr gerne .", type: "V2" },
             { cn: "你会说德语吗？", icons: ["💬", "❓"], answer: "Sprichst du Deutsch ?", type: "V1" },
             { cn: "面包店关门了。", icons: ["🥖", "❌"], answer: "Die Bäckerei ist geschlossen .", type: "V2" },
             { cn: "你的电话号码是多少？", icons: ["📱", "❓"], answer: "Wie ist deine Telefonnummer ?", type: "WV2" },
             { cn: "我们在写作业。", icons: ["✍️", "🏠"], answer: "Wir machen die Hausaufgaben .", type: "V2" },
             { cn: "你需要帮助吗？", icons: ["🆘", "❓"], answer: "Brauchst du Hilfe ?", type: "V1" },
-            { cn: "苹果很好吃。", icons: ["🍎", "😋"], answer: "Der Apple ist lecker .", type: "V2" },
+            { cn: "苹果很好吃。", icons: ["🍎", "😋"], answer: "Der Apfel ist lecker .", type: "V2" },
             { cn: "你要买什么？", icons: ["🛒", "❓"], answer: "Was kaufst du ?", type: "WV2" },
             { cn: "音乐很大声。", icons: ["🎵", "📢"], answer: "Die Musik ist laut .", type: "V2" },
             { cn: "你累了吗？", icons: ["🥱", "❓"], answer: "Bist du müde ?", type: "V1" },
             { cn: "门是开着的。", icons: ["🚪", "🔓"], answer: "Die Tür ist offen .", type: "V2" },
             { cn: "哪里有药店？", icons: ["🏥", "❓"], answer: "Wo ist eine Apotheke ?", type: "WV2" },
-            { cn: "他住在二楼。", icons: ["🏢", "🛌"], answer: "Er wohnt im Erdgeschoss .", type: "V2" },
             { cn: "你开车去吗？", icons: ["🚗", "❓"], answer: "Fährst du mit dem Auto ?", type: "V1" },
             { cn: "今天很冷。", icons: ["❄️", "🥶"], answer: "Heute ist es sehr kalt .", type: "V2" }
         ];
 
+        // 其余 JS 逻辑保持不变...
         let quizData = [...rawData].sort(() => Math.random() - 0.5);
         let currentIndex = 0;
         let selectedWords = [];
@@ -243,7 +263,6 @@
                     if (currentIndex < quizData.length) {
                         initLevel();
                     } else {
-                        // 标记通关，以便地图页显示图标
                         localStorage.setItem('level17_cleared', 'true');
                         document.getElementById('finish-modal').style.display = 'flex';
                     }
@@ -261,15 +280,15 @@
             let feedback = "";
 
             if (uArr.slice(0, -1).some(w => puncs.includes(w))) {
-                feedback = "❌ 哎呀！你把标点符号放在了句子中间。它就像大门的锁，只能锁在句子的最末端！";
+                feedback = "❌ 哎呀！标点符号只能在句子的最末端。";
             } else if (!puncs.includes(uArr[uArr.length-1])) {
-                feedback = "❌ 句子还没有“封顶”。请检查一下，是不是忘了把最后的标点符号放上去？";
+                feedback = "❌ 句子还没有“封顶”。请检查一下最后的标点。";
             } else if (uArr[0] !== cArr[0]) {
-                feedback = `❌ 开头顺序错了。德语的第一个单词 "${cArr[0]}" 必须承担起带头的责任（大写）！`;
+                feedback = `❌ 开头顺序错了。德语第一个单词 "${cArr[0]}" 必须大写带头。`;
             } else {
-                if(type === "V2") feedback = "❌ 在陈述句里，变位动词必须雷打不动地占据【第二位】。现在的位置不对哦。";
-                else if(type === "V1") feedback = "❌ 这是一个一般疑问句，德语规定【动词】要冲在第一位带头提问！";
-                else feedback = "❌ 疑问词占第一，动词必须紧跟在后面占【第二位】。这是德语语序的钢律。";
+                if(type === "V2") feedback = "❌ 在陈述句里，动词必须占据【第二位】。";
+                else if(type === "V1") feedback = "❌ 这是一个疑问句，【动词】要冲在第一位！";
+                else feedback = "❌ 疑问词占第一，动词必须紧跟在后面占【第二位】。";
             }
 
             document.getElementById('tip-text').innerText = feedback;
@@ -277,10 +296,7 @@
         }
 
         function closeTip() { document.getElementById('teacher-tip').classList.remove('active'); }
-        
-        function goBack() {
-            window.location.href = 'index.html';
-        }
+        function goBack() { window.location.href = 'index.html'; }
 
         initLevel();
     </script>
