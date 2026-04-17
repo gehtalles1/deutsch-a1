@@ -209,6 +209,13 @@
                     <div id="m18" class="absolute -top-2 -right-2 text-3xl medal-pop"></div>
                 </div>
 
+                <div id="lvl19" onclick="go(19)" class="premium-card p-4 flex flex-col items-center text-center locked-state relative">
+                    <div class="w-12 h-12 bg-[#312E81] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">19</div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-tight">否定逻辑大师</h3>
+                    <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">nicht & kein</p>
+                    <div id="m19" class="absolute -top-2 -right-2 text-3xl medal-pop"></div>
+                </div>
+
             </div>
         </main>
 
@@ -226,8 +233,8 @@
     </div>
 
     <script>
-        // 更新关卡 ID 列表，加入 lvl18
-        const levelIds = ['lvl1', 'lvl2', 'lvl3', 'lvl4', 'lvl5', 'lvl6', 'lvl7', 'lvl8', 'lvl9', 'lvl10', 'lvl11', 'lvl12', 'lvl13', 'lvl14', 'lvl15', 'lvl16', 'lvl17', 'lvl18'];
+        // 更新关卡 ID 列表，加入 lvl19
+        const levelIds = ['lvl1', 'lvl2', 'lvl3', 'lvl4', 'lvl5', 'lvl6', 'lvl7', 'lvl8', 'lvl9', 'lvl10', 'lvl11', 'lvl12', 'lvl13', 'lvl14', 'lvl15', 'lvl16', 'lvl17', 'lvl18', 'lvl19'];
 
         function checkStatus() {
             const unlocked = localStorage.getItem('isUnlocked') === 'true';
@@ -260,9 +267,10 @@
             if (localStorage.getItem('level15_cleared') === 'true') document.getElementById('m15').innerText = "🌈";
             if (localStorage.getItem('level16_cleared') === 'true') document.getElementById('m16').innerText = "🕰️";
             if (localStorage.getItem('level17_cleared') === 'true') document.getElementById('m17').innerText = "🏗️";
-            
-            // 第 18 关通关图标：魔法闪烁
             if (localStorage.getItem('level18_cleared') === 'true') document.getElementById('m18').innerText = "✨";
+            
+            // 第 19 关通关图标：禁止符号 (代表否定)
+            if (localStorage.getItem('level19_cleared') === 'true') document.getElementById('m19').innerText = "🚫";
         }
 
         function unlock() {
@@ -294,7 +302,8 @@
                 15: '15-partikeln.html',
                 16: '16-Praeteritum.html',
                 17: '17-satzbau.html',
-                18: '18-Imperativ.html' // 关联第 18 关文件
+                18: '18-Imperativ.html',
+                19: '19-negation.html' // 关联第 19 关文件
             };
             window.location.href = pages[n];
         }
