@@ -59,7 +59,7 @@
             border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 30px; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
             box-shadow: 0 20px 50px -15px rgba(0, 0, 0, 0.8);
-            transition: border-color 0.3s ease;
+            transition: all 0.2s ease;
         }
 
         .word-display { 
@@ -75,10 +75,18 @@
             border-radius: 12px; border: 2px solid rgba(255,255,255,0.1);
             font-size: 2.2rem; font-family: 'JetBrains Mono'; 
             display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s ease;
         }
         .slot.active { border-color: var(--gold); color: var(--gold); }
-        .slot.filled { border-color: rgba(0, 242, 255, 0.5); } /* 已输入状态 */
+        .slot.filled { border-color: rgba(0, 242, 255, 0.5); }
         .slot.correct { color: var(--success); border-color: var(--success); transform: scale(1.05); }
+        .slot.wrong { color: var(--error); border-color: var(--error); animation: shake 0.4s; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
 
         .keypad { 
             display: grid; grid-template-columns: repeat(3, 1fr); 
@@ -97,11 +105,10 @@
         }
         .key:active { background: var(--gold); color: #000; transform: scale(0.95); }
         .key-del { color: var(--error); font-size: 0.9rem; font-weight: bold; }
-        /* 增加OK键未激活状态的透明度，输入满后变亮 */
         .key-ok { 
             background: linear-gradient(145deg, #FFD700, #FFAA00) !important; 
             color: #000; font-weight: 800; border: none;
-            opacity: 0.5; transition: opacity 0.3s;
+            opacity: 0.4; transition: opacity 0.3s;
         }
         .key-ok.ready { opacity: 1; box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); }
 
@@ -111,8 +118,6 @@
             .word-display { font-size: 1.2rem; min-height: 3rem; }
             .slot { width: 40px; height: 50px; font-size: 1.8rem; }
             .key { height: 48px; font-size: 1.2rem; }
-            .header { padding: 0.5rem 1.2rem; }
-            .glass-panel { margin-bottom: 10px; }
         }
     </style>
 </head>
@@ -130,7 +135,7 @@
 
         <div class="glass-panel" id="main-panel">
             <div id="slot-container" class="slot-group"></div>
-            <div class="text-[8px] tracking-[4px] opacity-20 mb-2 uppercase font-bold">Signal Processing</div>
+            <div id="feedback-text" class="text-[8px] tracking-[4px] opacity-20 mb-2 uppercase font-bold">Signal Processing</div>
             <div id="q-text" class="word-display">waiting...</div>
             
             <div class="w-1/3 h-1 bg-white/5 mt-6 rounded-full overflow-hidden">
@@ -147,10 +152,10 @@
         </div>
 
         <div id="modal" class="modal">
-            <div id="m-icon" class="text-6xl mb-4"></div>
-            <h2 id="m-title" class="text-2xl font-black mb-2"></h2>
-            <p id="m-body" class="text-white/40 text-sm text-center mb-8 px-6"></p>
-            <button id="m-btn" class="w-full max-w-[240px] py-4 rounded-xl bg-amber-400 text-black font-black active:scale-95"></button>
+            <div id="m-icon" class="text-6xl mb-4">⭐️</div>
+            <h2 id="m-title" class="text-2xl font-black mb-2">建立完成</h2>
+            <p id="m-body" class="text-white/40 text-sm text-center mb-8 px-6">德语数字逻辑协议同步完毕。</p>
+            <button id="m-btn" class="w-full max-w-[240px] py-4 rounded-xl bg-amber-400 text-black font-black active:scale-95" onclick="location.href='index.html'">确认并退出</button>
         </div>
     </div>
 
@@ -184,12 +189,17 @@
         }
 
         function load() {
-            if (score >= 30) { finish(true); return; }
+            if (score >= 30) { finish(); return; }
             input = ""; 
             current = data[Math.floor(Math.random() * data.length)];
             document.getElementById('q-text').innerText = current.d;
             document.getElementById('p-percent').innerText = Math.floor((score/30)*100) + "%";
             document.getElementById('btn-ok').classList.remove('ready');
+            
+            const ft = document.getElementById('feedback-text');
+            ft.innerText = "Signal Processing";
+            ft.style.color = "white"; ft.style.opacity = "0.2";
+            
             buildSlots();
             startTimer();
         }
@@ -210,10 +220,10 @@
             clearInterval(timer); timeLeft = 100;
             const bar = document.getElementById('time-bar');
             timer = setInterval(() => {
-                timeLeft -= 0.7; // 稍微放慢了时间
+                timeLeft -= 0.6; 
                 bar.style.width = timeLeft + "%";
                 bar.style.backgroundColor = timeLeft < 30 ? "#ff4d4d" : "#00f2ff";
-                if(timeLeft <= 0) finish(false, `解码超时。${current.d} 是 ${current.v}`);
+                if(timeLeft <= 0) load(); // 超时直接下一题
             }, 100);
         }
 
@@ -222,65 +232,47 @@
             if(k === 'C') { 
                 input = ""; 
                 beep(300); 
-                document.getElementById('btn-ok').classList.remove('ready');
             } else { 
                 if(input.length < max) { 
                     input += k; 
                     beep(700 + (input.length * 100)); 
                 }
             }
-            
-            // 如果输入满了，点亮OK键
-            if(input.length === max) {
-                document.getElementById('btn-ok').classList.add('ready');
-            } else {
-                document.getElementById('btn-ok').classList.remove('ready');
-            }
-            
+            if(input.length === max) document.getElementById('btn-ok').classList.add('ready');
+            else document.getElementById('btn-ok').classList.remove('ready');
             buildSlots();
         }
 
         function check() {
             const max = current.v >= 100 ? 3 : (current.v < 10 ? 1 : 2);
-            if(input.length < max) return; // 没输完，点击无效
+            if(input.length < max) return;
+
+            clearInterval(timer); 
 
             if(parseInt(input) === current.v) {
                 score++; beep(1100);
                 document.getElementById('main-panel').style.borderColor = "var(--success)";
                 document.querySelectorAll('.slot').forEach(s => s.classList.add('correct'));
-                clearInterval(timer);
-                setTimeout(() => { 
-                    document.getElementById('main-panel').style.borderColor = "rgba(255, 255, 255, 0.08)";
-                    load(); 
-                }, 400);
+                setTimeout(load, 400);
             } else {
-                finish(false, `校验未通过。${current.d} 应为 ${current.v}`);
+                // 答错逻辑：不扣分，闪烁报错，停留 0.8 秒展示正确答案
+                beep(200);
+                document.getElementById('main-panel').style.borderColor = "var(--error)";
+                document.querySelectorAll('.slot').forEach(s => s.classList.add('wrong'));
+                
+                const ft = document.getElementById('feedback-text');
+                ft.innerText = `Error: Correct was ${current.v}`;
+                ft.style.color = "var(--error)"; ft.style.opacity = "1";
+
+                setTimeout(load, 800);
             }
         }
 
-        function finish(win, msg) {
+        function finish() {
             clearInterval(timer);
-            const m = document.getElementById('modal');
-            m.style.display = "flex";
-            if(win) {
-                beep(1000);
-                document.getElementById('m-icon').innerText = "⭐️";
-                document.getElementById('m-title').innerText = "建立完成";
-                document.getElementById('m-body').innerText = "德语数字逻辑协议同步完毕。";
-                document.getElementById('m-btn').innerText = "保存进度并退出";
-                document.getElementById('m-btn').onclick = () => { 
-                    localStorage.setItem('level21_cleared', 'true'); 
-                    location.href='index.html'; 
-                };
-                confetti({particleCount: 100, spread: 70, origin: {y: 0.6}});
-            } else {
-                beep(200);
-                document.getElementById('m-icon').innerText = "⚡️";
-                document.getElementById('m-title').innerText = "同步中断";
-                document.getElementById('m-body').innerText = msg;
-                document.getElementById('m-btn').innerText = "重新尝试";
-                document.getElementById('m-btn').onclick = () => { score = 0; m.style.display = "none"; load(); };
-            }
+            document.getElementById('modal').style.display = "flex";
+            confetti({particleCount: 100, spread: 70, origin: {y: 0.6}});
+            localStorage.setItem('level21_cleared', 'true');
         }
 
         function toggleMute() { muted = !muted; document.getElementById('mute-btn').innerText = muted ? "🔇" : "🔊"; }
