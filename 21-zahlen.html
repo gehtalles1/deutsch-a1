@@ -17,11 +17,9 @@
             --panel: rgba(15, 15, 25, 0.95);
         }
 
-        /* 使用 dvh 确保在移动端动态适配工具栏高度 */
         body { 
             background: #020205; 
             font-family: 'Inter', sans-serif; 
-            height: 100vh;
             height: 100dvh; 
             display: flex; align-items: center; justify-content: center; 
             overflow: hidden; margin: 0; color: white; 
@@ -29,13 +27,11 @@
 
         .app-container { 
             width: 100%; max-width: 450px; 
-            height: 100vh;
             height: 100dvh; 
             display: flex; flex-direction: column; position: relative; 
             background: radial-gradient(circle at 50% 10%, #1a1a35 0%, #020205 100%); 
         }
 
-        /* 顶部区域缩小间距 */
         .header {
             display: flex; align-items: center; justify-content: space-between;
             padding: 1rem 1.5rem; flex-shrink: 0;
@@ -56,7 +52,6 @@
             color: var(--neon); text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
         }
 
-        /* 核心面板：增加 min-height: 0 并允许收缩 */
         .glass-panel { 
             flex: 1; min-height: 0;
             margin: 0 20px 15px; 
@@ -82,18 +77,18 @@
             display: flex; align-items: center; justify-content: center;
         }
         .slot.active { border-color: var(--gold); color: var(--gold); }
+        .slot.filled { border-color: rgba(0, 242, 255, 0.5); } /* 已输入状态 */
         .slot.correct { color: var(--success); border-color: var(--success); transform: scale(1.05); }
 
-        /* 键盘区：固定在底部，缩小高度 */
         .keypad { 
             display: grid; grid-template-columns: repeat(3, 1fr); 
-            gap: 10px; padding: 20px 20px calc(20px + env(safe-area-inset-bottom)); 
+            gap: 10px; padding: 15px 20px calc(15px + env(safe-area-inset-bottom)); 
             background: #08080c; border-radius: 35px 35px 0 0;
             border-top: 1px solid rgba(255,255,255,0.05);
             flex-shrink: 0;
         }
         .key { 
-            height: 52px; background: #181822; border-radius: 15px; 
+            height: 55px; background: #181822; border-radius: 15px; 
             display: flex; align-items: center; justify-content: center; 
             font-family: 'JetBrains Mono'; font-size: 1.4rem; color: #fff;
             cursor: pointer; transition: 0.1s; border: 1px solid #2a2a35;
@@ -102,16 +97,21 @@
         }
         .key:active { background: var(--gold); color: #000; transform: scale(0.95); }
         .key-del { color: var(--error); font-size: 0.9rem; font-weight: bold; }
-        .key-ok { background: linear-gradient(145deg, #FFD700, #FFAA00) !important; color: #000; font-weight: 800; border: none; }
+        /* 增加OK键未激活状态的透明度，输入满后变亮 */
+        .key-ok { 
+            background: linear-gradient(145deg, #FFD700, #FFAA00) !important; 
+            color: #000; font-weight: 800; border: none;
+            opacity: 0.5; transition: opacity 0.3s;
+        }
+        .key-ok.ready { opacity: 1; box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); }
 
         .modal { position: absolute; inset: 0; background: rgba(2,2,5,0.98); z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 40px; }
 
-        /* 针对超短屏幕的微调 */
         @media (max-height: 670px) {
             .word-display { font-size: 1.2rem; min-height: 3rem; }
-            .slot { width: 40px; height: 55px; font-size: 2rem; }
-            .key { height: 45px; font-size: 1.2rem; }
-            .header { padding: 0.5rem 1.5rem; }
+            .slot { width: 40px; height: 50px; font-size: 1.8rem; }
+            .key { height: 48px; font-size: 1.2rem; }
+            .header { padding: 0.5rem 1.2rem; }
             .glass-panel { margin-bottom: 10px; }
         }
     </style>
@@ -143,7 +143,7 @@
             <div class="key" onclick="tap('4')">4</div><div class="key" onclick="tap('5')">5</div><div class="key" onclick="tap('6')">6</div>
             <div class="key" onclick="tap('7')">7</div><div class="key" onclick="tap('8')">8</div><div class="key" onclick="tap('9')">9</div>
             <div class="key key-del" onclick="tap('C')">DEL</div><div class="key" onclick="tap('0')">0</div>
-            <div class="key key-ok" onclick="check()">OK</div>
+            <div id="btn-ok" class="key key-ok" onclick="check()">OK</div>
         </div>
 
         <div id="modal" class="modal">
@@ -189,6 +189,7 @@
             current = data[Math.floor(Math.random() * data.length)];
             document.getElementById('q-text').innerText = current.d;
             document.getElementById('p-percent').innerText = Math.floor((score/30)*100) + "%";
+            document.getElementById('btn-ok').classList.remove('ready');
             buildSlots();
             startTimer();
         }
@@ -199,7 +200,7 @@
             const len = current.v >= 100 ? 3 : (current.v < 10 ? 1 : 2);
             for(let i=0; i<len; i++) {
                 const s = document.createElement('div');
-                s.className = `slot ${i === input.length ? 'active' : ''}`;
+                s.className = `slot ${i === input.length ? 'active' : (input[i] ? 'filled' : '')}`;
                 s.innerText = input[i] || "";
                 container.appendChild(s);
             }
@@ -209,7 +210,7 @@
             clearInterval(timer); timeLeft = 100;
             const bar = document.getElementById('time-bar');
             timer = setInterval(() => {
-                timeLeft -= 0.8;
+                timeLeft -= 0.7; // 稍微放慢了时间
                 bar.style.width = timeLeft + "%";
                 bar.style.backgroundColor = timeLeft < 30 ? "#ff4d4d" : "#00f2ff";
                 if(timeLeft <= 0) finish(false, `解码超时。${current.d} 是 ${current.v}`);
@@ -218,19 +219,31 @@
 
         function tap(k) {
             const max = current.v >= 100 ? 3 : (current.v < 10 ? 1 : 2);
-            if(k === 'C') { input = ""; beep(300); } 
-            else { 
+            if(k === 'C') { 
+                input = ""; 
+                beep(300); 
+                document.getElementById('btn-ok').classList.remove('ready');
+            } else { 
                 if(input.length < max) { 
                     input += k; 
                     beep(700 + (input.length * 100)); 
                 }
             }
+            
+            // 如果输入满了，点亮OK键
+            if(input.length === max) {
+                document.getElementById('btn-ok').classList.add('ready');
+            } else {
+                document.getElementById('btn-ok').classList.remove('ready');
+            }
+            
             buildSlots();
-            if(input.length === max) setTimeout(check, 150);
         }
 
         function check() {
-            if(input === "") return;
+            const max = current.v >= 100 ? 3 : (current.v < 10 ? 1 : 2);
+            if(input.length < max) return; // 没输完，点击无效
+
             if(parseInt(input) === current.v) {
                 score++; beep(1100);
                 document.getElementById('main-panel').style.borderColor = "var(--success)";
@@ -241,7 +254,7 @@
                     load(); 
                 }, 400);
             } else {
-                finish(false, `校验不匹配。${current.d} 是 ${current.v}`);
+                finish(false, `校验未通过。${current.d} 应为 ${current.v}`);
             }
         }
 
