@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>21-Zahlen Sync</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=JetBrains+Mono:wght@500;800&display=swap');
+        
+        :root { 
+            --gold: #FFD700; 
+            --neon: #00F2FF; 
+            --error: #FF4D4D; 
+            --success: #00FF88;
+            --panel: rgba(15, 15, 25, 0.95);
+        }
+
+        body { 
+            background: #020205; 
+            font-family: 'Inter', sans-serif; 
+            height: 100svh; 
+            display: flex; align-items: center; justify-content: center; 
+            overflow: hidden; margin: 0; color: white; 
+        }
+
+        .app-container { 
+            width: 100%; max-width: 450px; height: 100svh; 
+            display: flex; flex-direction: column; position: relative; 
+            background: radial-gradient(circle at 50% 10%, #1a1a35 0%, #020205 100%); 
+        }
+
+        .radar-container { position: relative; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; }
+        .radar-ring { position: absolute; inset: 0; border: 1.5px solid rgba(0, 242, 255, 0.15); border-radius: 50%; }
+        .radar-sweep { 
+            position: absolute; inset: 0; border-radius: 50%; 
+            background: conic-gradient(from 0deg, rgba(0, 242, 255, 0.5) 0deg, transparent 120deg); 
+            animation: radar-spin 2s linear infinite; 
+        }
+        @keyframes radar-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        
+        .radar-data { 
+            position: relative; z-index: 10; 
+            font-family: 'JetBrains Mono'; font-size: 1rem; font-weight: 800; 
+            color: var(--neon); text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+        }
+
+        .glass-panel { 
+            flex: 1; margin: 0 24px 24px; 
+            background: var(--panel); 
+            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 35px; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8);
+        }
+
+        .word-display { 
+            font-family: 'JetBrains Mono', monospace; color: #fff; 
+            font-size: 1.7rem; font-weight: 800; text-align: center; 
+            padding: 0 30px; min-height: 5rem; display: flex; align-items: center; 
+            text-transform: lowercase; letter-spacing: -1px;
+        }
+
+        .slot-group { display: flex; gap: 12px; margin-bottom: 30px; }
+        .slot { 
+            width: 52px; height: 72px; background: #111122; 
+            border-radius: 15px; border: 2px solid rgba(255,255,255,0.1);
+            font-size: 2.8rem; font-family: 'JetBrains Mono'; 
+            display: flex; align-items: center; justify-content: center;
+        }
+        .slot.active { border-color: var(--gold); color: var(--gold); background: rgba(255, 215, 0, 0.05); }
+        .slot.correct { color: var(--success); border-color: var(--success); transform: scale(1.1); }
+
+        .keypad { 
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; 
+            padding: 30px 25px; background: #08080c; border-radius: 45px 45px 0 0;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        .key { 
+            height: 62px; background: #181822; border-radius: 20px; 
+            display: flex; align-items: center; justify-content: center; 
+            font-family: 'JetBrains Mono'; font-size: 1.6rem; color: #fff;
+            cursor: pointer; transition: 0.1s; border: 1px solid #2a2a35;
+        }
+        .key:active { background: var(--gold); color: #000; transform: scale(0.92); }
+        .key-del { color: var(--error); font-size: 1rem; font-weight: bold; }
+        .key-ok { background: linear-gradient(145deg, #FFD700, #FFAA00) !important; color: #000; font-weight: 800; border: none; }
+
+        .modal { position: absolute; inset: 0; background: rgba(2,2,5,0.98); z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 40px; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="flex items-center justify-between px-8 py-6">
+            <div class="text-xl cursor-pointer opacity-40 hover:opacity-100" onclick="location.href='index.html'">✕</div>
+            <div class="radar-container">
+                <div class="radar-ring"></div>
+                <div class="radar-sweep"></div>
+                <div class="radar-data" id="p-percent">0%</div>
+            </div>
+            <div id="mute-btn" class="text-xl cursor-pointer opacity-40" onclick="toggleMute()">🔊</div>
+        </div>
+
+        <div class="glass-panel" id="main-panel">
+            <div id="slot-container" class="slot-group"></div>
+            <div class="text-[9px] tracking-[6px] opacity-20 mb-4 uppercase font-bold">Signal Processing</div>
+            <div id="q-text" class="word-display">waiting...</div>
+            
+            <div class="w-1/2 h-1 bg-white/5 mt-10 rounded-full overflow-hidden">
+                <div id="time-bar" class="h-full bg-cyan-400 w-full transition-all duration-100 linear"></div>
+            </div>
+        </div>
+
+        <div class="keypad">
+            <div class="key" onclick="tap('1')">1</div><div class="key" onclick="tap('2')">2</div><div class="key" onclick="tap('3')">3</div>
+            <div class="key" onclick="tap('4')">4</div><div class="key" onclick="tap('5')">5</div><div class="key" onclick="tap('6')">6</div>
+            <div class="key" onclick="tap('7')">7</div><div class="key" onclick="tap('8')">8</div><div class="key" onclick="tap('9')">9</div>
+            <div class="key key-del" onclick="tap('C')">DEL</div><div class="key" onclick="tap('0')">0</div>
+            <div class="key key-ok" onclick="check()">OK</div>
+        </div>
+
+        <div id="modal" class="modal">
+            <div id="m-icon" class="text-8xl mb-6"></div>
+            <h2 id="m-title" class="text-3xl font-black mb-3"></h2>
+            <p id="m-body" class="text-white/40 text-center mb-10 px-6"></p>
+            <button id="m-btn" class="w-full max-w-[280px] py-5 rounded-2xl bg-amber-400 text-black font-black active:scale-95 transition-all"></button>
+        </div>
+    </div>
+
+    <script>
+        // 优化后的题库：移除了叠字数字，重点在于个位十位的倒置练习
+        const data = [
+            {d: "elf", v: 11}, {d: "zwölf", v: 12}, {d: "dreizehn", v: 13}, {d: "vierzehn", v: 14}, {d: "fünfzehn", v: 15},
+            {d: "sechzehn", v: 16}, {d: "siebzehn", v: 17}, {d: "achtzehn", v: 18}, {d: "neunzehn", v: 19}, {d: "zwanzig", v: 20},
+            {d: "einundzwanzig", v: 21}, {d: "vierundzwanzig", v: 24}, {d: "achtundzwanzig", v: 28}, {d: "neunundzwanzig", v: 29},
+            {d: "zweiunddreißig", v: 32}, {d: "fünfunddreißig", v: 35}, {d: "sechsunddreißig", v: 36}, {d: "achtunddreißig", v: 38},
+            {d: "neununddreißig", v: 39}, {d: "vierzig", v: 40}, {d: "dreiundvierzig", v: 43}, {d: "achtundvierzig", v: 48},
+            {d: "zweiundfünfzig", v: 52}, {d: "vierundfünfzig", v: 54}, {d: "siebenundfünfzig", v: 57}, {d: "achtundfünfzig", v: 58},
+            {d: "sechzig", v: 60}, {d: "dreiundsechzig", v: 63}, {d: "fünfundsechzig", v: 65}, {d: "achtundsechzig", v: 68},
+            {d: "einundsiebzig", v: 71}, {d: "vierundsiebzig", v: 74}, {d: "sechsundsiebzig", v: 76}, {d: "neunundsiebzig", v: 79},
+            {d: "zweiundachtzig", v: 82}, {d: "fünfundachtzig", v: 85}, {d: "siebenundachtzig", v: 87}, {d: "neunundachtzig", v: 89},
+            {d: "neunzig", v: 90}, {d: "einundneunzig", v: 91}, {d: "dreiundneunzig", v: 93}, {d: "vierundneunzig", v: 94},
+            {d: "sechsundneunzig", v: 96}, {d: "achtundneunzig", v: 98}, {d: "einhundert", v: 100}
+        ];
+
+        let score = 0, input = "", current = null, timeLeft = 100, timer = null, muted = false;
+
+        function beep(freq) {
+            if (muted) return;
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const o = ctx.createOscillator();
+            const g = ctx.createGain();
+            o.frequency.value = freq; o.connect(g); g.connect(ctx.destination);
+            o.start(); g.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.1);
+            o.stop(ctx.currentTime + 0.1);
+        }
+
+        function load() {
+            if (score >= 30) { finish(true); return; }
+            input = ""; 
+            current = data[Math.floor(Math.random() * data.length)];
+            document.getElementById('q-text').innerText = current.d;
+            document.getElementById('p-percent').innerText = Math.floor((score/30)*100) + "%";
+            buildSlots();
+            startTimer();
+        }
+
+        function buildSlots() {
+            const container = document.getElementById('slot-container');
+            container.innerHTML = "";
+            const len = current.v >= 100 ? 3 : (current.v < 10 ? 1 : 2);
+            for(let i=0; i<len; i++) {
+                const s = document.createElement('div');
+                s.className = `slot ${i === input.length ? 'active' : ''}`;
+                s.innerText = input[i] || "";
+                container.appendChild(s);
+            }
+        }
+
+        function startTimer() {
+            clearInterval(timer); timeLeft = 100;
+            const bar = document.getElementById('time-bar');
+            timer = setInterval(() => {
+                timeLeft -= 0.65;
+                bar.style.width = timeLeft + "%";
+                bar.style.backgroundColor = timeLeft < 30 ? "#ff4d4d" : "#00f2ff";
+                if(timeLeft <= 0) finish(false, `解码超时。${current.d} 是 ${current.v}`);
+            }, 100);
+        }
+
+        function tap(k) {
+            if(k === 'C') { input = ""; beep(300); }
+            else { 
+                const max = current.v >= 100 ? 3 : (current.v < 10 ? 1 : 2);
+                if(input.length < max) { input += k; beep(700); }
+            }
+            buildSlots();
+        }
+
+        function check() {
+            if(parseInt(input) === current.v) {
+                score++; beep(1100);
+                document.getElementById('main-panel').style.borderColor = "var(--success)";
+                document.querySelectorAll('.slot').forEach(s => s.classList.add('correct'));
+                setTimeout(() => { 
+                    document.getElementById('main-panel').style.borderColor = "rgba(255, 255, 255, 0.08)";
+                    load(); 
+                }, 300);
+            } else {
+                finish(false, `校验未通过。${current.d} 对应的数值为 ${current.v}`);
+            }
+        }
+
+        function finish(win, msg) {
+            clearInterval(timer);
+            const m = document.getElementById('modal');
+            m.style.display = "flex";
+            if(win) {
+                beep(1000);
+                document.getElementById('m-icon').innerText = "⭐️";
+                document.getElementById('m-title').innerText = "链路建立完成";
+                document.getElementById('m-body').innerText = "30组德语数字逻辑已成功配对，协议同步完毕。";
+                document.getElementById('m-btn').innerText = "保存进度并退出";
+                document.getElementById('m-btn').onclick = () => { localStorage.setItem('level21_cleared', 'true'); location.href='index.html'; };
+                confetti({particleCount: 150, spread: 80, origin: {y: 0.6}});
+            } else {
+                beep(200);
+                if(window.navigator.vibrate) window.navigator.vibrate(200);
+                document.getElementById('m-icon').innerText = "⚡️";
+                document.getElementById('m-title').innerText = "校验失败";
+                document.getElementById('m-body').innerText = msg;
+                document.getElementById('m-btn').innerText = "重试同步";
+                document.getElementById('m-btn').onclick = () => { score = 0; m.style.display = "none"; load(); };
+            }
+        }
+
+        function toggleMute() { muted = !muted; document.getElementById('mute-btn').innerText = muted ? "🔇" : "🔊"; }
+        load();
+    </script>
+</body>
+</html>
