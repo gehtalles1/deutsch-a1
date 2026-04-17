@@ -17,22 +17,31 @@
             --panel: rgba(15, 15, 25, 0.95);
         }
 
+        /* 使用 dvh 确保在移动端动态适配工具栏高度 */
         body { 
             background: #020205; 
             font-family: 'Inter', sans-serif; 
-            height: 100svh; 
+            height: 100vh;
+            height: 100dvh; 
             display: flex; align-items: center; justify-content: center; 
             overflow: hidden; margin: 0; color: white; 
         }
 
         .app-container { 
-            width: 100%; max-width: 450px; height: 100svh; 
+            width: 100%; max-width: 450px; 
+            height: 100vh;
+            height: 100dvh; 
             display: flex; flex-direction: column; position: relative; 
             background: radial-gradient(circle at 50% 10%, #1a1a35 0%, #020205 100%); 
         }
 
-        /* 顶部雷达扫描动画 */
-        .radar-container { position: relative; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; }
+        /* 顶部区域缩小间距 */
+        .header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 1rem 1.5rem; flex-shrink: 0;
+        }
+
+        .radar-container { position: relative; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; }
         .radar-ring { position: absolute; inset: 0; border: 1.5px solid rgba(0, 242, 255, 0.15); border-radius: 50%; }
         .radar-sweep { 
             position: absolute; inset: 0; border-radius: 50%; 
@@ -43,59 +52,73 @@
         
         .radar-data { 
             position: relative; z-index: 10; 
-            font-family: 'JetBrains Mono'; font-size: 1rem; font-weight: 800; 
+            font-family: 'JetBrains Mono'; font-size: 0.9rem; font-weight: 800; 
             color: var(--neon); text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
         }
 
+        /* 核心面板：增加 min-height: 0 并允许收缩 */
         .glass-panel { 
-            flex: 1; margin: 0 24px 24px; 
+            flex: 1; min-height: 0;
+            margin: 0 20px 15px; 
             background: var(--panel); 
-            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 35px; 
+            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 30px; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8);
+            box-shadow: 0 20px 50px -15px rgba(0, 0, 0, 0.8);
             transition: border-color 0.3s ease;
         }
 
         .word-display { 
             font-family: 'JetBrains Mono', monospace; color: #fff; 
-            font-size: 1.7rem; font-weight: 800; text-align: center; 
-            padding: 0 30px; min-height: 5rem; display: flex; align-items: center; 
+            font-size: 1.5rem; font-weight: 800; text-align: center; 
+            padding: 0 20px; min-height: 4rem; display: flex; align-items: center; 
             text-transform: lowercase; letter-spacing: -1px;
         }
 
-        .slot-group { display: flex; gap: 12px; margin-bottom: 30px; }
+        .slot-group { display: flex; gap: 10px; margin-bottom: 20px; }
         .slot { 
-            width: 52px; height: 72px; background: #111122; 
-            border-radius: 15px; border: 2px solid rgba(255,255,255,0.1);
-            font-size: 2.8rem; font-family: 'JetBrains Mono'; 
+            width: 45px; height: 60px; background: #111122; 
+            border-radius: 12px; border: 2px solid rgba(255,255,255,0.1);
+            font-size: 2.2rem; font-family: 'JetBrains Mono'; 
             display: flex; align-items: center; justify-content: center;
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .slot.active { border-color: var(--gold); color: var(--gold); background: rgba(255, 215, 0, 0.05); }
-        .slot.correct { color: var(--success); border-color: var(--success); transform: scale(1.1); }
+        .slot.active { border-color: var(--gold); color: var(--gold); }
+        .slot.correct { color: var(--success); border-color: var(--success); transform: scale(1.05); }
 
+        /* 键盘区：固定在底部，缩小高度 */
         .keypad { 
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; 
-            padding: 30px 25px; background: #08080c; border-radius: 45px 45px 0 0;
+            display: grid; grid-template-columns: repeat(3, 1fr); 
+            gap: 10px; padding: 20px 20px calc(20px + env(safe-area-inset-bottom)); 
+            background: #08080c; border-radius: 35px 35px 0 0;
             border-top: 1px solid rgba(255,255,255,0.05);
+            flex-shrink: 0;
         }
         .key { 
-            height: 62px; background: #181822; border-radius: 20px; 
+            height: 52px; background: #181822; border-radius: 15px; 
             display: flex; align-items: center; justify-content: center; 
-            font-family: 'JetBrains Mono'; font-size: 1.6rem; color: #fff;
+            font-family: 'JetBrains Mono'; font-size: 1.4rem; color: #fff;
             cursor: pointer; transition: 0.1s; border: 1px solid #2a2a35;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
-        .key:active { background: var(--gold); color: #000; transform: scale(0.92); }
-        .key-del { color: var(--error); font-size: 1rem; font-weight: bold; }
+        .key:active { background: var(--gold); color: #000; transform: scale(0.95); }
+        .key-del { color: var(--error); font-size: 0.9rem; font-weight: bold; }
         .key-ok { background: linear-gradient(145deg, #FFD700, #FFAA00) !important; color: #000; font-weight: 800; border: none; }
 
         .modal { position: absolute; inset: 0; background: rgba(2,2,5,0.98); z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 40px; }
+
+        /* 针对超短屏幕的微调 */
+        @media (max-height: 670px) {
+            .word-display { font-size: 1.2rem; min-height: 3rem; }
+            .slot { width: 40px; height: 55px; font-size: 2rem; }
+            .key { height: 45px; font-size: 1.2rem; }
+            .header { padding: 0.5rem 1.5rem; }
+            .glass-panel { margin-bottom: 10px; }
+        }
     </style>
 </head>
 <body>
     <div class="app-container">
-        <div class="flex items-center justify-between px-8 py-6">
+        <div class="header">
             <div class="text-xl cursor-pointer opacity-40 hover:opacity-100" onclick="location.href='index.html'">✕</div>
             <div class="radar-container">
                 <div class="radar-ring"></div>
@@ -107,10 +130,10 @@
 
         <div class="glass-panel" id="main-panel">
             <div id="slot-container" class="slot-group"></div>
-            <div class="text-[9px] tracking-[6px] opacity-20 mb-4 uppercase font-bold">Signal Processing</div>
+            <div class="text-[8px] tracking-[4px] opacity-20 mb-2 uppercase font-bold">Signal Processing</div>
             <div id="q-text" class="word-display">waiting...</div>
             
-            <div class="w-1/2 h-1 bg-white/5 mt-10 rounded-full overflow-hidden">
+            <div class="w-1/3 h-1 bg-white/5 mt-6 rounded-full overflow-hidden">
                 <div id="time-bar" class="h-full bg-cyan-400 w-full transition-all duration-100 linear"></div>
             </div>
         </div>
@@ -124,15 +147,14 @@
         </div>
 
         <div id="modal" class="modal">
-            <div id="m-icon" class="text-8xl mb-6"></div>
-            <h2 id="m-title" class="text-3xl font-black mb-3"></h2>
-            <p id="m-body" class="text-white/40 text-center mb-10 px-6"></p>
-            <button id="m-btn" class="w-full max-w-[280px] py-5 rounded-2xl bg-amber-400 text-black font-black active:scale-95 transition-all"></button>
+            <div id="m-icon" class="text-6xl mb-4"></div>
+            <h2 id="m-title" class="text-2xl font-black mb-2"></h2>
+            <p id="m-body" class="text-white/40 text-sm text-center mb-8 px-6"></p>
+            <button id="m-btn" class="w-full max-w-[240px] py-4 rounded-xl bg-amber-400 text-black font-black active:scale-95"></button>
         </div>
     </div>
 
     <script>
-        // 精选德语数字题库
         const data = [
             {d: "elf", v: 11}, {d: "zwölf", v: 12}, {d: "dreizehn", v: 13}, {d: "vierzehn", v: 14}, {d: "fünfzehn", v: 15},
             {d: "sechzehn", v: 16}, {d: "siebzehn", v: 17}, {d: "achtzehn", v: 18}, {d: "neunzehn", v: 19}, {d: "zwanzig", v: 20},
@@ -149,7 +171,6 @@
 
         let score = 0, input = "", current = null, timeLeft = 100, timer = null, muted = false;
 
-        // 音效控制
         function beep(freq) {
             if (muted) return;
             try {
@@ -162,7 +183,6 @@
             } catch(e) {}
         }
 
-        // 初始化题目
         function load() {
             if (score >= 30) { finish(true); return; }
             input = ""; 
@@ -173,7 +193,6 @@
             startTimer();
         }
 
-        // 构建输入框
         function buildSlots() {
             const container = document.getElementById('slot-container');
             container.innerHTML = "";
@@ -186,55 +205,46 @@
             }
         }
 
-        // 倒计时
         function startTimer() {
             clearInterval(timer); timeLeft = 100;
             const bar = document.getElementById('time-bar');
             timer = setInterval(() => {
-                timeLeft -= 0.8; // 每题约 12 秒
+                timeLeft -= 0.8;
                 bar.style.width = timeLeft + "%";
                 bar.style.backgroundColor = timeLeft < 30 ? "#ff4d4d" : "#00f2ff";
-                if(timeLeft <= 0) finish(false, `解码超时。${current.d} 实际上是 ${current.v}`);
+                if(timeLeft <= 0) finish(false, `解码超时。${current.d} 是 ${current.v}`);
             }, 100);
         }
 
-        // 按键处理
         function tap(k) {
             const max = current.v >= 100 ? 3 : (current.v < 10 ? 1 : 2);
-            if(k === 'C') { 
-                input = ""; 
-                beep(300); 
-            } else { 
+            if(k === 'C') { input = ""; beep(300); } 
+            else { 
                 if(input.length < max) { 
                     input += k; 
                     beep(700 + (input.length * 100)); 
                 }
             }
             buildSlots();
-            // 如果输满了自动触发校验，提升流畅感
-            if(input.length === max) {
-                setTimeout(check, 200);
-            }
+            if(input.length === max) setTimeout(check, 150);
         }
 
-        // 校验逻辑
         function check() {
             if(input === "") return;
             if(parseInt(input) === current.v) {
                 score++; beep(1100);
                 document.getElementById('main-panel').style.borderColor = "var(--success)";
                 document.querySelectorAll('.slot').forEach(s => s.classList.add('correct'));
-                clearInterval(timer); // 答对瞬间停止计时
+                clearInterval(timer);
                 setTimeout(() => { 
                     document.getElementById('main-panel').style.borderColor = "rgba(255, 255, 255, 0.08)";
                     load(); 
                 }, 400);
             } else {
-                finish(false, `校验不匹配。${current.d} 是 ${current.v}，你输入了 ${input}`);
+                finish(false, `校验不匹配。${current.d} 是 ${current.v}`);
             }
         }
 
-        // 结束逻辑
         function finish(win, msg) {
             clearInterval(timer);
             const m = document.getElementById('modal');
@@ -242,35 +252,25 @@
             if(win) {
                 beep(1000);
                 document.getElementById('m-icon').innerText = "⭐️";
-                document.getElementById('m-title').innerText = "链路建立完成";
-                document.getElementById('m-body').innerText = "30组德语数字逻辑已成功配对，地图协议同步完毕。";
+                document.getElementById('m-title').innerText = "建立完成";
+                document.getElementById('m-body').innerText = "德语数字逻辑协议同步完毕。";
                 document.getElementById('m-btn').innerText = "保存进度并退出";
-                
-                // 核心：设置本地存储，驱动地图图标亮起
                 document.getElementById('m-btn').onclick = () => { 
                     localStorage.setItem('level21_cleared', 'true'); 
                     location.href='index.html'; 
                 };
-                
-                confetti({particleCount: 150, spread: 80, origin: {y: 0.6}});
+                confetti({particleCount: 100, spread: 70, origin: {y: 0.6}});
             } else {
                 beep(200);
-                if(window.navigator.vibrate) window.navigator.vibrate(200);
                 document.getElementById('m-icon').innerText = "⚡️";
                 document.getElementById('m-title').innerText = "同步中断";
                 document.getElementById('m-body').innerText = msg;
-                document.getElementById('m-btn').innerText = "重新初始化";
-                document.getElementById('m-btn').onclick = () => { 
-                    score = 0; 
-                    m.style.display = "none"; 
-                    load(); 
-                };
+                document.getElementById('m-btn').innerText = "重新尝试";
+                document.getElementById('m-btn').onclick = () => { score = 0; m.style.display = "none"; load(); };
             }
         }
 
         function toggleMute() { muted = !muted; document.getElementById('mute-btn').innerText = muted ? "🔇" : "🔊"; }
-        
-        // 启动
         window.onload = load;
     </script>
 </body>
