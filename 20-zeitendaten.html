@@ -8,43 +8,74 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@500;700;900&display=swap');
-        body { background: #0F172A; font-family: 'Noto Sans SC', sans-serif; height: 100svh; display: flex; align-items: center; justify-content: center; overflow: hidden; margin: 0; color: white; }
-        .app-container { width: 100%; max-width: 600px; height: 100%; background: linear-gradient(180deg, #111827 0%, #0F172A 100%); position: relative; display: flex; flex-direction: column; }
         
-        /* 顶部导航 */
-        .header-nav { padding: 20px 20px 5px; display: flex; align-items: center; justify-content: space-between; gap: 15px; }
+        /* 优化：允许垂直方向自然滚动，防止文字大时截断 */
+        body { 
+            background: #0F172A; 
+            font-family: 'Noto Sans SC', sans-serif; 
+            min-height: 100svh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            margin: 0; 
+            color: white; 
+            overflow-x: hidden;
+        }
+
+        /* 优化：容器高度设为 min-h-screen 保持自适应 */
+        .app-container { 
+            width: 100%; 
+            max-width: 600px; 
+            min-height: 100svh; 
+            background: linear-gradient(180deg, #111827 0%, #0F172A 100%); 
+            position: relative; 
+            display: flex; 
+            flex-direction: column; 
+        }
+        
+        /* 顶部导航固定 */
+        .header-nav { padding: 20px 20px 5px; display: flex; align-items: center; justify-content: space-between; gap: 15px; flex-shrink: 0; }
         .nav-btn { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); border-radius: 12px; cursor: pointer; font-size: 1.2rem; }
         .progress-wrapper { flex: 1; height: 10px; background: rgba(255,255,255,0.1); border-radius: 20px; overflow: hidden; }
         #progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #6366F1, #A855F7); transition: 0.6s ease-out; }
-        #progress-num { text-align: center; font-size: 0.85rem; font-weight: 900; color: #475569; margin-top: 5px; }
+        #progress-num { text-align: center; font-size: 0.85rem; font-weight: 900; color: #475569; margin-top: 5px; flex-shrink: 0; }
 
-        /* 动态图标 */
-        .icon-display { height: 120px; display: flex; align-items: center; justify-content: center; }
-        .main-emoji { font-size: 4.5rem; animation: breathe 2.5s infinite ease-in-out; filter: drop-shadow(0 0 15px rgba(99, 102, 241, 0.4)); }
+        /* 图标动态高度：小屏幕自动缩小 */
+        .icon-display { height: clamp(80px, 15vh, 120px); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .main-emoji { font-size: clamp(3rem, 10vw, 4.5rem); animation: breathe 2.5s infinite ease-in-out; filter: drop-shadow(0 0 15px rgba(99, 102, 241, 0.4)); }
         @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
 
-        /* 对话区 */
-        .challenge-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 20px; }
-        .dialog-container { width: 100%; display: flex; flex-direction: column; gap: 20px; }
-        .bubble { max-width: 85%; padding: 18px 22px; border-radius: 24px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        /* 对话区优化：增加最小高度同时允许文字撑开 */
+        .challenge-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 20px; min-height: 200px; }
+        .dialog-container { width: 100%; display: flex; flex-direction: column; gap: 15px; }
+        .bubble { max-width: 90%; padding: clamp(12px, 4vw, 18px) clamp(15px, 5vw, 22px); border-radius: 24px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
         .bubble-a { background: #1F2937; align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid #374151; }
         .bubble-b { background: #1E1B4B; align-self: flex-end; border-bottom-right-radius: 4px; border: 2px solid #6366F1; }
         
-        .role-label { font-size: 0.7rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; display: block; }
+        .role-label { font-size: 0.7rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; display: block; }
         .label-a { color: #94A3B8; }
         .label-b { color: #A5B4FC; }
 
-        .sentence { font-size: 1.4rem; font-weight: 800; line-height: 1.3; color: #FFFFFF; }
-        .trans-hint { font-size: 0.85rem; color: #64748B; margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.05); display: block; }
+        /* 文字大小适配：使用 clamp 防止极大字体撑爆屏幕 */
+        .sentence { font-size: clamp(1.1rem, 5vw, 1.4rem); font-weight: 800; line-height: 1.3; color: #FFFFFF; }
+        .trans-hint { font-size: 0.85rem; color: #64748B; margin-top: 8px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.05); display: block; }
 
-        .gap { display: inline-block; min-width: 60px; border-bottom: 3px solid #6366F1; color: #818CF8; text-align: center; margin: 0 5px; }
+        .gap { display: inline-block; min-width: 50px; border-bottom: 3px solid #6366F1; color: #818CF8; text-align: center; margin: 0 5px; }
 
-        /* 选项按钮 */
-        .options-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; padding: 10px 20px 40px; }
+        /* 选项按钮优化：高度自适应文字 */
+        .options-grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 12px; 
+            padding: 10px 20px 30px; 
+            flex-shrink: 0;
+            margin-bottom: env(safe-area-inset-bottom); /* 适配 iPhone 底部刘海 */
+        }
         .opt-btn { 
-            background: #1E293B; border: 2px solid #334155; border-radius: 20px; height: 70px;
+            background: #1E293B; border: 2px solid #334155; border-radius: 18px; 
+            min-height: 60px; height: auto; padding: 10px 5px;
             display: flex; align-items: center; justify-content: center; 
-            font-size: 1.2rem; font-weight: 800; transition: 0.2s; cursor: pointer;
+            font-size: 1.1rem; font-weight: 800; transition: 0.2s; cursor: pointer;
             box-shadow: 0 4px 0 #020617;
         }
         .opt-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #020617; }
@@ -52,10 +83,9 @@
         .opt-btn.wrong { background: #EF4444 !important; border-color: #EF4444; animation: shake 0.4s; }
         @keyframes shake { 0%,100% {transform:translateX(0)} 25% {transform:translateX(-8px)} 75% {transform:translateX(8px)} }
 
-        /* 弹窗层 */
-        .overlay { position: absolute; inset: 0; background: rgba(15,23,42,0.95); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100; padding: 30px; }
-        .card { background: #1F2937; border-radius: 32px; padding: 30px; width: 100%; border: 1px solid #374151; text-align: center; }
-        .btn-magic { width: 100%; padding: 18px; background: #6366F1; color: white; border-radius: 20px; font-weight: 900; font-size: 1.2rem; margin-top: 20px; border-bottom: 4px solid #4338CA; }
+        .overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.95); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
+        .card { background: #1F2937; border-radius: 32px; padding: 25px; width: 100%; max-width: 400px; border: 1px solid #374151; text-align: center; }
+        .btn-magic { width: 100%; padding: 16px; background: #6366F1; color: white; border-radius: 18px; font-weight: 900; font-size: 1.1rem; margin-top: 15px; border-bottom: 4px solid #4338CA; }
     </style>
 </head>
 <body>
@@ -91,22 +121,23 @@
 
         <div id="tip-layer" class="overlay">
             <div class="card">
-                <div class="text-6xl mb-4">⌛</div>
+                <div class="text-5xl mb-3">⌛</div>
                 <h3 class="text-xl font-bold text-indigo-400 mb-2">时间规律</h3>
-                <p id="tip-msg" class="text-slate-300 leading-relaxed text-md mb-6"></p>
+                <p id="tip-msg" class="text-slate-300 leading-relaxed text-sm mb-5"></p>
                 <button onclick="closeTip()" class="btn-magic">掌握了</button>
             </div>
         </div>
 
         <div id="win-layer" class="overlay">
-            <div class="text-8xl mb-6">⏰</div>
-            <h3 class="text-3xl font-black text-white mb-2">时间守护大师</h3>
-            <p class="text-slate-400 font-medium mb-8">20 个时间挑战全部达成！</p>
+            <div class="text-7xl mb-5">🏆</div>
+            <h3 class="text-2xl font-black text-white mb-2">时间守护大师</h3>
+            <p class="text-slate-400 font-medium mb-6">20 个时间挑战全部达成！</p>
             <button onclick="finishLevel()" class="btn-magic" style="background: linear-gradient(90deg, #6366F1, #A855F7);">点亮勋章</button>
         </div>
     </div>
 
     <script>
+        // ... (保持你原有的脚本部分不变，因为逻辑没有问题) ...
         const quizBank = [
             { a: "Wie spät ist es?", at: "现在几点？", b: "Es ist _____ Uhr.", bt: "现在两点整。", ans: "zwei", opts: ["zwei", "zweiten", "am zwei", "um zwei"], icon: "🕑", tip: "直接用数字 + Uhr 表示几点整。" },
             { a: "Wann kommst du?", at: "你什么时候来？", b: "Ich komme _____ Montag.", bt: "我周一过来。", ans: "am", opts: ["am", "im", "um", "an"], icon: "📅", tip: "星期前固定用 <b>am</b>。" },
@@ -121,7 +152,7 @@
             { a: "Wann kommst du?", at: "你什么时候回来？", b: "Kurz _____ zwölf.", bt: "快到12点了。", ans: "vor", opts: ["vor", "nach", "um", "zu"], icon: "🏠", tip: "<b>kurz vor</b> 表示即将到某个时刻。" },
             { a: "Wann arbeitest du?", at: "你什么时候工作？", b: "_____ Vormittag.", bt: "在上午工作。", ans: "Am", opts: ["Am", "Im", "Um", "An"], icon: "💼", tip: "时间段（除夜晚）用 <b>am</b>。" },
             { a: "Wann ist die Party?", at: "派对几号？", b: "Am 21. _____.", bt: "在4月21日。", ans: "April", opts: ["April", "Aprils", "am April", "im April"], icon: "🥳", tip: "日期中的月份直接用原形。" },
-            { a: "Wie spät ist es?", at: "几点钟了？", b: "Viertel _____ elf.", bt: "十点三刻 (10:45)。", ans: "vor", opts: ["nach", "vor", "auf", "in"], icon: "⌛", tip: "差一刻到11点用 <b>Viertel vor</b>。" },
+            { a: "Wie spät ist es?", at: "几点钟了？", b: "Viertel _____ elf.", bt: "十点三刻 (10:45)。", ans: "vor", opts: ["nach", "vor", "auf", "in"], icon: "⌛", tip: "差一刻到11点用 <b>Vitel vor</b>。" },
             { a: "Wann schläfst du?", at: "你几点睡觉？", b: "In der _____.", bt: "在深夜睡觉。", ans: "Nacht", opts: ["Morgen", "Tag", "Nacht", "Abend"], icon: "🌙", tip: "特例：深夜用 <b>In der Nacht</b>。" },
             { a: "Wann ist Weihnachten?", at: "圣诞节在什么时候？", b: "_____ Dezember.", bt: "在十二月。", ans: "Im", opts: ["Am", "Im", "Um", "In"], icon: "🎄", tip: "月份固定搭配 <b>im</b>。" },
             { a: "Wann stehst du auf?", at: "你何时起床？", b: "_____ Morgen.", bt: "在清晨。", ans: "Am", opts: ["Am", "Im", "Um", "In"], icon: "🌅", tip: "早晨(Morgen)前用 <b>am</b>。" },
@@ -190,7 +221,6 @@
         }
 
         function finishLevel() { 
-            // 核心：设置此 key 确保 index.html 能识别并点亮第 20 关
             localStorage.setItem('level20_cleared', 'true'); 
             location.href = 'index.html'; 
         }
