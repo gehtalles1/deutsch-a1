@@ -223,6 +223,13 @@
                     <div id="m20" class="absolute -top-2 -right-2 text-3xl medal-pop"></div>
                 </div>
 
+                <div id="lvl21" onclick="go(21)" class="premium-card p-4 flex flex-col items-center text-center locked-state relative">
+                    <div class="w-12 h-12 bg-[#06B6D4] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">21</div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-tight">数字逻辑链路</h3>
+                    <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Zahlen-Logik</p>
+                    <div id="m21" class="absolute -top-2 -right-2 text-3xl medal-pop"></div>
+                </div>
+
             </div>
         </main>
 
@@ -240,8 +247,8 @@
     </div>
 
     <script>
-        // 更新关卡 ID 列表，包含 lvl20
-        const levelIds = ['lvl1', 'lvl2', 'lvl3', 'lvl4', 'lvl5', 'lvl6', 'lvl7', 'lvl8', 'lvl9', 'lvl10', 'lvl11', 'lvl12', 'lvl13', 'lvl14', 'lvl15', 'lvl16', 'lvl17', 'lvl18', 'lvl19', 'lvl20'];
+        // 更新关卡 ID 列表，包含 lvl21
+        const levelIds = ['lvl1', 'lvl2', 'lvl3', 'lvl4', 'lvl5', 'lvl6', 'lvl7', 'lvl8', 'lvl9', 'lvl10', 'lvl11', 'lvl12', 'lvl13', 'lvl14', 'lvl15', 'lvl16', 'lvl17', 'lvl18', 'lvl19', 'lvl20', 'lvl21'];
 
         function checkStatus() {
             const unlocked = localStorage.getItem('isUnlocked') === 'true';
@@ -276,9 +283,10 @@
             if (localStorage.getItem('level17_cleared') === 'true') document.getElementById('m17').innerText = "🏗️";
             if (localStorage.getItem('level18_cleared') === 'true') document.getElementById('m18').innerText = "✨";
             if (localStorage.getItem('level19_cleared') === 'true') document.getElementById('m19').innerText = "🚫";
-            
-            // 第 20 关通关图标：闹钟
             if (localStorage.getItem('level20_cleared') === 'true') document.getElementById('m20').innerText = "⏰";
+            
+            // 第 21 关通关图标：卫星天线
+            if (localStorage.getItem('level21_cleared') === 'true') document.getElementById('m21').innerText = "📡";
         }
 
         function unlock() {
@@ -312,7 +320,8 @@
                 17: '17-satzbau.html',
                 18: '18-Imperativ.html',
                 19: '19-negation.html',
-                20: '20-zeitendaten.html' // 关联第 20 关
+                20: '20-zeitendaten.html',
+                21: '21-zahlen.html' // 关联第 21 关
             };
             window.location.href = pages[n];
         }
