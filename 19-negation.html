@@ -15,7 +15,7 @@
         .back-btn { font-size: 1.5rem; cursor: pointer; color: #64748B; width: 30px; }
         .progress-wrapper { flex: 1; display: flex; flex-direction: column; gap: 4px; }
         .progress-bg { height: 8px; background: #F1F5F9; border-radius: 10px; overflow: hidden; }
-        #progress-fill { width: 0%; height: 100%; background: #6366F1; transition: 0.6s ease-out; }
+        #progress-fill { width: 0%; height: 100%; background: #312E81; transition: 0.6s ease-out; }
         .mute-btn { font-size: 1.4rem; cursor: pointer; width: 30px; text-align: right; }
 
         .breathing-icon { font-size: 4.2rem; animation: pureBreathe 3s infinite ease-in-out; will-change: transform; }
@@ -23,14 +23,15 @@
 
         .challenge-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 20px; }
         .german-row { display: flex; align-items: baseline; justify-content: center; flex-wrap: wrap; gap: 10px; font-size: 1.8rem; font-weight: 800; color: #1E293B; width: 100%; text-align: center; }
-        .gap-box { min-width: 100px; border-bottom: 3.5px solid #6366F1; color: #6366F1; text-align: center; padding: 0 10px; height: 2.5rem; line-height: 2.5rem; transition: 0.3s; }
+        .gap-box { min-width: 100px; border-bottom: 3.5px solid #312E81; color: #312E81; text-align: center; padding: 0 10px; height: 2.5rem; line-height: 2.5rem; transition: 0.3s; }
 
         .options-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 15px 20px 30px; }
         .opt-btn { 
             background: #F5F7FF; border: 2.5px solid #E0E7FF; border-radius: 20px; padding: 16px; 
-            font-size: 1.25rem; font-weight: 800; color: #4338CA; transition: 0.2s; text-align: center;
-            cursor: pointer; box-shadow: 0 2px 0 #E0E7FF;
+            font-size: 1.25rem; font-weight: 800; color: #312E81; transition: 0.2s; text-align: center;
+            cursor: pointer; box-shadow: 0 4px 0 #E0E7FF;
         }
+        .opt-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #E0E7FF; }
         .opt-btn.correct { background: #10B981 !important; border-color: #10B981; color: white; box-shadow: 0 4px 0 #059669; }
         .opt-btn.wrong { background: #EF4444 !important; border-color: #EF4444; color: white; animation: shake 0.4s; }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
@@ -55,7 +56,7 @@
         </div>
 
         <div class="challenge-area">
-            <div id="main-icon" class="breathing-icon mb-4">🏫</div>
+            <div id="main-icon" class="breathing-icon mb-4">🚫</div>
             <p id="cn-text" class="text-slate-400 font-bold mb-6 text-lg"></p>
             <div class="german-row" id="q-container"></div>
         </div>
@@ -65,51 +66,51 @@
         <div id="tip-layer" class="full-overlay">
             <div class="info-card">
                 <div class="text-5xl mb-4">👩‍🏫</div>
-                <h3 class="text-xl font-black text-rose-500 mb-2">咒语有误</h3>
+                <h3 class="text-xl font-black text-rose-500 mb-2">逻辑纠偏</h3>
                 <p id="tip-msg" class="text-slate-600 text-left leading-relaxed mb-6 bg-slate-50 p-4 rounded-xl text-sm"></p>
-                <button onclick="closeTip()" class="primary-btn">重新吟唱</button>
+                <button onclick="closeTip()" class="primary-btn">我会了，再试一次</button>
             </div>
         </div>
 
         <div id="win-layer" class="full-overlay">
-            <div class="text-7xl mb-6">🏆</div>
-            <h3 class="text-3xl font-black text-indigo-600 mb-2">通关贺词</h3>
+            <div class="text-7xl mb-6">🚫</div>
+            <h3 class="text-3xl font-black text-indigo-900 mb-2">否定大师！</h3>
             <p class="text-slate-500 font-bold mb-8">你不止区分了 nicht 和 kein，<br>还掌握了德语复杂的变格否定！</p>
-            <button onclick="handleFinish()" class="primary-btn" style="background: #6366F1;">确定</button>
+            <button onclick="handleFinish()" class="primary-btn" style="background: #312E81;">点此点亮勋章</button>
         </div>
     </div>
 
     <script>
         const quizBank = [
-            { q: ["Hast du","Hund?"], c: "你没有狗吗？", a: "keinen", opts: ["kein", "keine", "keinen", "nicht"], icon: "🐕", tip: "<b>Hund</b> 是阳性(der)。作为动词 haben 的第四格宾语，否定冠词需加词尾 <b>-en</b>。" },
-            { q: ["Ist das","die Schule?"], c: "这不是那所学校吗？", a: "nicht", opts: ["kein", "keine", "nicht", "keinen"], icon: "🏫", tip: "名词前有<b>定冠词</b>(die)，必须使用 <b>nicht</b> 否定。" },
+            { q: ["Hast du","Hund?"], c: "你没有狗吗？", a: "keinen", opts: ["kein", "keine", "keinen", "nicht"], icon: "🐕", tip: "<b>Hund</b> 是阳性(der)。作为 haben 的宾语（第四格），否定冠词需用阳性四格形式 <b>keinen</b>。" },
+            { q: ["Ist das","die Schule?"], c: "这不是那所学校吗？", a: "nicht", opts: ["kein", "keine", "nicht", "keinen"], icon: "🏫", tip: "名词前有<b>定冠词</b>(die)，否定必须使用 <b>nicht</b>。" },
             { q: ["Trinkst du","Kaffee?"], c: "你不喝咖啡吗？", a: "keinen", opts: ["kein", "keine", "keinen", "nicht"], icon: "☕", tip: "<b>Kaffee</b> 是阳性(der)。第四格否定冠词使用 <b>keinen</b>。" },
-            { q: ["Das Obst ist","teuer."], c: "水果不贵。", a: "nicht", opts: ["kein", "keine", "nicht", "keinen"], icon: "🏷️", tip: "否定形容词 <b>teuer</b> (昂贵) 一律使用 <b>nicht</b>。" },
+            { q: ["Das Obst ist","teuer."], c: "水果不贵。", a: "nicht", opts: ["kein", "keine", "nicht", "keinen"], icon: "🏷️", tip: "否定单独使用的<b>形容词</b>（如 teuer）一律使用 <b>nicht</b>。" },
             { q: ["Das ist","mein Handy."], c: "这不是我的手机。", a: "nicht", opts: ["kein", "keine", "nicht", "keinen"], icon: "📱", tip: "名词前有<b>物主代词</b>(mein)，否定必须用 <b>nicht</b>。" },
-            { q: ["Ich brauche","Hilfe."], c: "我不需要帮助。", a: "keine", opts: ["kein", "keine", "keinen", "nicht"], icon: "🆘", tip: "<b>Hilfe</b> 是阴性名词(die)。否定冠词词尾加 <b>-e</b>。" },
-            { q: ["Haben wir","Milch?"], c: "我们没有牛奶了吗？", a: "keine", opts: ["kein", "keine", "keinen", "nicht"], icon: "🥛", tip: "<b>Milch</b> 是阴性。否定名词使用 <b>keine</b>。" },
-            { q: ["Er versteht","."], c: "他不明白。", a: "nicht", opts: ["kein", "keine", "nicht", "keinen"], icon: "❓", tip: "直接否定动词动作，使用 <b>nicht</b>。" },
-            { q: ["Das Wetter ist","schön."], c: "天气不好。", a: "nicht", opts: ["kein", "keine", "nicht", "keinen"], icon: "☁️", tip: "否定形容词使用 <b>nicht</b>。" },
-            { q: ["Wir haben","Zeit."], c: "我们没有时间。", a: "keine", opts: ["kein", "keine", "keinen", "nicht"], icon: "⏰", tip: "<b>Zeit</b> 是阴性(die)。第四格宾语词尾加 <b>-e</b>。" },
-            { q: ["Sind das","Eier?"], c: "这些不是鸡蛋吗？", a: "keine", opts: ["kein", "keine", "keinen", "nicht"], icon: "🥚", tip: "<b>Eier</b> 是复数名词。复数的否定词尾固定为 <b>-e</b>。" },
-            { q: ["Ich sehe","Auto."], c: "我没看到车。", a: "kein", opts: ["kein", "keine", "keinen", "nicht"], icon: "🚗", tip: "<b>Auto</b> 是中性(das)。第四格中性词尾不加东西，即 <b>kein</b>。" },
-            { q: ["Wir wohnen","in Berlin."], c: "我们不住在柏林。", a: "nicht", opts: ["kein", "keine", "nicht", "keinen"], icon: "📍", tip: "否定地点状语（介词短语）时使用 <b>nicht</b>。" },
-            { q: ["Das ist","Wasser."], c: "这不是水。", a: "kein", opts: ["kein", "keine", "keinen", "nicht"], icon: "💧", tip: "<b>Wasser</b> 中性。否定名词表语使用 <b>kein</b>。" },
-            { q: ["Kommst du","?"], c: "你不来吗？", a: "nicht", opts: ["kein", "keine", "nicht", "keinen"], icon: "🚶", tip: "对动词动作的否定，使用 <b>nicht</b>。" },
-            { q: ["Ich mag","Pizza."], c: "我不吃披萨。", a: "keine", opts: ["kein", "keine", "keinen", "nicht"], icon: "🍕", tip: "<b>Pizza</b> 是阴性。否定宾语名词使用 <b>keine</b>。" },
-            { q: ["Er ist","Lehrer."], c: "他不是老师。", a: "kein", opts: ["kein", "keine", "keinen", "nicht"], icon: "👨‍🏫", tip: "否定无冠词的职业名词使用 <b>kein</b>。" },
-            { q: ["Sind Sie","Herr Müller?"], c: "您不是米勒先生吗？", a: "nicht", opts: ["kein", "keine", "nicht", "keinen"], icon: "🤵", tip: "专有名词（人名）前的否定用 <b>nicht</b>。" },
-            { q: ["Wir finden den Weg","."], c: "我们找不到路。", a: "nicht", opts: ["kein", "keine", "nicht", "keinen"], icon: "🗺️", tip: "特指名词的否定，<b>nicht</b> 放在句末。" },
-            { q: ["Ich habe","Geld."], c: "我没钱。", a: "kein", opts: ["kein", "keine", "keinen", "nicht"], icon: "💰", tip: "<b>Geld</b> 是中性。第四格宾语不加词尾，即 <b>kein</b>。" },
+            { q: ["Ich brauche","Hilfe."], c: "我不需要帮助。", a: "keine", opts: ["kein", "keine", "keinen", "nicht"], icon: "🆘", tip: "<b>Hilfe</b> 是阴性名词(die)。否定名词使用词尾加 -e 的 <b>keine</b>。" },
+            { q: ["Haben wir","Milch?"], c: "我们没有牛奶了吗？", a: "keine", opts: ["kein", "keine", "keinen", "nicht"], icon: "🥛", tip: "<b>Milch</b> 是阴性，否定零冠词名词使用 <b>keine</b>。" },
+            { q: ["Er versteht","."], c: "他不明白。", a: "nicht", opts: ["kein", "keine", "nicht", "keinen"], icon: "❓", tip: "直接否定<b>动词动作</b>或整个句子，使用 <b>nicht</b> 并通常放句末。" },
+            { q: ["Das Wetter ist","schön."], c: "天气不好。", a: "nicht", opts: ["kein", "keine", "nicht", "keinen"], icon: "☁️", tip: "否定形容词表语使用 <b>nicht</b>。" },
+            { q: ["Wir haben","Zeit."], c: "我们没有时间。", a: "keine", opts: ["kein", "keine", "keinen", "nicht"], icon: "⏰", tip: "<b>Zeit</b> 是阴性(die)。否定名词使用 <b>keine</b>。" },
+            { q: ["Sind das","Eier?"], c: "这些不是鸡蛋吗？", a: "keine", opts: ["kein", "keine", "keinen", "nicht"], icon: "🥚", tip: "<b>Eier</b> 是复数。复数的否定词尾固定为 <b>-e</b>，即 <b>keine</b>。" },
+            { q: ["Ich sehe","Auto."], c: "我没看到车。", a: "kein", opts: ["kein", "keine", "keinen", "nicht"], icon: "🚗", tip: "<b>Auto</b> 是中性(das)。第四格中性否定冠词不加词尾，即 <b>kein</b>。" },
+            { q: ["Wir wohnen","in Berlin."], c: "我们不住在柏林。", a: "nicht", opts: ["kein", "keine", "nicht", "keinen"], icon: "📍", tip: "否定<b>介词短语</b>（地点状语）时，<b>nicht</b> 放在该短语之前。" },
+            { q: ["Das ist","Wasser."], c: "这不是水。", a: "kein", opts: ["kein", "keine", "keinen", "nicht"], icon: "💧", tip: "<b>Wasser</b> 是中性。否定零冠词名词使用 <b>kein</b>。" },
+            { q: ["Kommst du","?"], c: "你不来吗？", a: "nicht", opts: ["kein", "keine", "nicht", "keinen"], icon: "🚶", tip: "否定动词，使用 <b>nicht</b>。" },
+            { q: ["Ich mag","Pizza."], c: "我不喜欢披萨。", a: "keine", opts: ["kein", "keine", "keinen", "nicht"], icon: "🍕", tip: "<b>Pizza</b> 是阴性。否定宾语名词使用 <b>keine</b>。" },
+            { q: ["Er ist","Lehrer."], c: "他不是老师。", a: "kein", opts: ["kein", "keine", "keinen", "nicht"], icon: "👨‍🏫", tip: "否定无冠词的<b>职业名词</b>使用 <b>kein</b>。" },
+            { q: ["Sind Sie","Herr Müller?"], c: "您不是米勒先生吗？", a: "nicht", opts: ["kein", "keine", "nicht", "keinen"], icon: "🤵", tip: "否定<b>专有名词</b>（人名）使用 <b>nicht</b>。" },
+            { q: ["Wir finden den Weg","."], c: "我们找不到路。", a: "nicht", opts: ["kein", "keine", "nicht", "keinen"], icon: "🗺️", tip: "宾语带有定冠词(den)，必须用 <b>nicht</b> 否定，且通常放在句末。" },
+            { q: ["Ich habe","Geld."], c: "我没钱。", a: "kein", opts: ["kein", "keine", "keinen", "nicht"], icon: "💰", tip: "<b>Geld</b> 是中性。第四格中性否定使用 <b>kein</b>。" },
             { q: ["Das ist","einfach."], c: "这不容易。", a: "nicht", opts: ["kein", "keine", "nicht", "keinen"], icon: "🧩", tip: "否定形容词使用 <b>nicht</b>。" },
-            { q: ["Sie hat","Kinder."], c: "她没有孩子。", a: "keine", opts: ["kein", "keine", "keinen", "nicht"], icon: "👶", tip: "复数名词否定词尾为 <b>-e</b>。" },
-            { q: ["Das ist","mein Problem."], c: "这不是我的问题。", a: "nicht", opts: ["kein", "keine", "nicht", "keinen"], icon: "😤", tip: "物主代词前的否定必须用 <b>nicht</b>。" },
-            { q: ["Kaufst du","Apfel?"], c: "你不买苹果吗？", a: "keinen", opts: ["kein", "keine", "keinen", "nicht"], icon: "🍎", tip: "<b>Apfel</b> 阳性(der)第四格，用 <b>keinen</b>。" },
-            { q: ["Sie spricht","Deutsch."], c: "她不说德语。", a: "kein", opts: ["kein", "keine", "keinen", "nicht"], icon: "🇩🇪", tip: "否定语言名词用 <b>kein</b>。" },
+            { q: ["Sie hat","Kinder."], c: "她没有孩子。", a: "keine", opts: ["kein", "keine", "keinen", "nicht"], icon: "👶", tip: "<b>Kinder</b> 是复数，否定词尾为 <b>-e</b>。" },
+            { q: ["Das ist","mein Problem."], c: "这不是我的问题。", a: "nicht", opts: ["kein", "keine", "nicht", "keinen"], icon: "😤", tip: "物主代词前必须用 <b>nicht</b>。" },
+            { q: ["Kaufst du","Apfel?"], c: "你不买苹果吗？", a: "keinen", opts: ["kein", "keine", "keinen", "nicht"], icon: "🍎", tip: "<b>Apfel</b> 是阳性(der)，这里是第四格宾语，使用 <b>keinen</b>。" },
+            { q: ["Sie spricht","Deutsch."], c: "她不说德语。", a: "kein", opts: ["kein", "keine", "keinen", "nicht"], icon: "🇩🇪", tip: "否定抽象的名词或语言，通常视作零冠词名词，用 <b>kein</b>。" },
             { q: ["Wir essen","Fleisch."], c: "我们不吃肉。", a: "kein", opts: ["kein", "keine", "keinen", "nicht"], icon: "🥩", tip: "<b>Fleisch</b> 是中性，第四格宾语用 <b>kein</b>。" },
-            { q: ["Ich kenne ihn","."], c: "我不认识他。", a: "nicht", opts: ["kein", "keine", "nicht", "keinen"], icon: "👤", tip: "否定代词宾语时，<b>nicht</b> 放在后面。" },
-            { q: ["Das sind","meine Schuhe."], c: "这不是我的鞋子。", a: "nicht", opts: ["kein", "keine", "nicht", "keinen"], icon: "👟", tip: "物主代词前的否定使用 <b>nicht</b>。" },
-            { q: ["Er schreibt","."], c: "他不写字。", a: "nicht", opts: ["kein", "keine", "nicht", "keinen"], icon: "✍️", tip: "否定动词动作，用 <b>nicht</b>。" },
+            { q: ["Ich kenne ihn","."], c: "我不认识他。", a: "nicht", opts: ["kein", "keine", "nicht", "keinen"], icon: "👤", tip: "否定代词宾语时，<b>nicht</b> 放在代词后面。" },
+            { q: ["Das sind","meine Schuhe."], c: "这不是我的鞋子。", a: "nicht", opts: ["kein", "keine", "nicht", "keinen"], icon: "👟", tip: "物主代词(meine)前的否定固定使用 <b>nicht</b>。" },
+            { q: ["Er schreibt","."], c: "他不写字。", a: "nicht", opts: ["kein", "keine", "nicht", "keinen"], icon: "✍️", tip: "纯动词否定用 <b>nicht</b>。" },
             { q: ["Das ist","wichtig."], c: "这不重要。", a: "nicht", opts: ["kein", "keine", "nicht", "keinen"], icon: "⚠️", tip: "否定形容词用 <b>nicht</b>。" }
         ];
 
@@ -117,38 +118,74 @@
         const sndR = document.getElementById('snd-right'), sndW = document.getElementById('snd-wrong');
 
         function init() {
-            if(cur === 0) shuffled = quizBank.sort(() => Math.random() - 0.5);
+            if(cur === 0) shuffled = [...quizBank].sort(() => Math.random() - 0.5);
             const d = shuffled[cur];
             document.getElementById('progress-fill').style.width = ((cur + 1) / quizBank.length * 100) + '%';
             document.getElementById('counter-val').innerText = `${cur + 1} / ${quizBank.length}`;
             document.getElementById('main-icon').innerText = d.icon;
             document.getElementById('cn-text').innerText = d.c;
-            document.getElementById('q-container').innerHTML = `<span>${d.q[0]}</span><span id="gap" class="gap-box"></span><span>${d.q[1]}</span>`;
+            document.getElementById('q-container').innerHTML = `<span>${d.q[0]}</span><span id="gap" class="gap-box"></span><span>${d.q[1] || ''}</span>`;
 
             const g = document.getElementById('options-grid'); g.innerHTML = '';
+            // 每次选项也随机排序
             [...d.opts].sort(() => Math.random() - 0.5).forEach(o => {
                 const b = document.createElement('div'); b.className = 'opt-btn'; b.innerText = o;
                 b.onclick = () => {
                     if(o === d.a) {
-                        if(!muted) sndR.play();
-                        b.classList.add('correct'); document.getElementById('gap').innerText = o;
-                        confetti({ particleCount: 30, spread: 60, origin: { y: 0.8 } });
-                        document.querySelectorAll('.opt-btn').forEach(e => e.onclick = null);
-                        setTimeout(() => { cur++; if(cur < quizBank.length) init(); else document.getElementById('win-layer').style.display='flex'; }, 3000);
+                        handleCorrect(b, o);
                     } else {
-                        if(!muted) sndW.play();
-                        b.classList.add('wrong');
-                        setTimeout(() => { document.getElementById('tip-msg').innerHTML = d.tip; document.getElementById('tip-layer').style.display='flex'; }, 500);
+                        handleWrong(b, d.tip);
                     }
                 };
                 g.appendChild(b);
             });
         }
 
-        function toggleMute() { muted = !muted; document.getElementById('mute-btn').innerText = muted ? "🔇" : "🔊"; }
-        function closeTip() { document.getElementById('tip-layer').style.display='none'; document.querySelectorAll('.opt-btn').forEach(e => e.classList.remove('wrong')); }
-        function handleFinish() { localStorage.setItem('level19_cleared', 'true'); location.href = 'index.html'; }
-        init();
+        function handleCorrect(btn, val) {
+            if(!muted) sndR.play();
+            btn.classList.add('correct');
+            document.getElementById('gap').innerText = val;
+            confetti({ particleCount: 40, spread: 70, origin: { y: 0.8 } });
+            
+            // 禁用所有按钮防止重复点击
+            document.querySelectorAll('.opt-btn').forEach(e => e.onclick = null);
+            
+            setTimeout(() => {
+                cur++;
+                if(cur < quizBank.length) {
+                    init();
+                } else {
+                    document.getElementById('win-layer').style.display = 'flex';
+                }
+            }, 1500);
+        }
+
+        function handleWrong(btn, tip) {
+            if(!muted) sndW.play();
+            btn.classList.add('wrong');
+            setTimeout(() => {
+                document.getElementById('tip-msg').innerHTML = tip;
+                document.getElementById('tip-layer').style.display = 'flex';
+            }, 500);
+        }
+
+        function toggleMute() { 
+            muted = !muted; 
+            document.getElementById('mute-btn').innerText = muted ? "🔇" : "🔊"; 
+        }
+
+        function closeTip() { 
+            document.getElementById('tip-layer').style.display = 'none'; 
+            document.querySelectorAll('.opt-btn').forEach(e => e.classList.remove('wrong')); 
+        }
+
+        function handleFinish() { 
+            // 核心逻辑：点亮地图对应的 19 关
+            localStorage.setItem('level19_cleared', 'true'); 
+            location.href = 'index.html'; 
+        }
+
+        window.onload = init;
     </script>
 </body>
 </html>
