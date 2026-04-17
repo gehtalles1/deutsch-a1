@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>21-Zahlen Sync</title>
+    <title>21-Zahlen Sync | 数字逻辑链路</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
@@ -31,6 +31,7 @@
             background: radial-gradient(circle at 50% 10%, #1a1a35 0%, #020205 100%); 
         }
 
+        /* 顶部雷达扫描动画 */
         .radar-container { position: relative; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; }
         .radar-ring { position: absolute; inset: 0; border: 1.5px solid rgba(0, 242, 255, 0.15); border-radius: 50%; }
         .radar-sweep { 
@@ -52,6 +53,7 @@
             border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 35px; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
             box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8);
+            transition: border-color 0.3s ease;
         }
 
         .word-display { 
@@ -67,6 +69,7 @@
             border-radius: 15px; border: 2px solid rgba(255,255,255,0.1);
             font-size: 2.8rem; font-family: 'JetBrains Mono'; 
             display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .slot.active { border-color: var(--gold); color: var(--gold); background: rgba(255, 215, 0, 0.05); }
         .slot.correct { color: var(--success); border-color: var(--success); transform: scale(1.1); }
@@ -81,6 +84,7 @@
             display: flex; align-items: center; justify-content: center; 
             font-family: 'JetBrains Mono'; font-size: 1.6rem; color: #fff;
             cursor: pointer; transition: 0.1s; border: 1px solid #2a2a35;
+            user-select: none;
         }
         .key:active { background: var(--gold); color: #000; transform: scale(0.92); }
         .key-del { color: var(--error); font-size: 1rem; font-weight: bold; }
@@ -128,7 +132,7 @@
     </div>
 
     <script>
-        // 优化后的题库：移除了叠字数字，重点在于个位十位的倒置练习
+        // 精选德语数字题库
         const data = [
             {d: "elf", v: 11}, {d: "zwölf", v: 12}, {d: "dreizehn", v: 13}, {d: "vierzehn", v: 14}, {d: "fünfzehn", v: 15},
             {d: "sechzehn", v: 16}, {d: "siebzehn", v: 17}, {d: "achtzehn", v: 18}, {d: "neunzehn", v: 19}, {d: "zwanzig", v: 20},
@@ -145,16 +149,20 @@
 
         let score = 0, input = "", current = null, timeLeft = 100, timer = null, muted = false;
 
+        // 音效控制
         function beep(freq) {
             if (muted) return;
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const o = ctx.createOscillator();
-            const g = ctx.createGain();
-            o.frequency.value = freq; o.connect(g); g.connect(ctx.destination);
-            o.start(); g.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.1);
-            o.stop(ctx.currentTime + 0.1);
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const o = ctx.createOscillator();
+                const g = ctx.createGain();
+                o.frequency.value = freq; o.connect(g); g.connect(ctx.destination);
+                o.start(); g.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.1);
+                o.stop(ctx.currentTime + 0.1);
+            } catch(e) {}
         }
 
+        // 初始化题目
         function load() {
             if (score >= 30) { finish(true); return; }
             input = ""; 
@@ -165,6 +173,7 @@
             startTimer();
         }
 
+        // 构建输入框
         function buildSlots() {
             const container = document.getElementById('slot-container');
             container.innerHTML = "";
@@ -177,40 +186,55 @@
             }
         }
 
+        // 倒计时
         function startTimer() {
             clearInterval(timer); timeLeft = 100;
             const bar = document.getElementById('time-bar');
             timer = setInterval(() => {
-                timeLeft -= 0.65;
+                timeLeft -= 0.8; // 每题约 12 秒
                 bar.style.width = timeLeft + "%";
                 bar.style.backgroundColor = timeLeft < 30 ? "#ff4d4d" : "#00f2ff";
-                if(timeLeft <= 0) finish(false, `解码超时。${current.d} 是 ${current.v}`);
+                if(timeLeft <= 0) finish(false, `解码超时。${current.d} 实际上是 ${current.v}`);
             }, 100);
         }
 
+        // 按键处理
         function tap(k) {
-            if(k === 'C') { input = ""; beep(300); }
-            else { 
-                const max = current.v >= 100 ? 3 : (current.v < 10 ? 1 : 2);
-                if(input.length < max) { input += k; beep(700); }
+            const max = current.v >= 100 ? 3 : (current.v < 10 ? 1 : 2);
+            if(k === 'C') { 
+                input = ""; 
+                beep(300); 
+            } else { 
+                if(input.length < max) { 
+                    input += k; 
+                    beep(700 + (input.length * 100)); 
+                }
             }
             buildSlots();
+            // 如果输满了自动触发校验，提升流畅感
+            if(input.length === max) {
+                setTimeout(check, 200);
+            }
         }
 
+        // 校验逻辑
         function check() {
+            if(input === "") return;
             if(parseInt(input) === current.v) {
                 score++; beep(1100);
                 document.getElementById('main-panel').style.borderColor = "var(--success)";
                 document.querySelectorAll('.slot').forEach(s => s.classList.add('correct'));
+                clearInterval(timer); // 答对瞬间停止计时
                 setTimeout(() => { 
                     document.getElementById('main-panel').style.borderColor = "rgba(255, 255, 255, 0.08)";
                     load(); 
-                }, 300);
+                }, 400);
             } else {
-                finish(false, `校验未通过。${current.d} 对应的数值为 ${current.v}`);
+                finish(false, `校验不匹配。${current.d} 是 ${current.v}，你输入了 ${input}`);
             }
         }
 
+        // 结束逻辑
         function finish(win, msg) {
             clearInterval(timer);
             const m = document.getElementById('modal');
@@ -219,23 +243,35 @@
                 beep(1000);
                 document.getElementById('m-icon').innerText = "⭐️";
                 document.getElementById('m-title').innerText = "链路建立完成";
-                document.getElementById('m-body').innerText = "30组德语数字逻辑已成功配对，协议同步完毕。";
+                document.getElementById('m-body').innerText = "30组德语数字逻辑已成功配对，地图协议同步完毕。";
                 document.getElementById('m-btn').innerText = "保存进度并退出";
-                document.getElementById('m-btn').onclick = () => { localStorage.setItem('level21_cleared', 'true'); location.href='index.html'; };
+                
+                // 核心：设置本地存储，驱动地图图标亮起
+                document.getElementById('m-btn').onclick = () => { 
+                    localStorage.setItem('level21_cleared', 'true'); 
+                    location.href='index.html'; 
+                };
+                
                 confetti({particleCount: 150, spread: 80, origin: {y: 0.6}});
             } else {
                 beep(200);
                 if(window.navigator.vibrate) window.navigator.vibrate(200);
                 document.getElementById('m-icon').innerText = "⚡️";
-                document.getElementById('m-title').innerText = "校验失败";
+                document.getElementById('m-title').innerText = "同步中断";
                 document.getElementById('m-body').innerText = msg;
-                document.getElementById('m-btn').innerText = "重试同步";
-                document.getElementById('m-btn').onclick = () => { score = 0; m.style.display = "none"; load(); };
+                document.getElementById('m-btn').innerText = "重新初始化";
+                document.getElementById('m-btn').onclick = () => { 
+                    score = 0; 
+                    m.style.display = "none"; 
+                    load(); 
+                };
             }
         }
 
         function toggleMute() { muted = !muted; document.getElementById('mute-btn').innerText = muted ? "🔇" : "🔊"; }
-        load();
+        
+        // 启动
+        window.onload = load;
     </script>
 </body>
 </html>
