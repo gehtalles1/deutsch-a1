@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>19-时间表达魔法课 | 完美修正版</title>
+    <title>20-时间表达攻关 | 闯关成功亮起图标</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
@@ -15,46 +15,47 @@
         .header-nav { padding: 20px 20px 5px; display: flex; align-items: center; justify-content: space-between; gap: 15px; }
         .nav-btn { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); border-radius: 12px; cursor: pointer; font-size: 1.2rem; }
         .progress-wrapper { flex: 1; height: 10px; background: rgba(255,255,255,0.1); border-radius: 20px; overflow: hidden; }
-        #progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #A855F7, #EC4899); transition: 0.6s ease-out; }
+        #progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #6366F1, #A855F7); transition: 0.6s ease-out; }
         #progress-num { text-align: center; font-size: 0.85rem; font-weight: 900; color: #475569; margin-top: 5px; }
 
         /* 动态图标 */
         .icon-display { height: 120px; display: flex; align-items: center; justify-content: center; }
-        .main-emoji { font-size: 4.5rem; animation: breathe 2.5s infinite ease-in-out; filter: drop-shadow(0 0 15px rgba(168, 85, 247, 0.4)); }
+        .main-emoji { font-size: 4.5rem; animation: breathe 2.5s infinite ease-in-out; filter: drop-shadow(0 0 15px rgba(99, 102, 241, 0.4)); }
         @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
 
-        /* 对话区：强对比设计 */
+        /* 对话区 */
         .challenge-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 20px; }
         .dialog-container { width: 100%; display: flex; flex-direction: column; gap: 20px; }
-        .bubble { max-width: 85%; padding: 18px 22px; border-radius: 24px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .bubble { max-width: 85%; padding: 18px 22px; border-radius: 24px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
         .bubble-a { background: #1F2937; align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid #374151; }
-        .bubble-b { background: #312E81; align-self: flex-end; border-bottom-right-radius: 4px; border: 2px solid #4F46E5; }
+        .bubble-b { background: #1E1B4B; align-self: flex-end; border-bottom-right-radius: 4px; border: 2px solid #6366F1; }
         
         .role-label { font-size: 0.7rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; display: block; }
-        .label-a { color: #9CA3AF; }
-        .label-b { color: #C7D2FE; }
+        .label-a { color: #94A3B8; }
+        .label-b { color: #A5B4FC; }
 
-        .sentence { font-size: 1.55rem; font-weight: 800; line-height: 1.3; color: #FFFFFF; }
-        .trans-hint { font-size: 0.9rem; color: #94A3B8; margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); display: block; }
-        .bubble-b .trans-hint { color: #A5B4FC; }
+        .sentence { font-size: 1.4rem; font-weight: 800; line-height: 1.3; color: #FFFFFF; }
+        .trans-hint { font-size: 0.85rem; color: #64748B; margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.05); display: block; }
 
-        .gap { display: inline-block; min-width: 70px; border-bottom: 4px solid #F472B6; color: #F472B6; text-align: center; margin: 0 8px; }
+        .gap { display: inline-block; min-width: 60px; border-bottom: 3px solid #6366F1; color: #818CF8; text-align: center; margin: 0 5px; }
 
         /* 选项按钮 */
         .options-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; padding: 10px 20px 40px; }
         .opt-btn { 
-            background: #1E293B; border: 2px solid #334155; border-radius: 20px; height: 75px;
+            background: #1E293B; border: 2px solid #334155; border-radius: 20px; height: 70px;
             display: flex; align-items: center; justify-content: center; 
-            font-size: 1.4rem; font-weight: 800; transition: 0.2s; cursor: pointer;
-            box-shadow: 0 4px 0 #0F172A;
+            font-size: 1.2rem; font-weight: 800; transition: 0.2s; cursor: pointer;
+            box-shadow: 0 4px 0 #020617;
         }
-        .opt-btn.correct { background: #10B981 !important; border-color: #10B981; box-shadow: 0 4px 0 #059669; }
+        .opt-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #020617; }
+        .opt-btn.correct { background: #10B981 !important; border-color: #10B981; box-shadow: 0 4px 0 #064E3B; }
         .opt-btn.wrong { background: #EF4444 !important; border-color: #EF4444; animation: shake 0.4s; }
         @keyframes shake { 0%,100% {transform:translateX(0)} 25% {transform:translateX(-8px)} 75% {transform:translateX(8px)} }
 
-        .overlay { position: absolute; inset: 0; background: rgba(15,23,42,0.98); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100; padding: 30px; }
+        /* 弹窗层 */
+        .overlay { position: absolute; inset: 0; background: rgba(15,23,42,0.95); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100; padding: 30px; }
         .card { background: #1F2937; border-radius: 32px; padding: 30px; width: 100%; border: 1px solid #374151; text-align: center; }
-        .btn-magic { width: 100%; padding: 18px; background: #6366F1; color: white; border-radius: 20px; font-weight: 900; font-size: 1.2rem; margin-top: 20px; }
+        .btn-magic { width: 100%; padding: 18px; background: #6366F1; color: white; border-radius: 20px; font-weight: 900; font-size: 1.2rem; margin-top: 20px; border-bottom: 4px solid #4338CA; }
     </style>
 </head>
 <body>
@@ -90,18 +91,18 @@
 
         <div id="tip-layer" class="overlay">
             <div class="card">
-                <div class="text-6xl mb-4">🔮</div>
-                <h3 class="text-xl font-bold text-indigo-400 mb-2">魔法纠错</h3>
+                <div class="text-6xl mb-4">⌛</div>
+                <h3 class="text-xl font-bold text-indigo-400 mb-2">时间规律</h3>
                 <p id="tip-msg" class="text-slate-300 leading-relaxed text-md mb-6"></p>
-                <button onclick="closeTip()" class="btn-magic">领悟了</button>
+                <button onclick="closeTip()" class="btn-magic">掌握了</button>
             </div>
         </div>
 
         <div id="win-layer" class="overlay">
-            <div class="text-8xl mb-6">✨</div>
+            <div class="text-8xl mb-6">⏰</div>
             <h3 class="text-3xl font-black text-white mb-2">时间守护大师</h3>
             <p class="text-slate-400 font-medium mb-8">20 个时间挑战全部达成！</p>
-            <button onclick="finishLevel()" class="btn-magic" style="background: linear-gradient(90deg, #A855F7, #EC4899);">点亮勋章</button>
+            <button onclick="finishLevel()" class="btn-magic" style="background: linear-gradient(90deg, #6366F1, #A855F7);">点亮勋章</button>
         </div>
     </div>
 
@@ -112,7 +113,7 @@
             { a: "Wann beginnt der Kurs?", at: "课程几点开始？", b: "_____ 20 Uhr.", bt: "在20点开始。", ans: "Um", opts: ["Am", "Um", "Im", "Zu"], icon: "🎓", tip: "具体时刻点用 <b>Um</b>。" },
             { a: "Wie viel Uhr ist es?", at: "现在几点？", b: "Viertel _____ acht.", bt: "八点一刻 (8:15)。", ans: "nach", opts: ["vor", "nach", "auf", "in"], icon: "☕", tip: "<b>nach</b> 表示过了几分。" },
             { a: "Wann treffen wir uns?", at: "我们几点见？", b: "Um halb _____.", bt: "在九点半 (9:30)。", ans: "zehn", opts: ["neun", "zehn", "acht", "elf"], icon: "🤝", tip: "<b>halb zehn</b> 是10点的一半，即 9:30。" },
-            { a: "Der wievielte ist heute?", at: "今天几号？", b: "Der _____ Mai.", bt: "五月一号。", ans: "erste", opts: ["ein", "eins", "erste", "ersten"], icon: "🚩", tip: "日期序数词：第一天是 der <b>erste</b>。" },
+            { a: "Der wievielte ist heute?", at: "今天几号？", b: "Heute ist der _____ Mai.", bt: "今天是五月一号。", ans: "erste", opts: ["ein", "eins", "erste", "ersten"], icon: "🚩", tip: "日期序数词：第一天是 der <b>erste</b>。" },
             { a: "Wann hast du frei?", at: "你什么时候有空？", b: "_____ Wochenende.", bt: "周末有空。", ans: "Am", opts: ["Im", "Am", "Um", "An"], icon: "🏖️", tip: "周末固定搭配 <b>am</b>。" },
             { a: "Wie spät ist es?", at: "几点了？", b: "Zehn _____ sechs.", bt: "五点五十 (5:50)。", ans: "vor", opts: ["vor", "nach", "um", "an"], icon: "🏃", tip: "<b>vor</b> 表示差几分到某点。" },
             { a: "In welchem Monat?", at: "在哪个月？", b: "Ich reise _____ Juni.", bt: "我六月旅行。", ans: "im", opts: ["am", "im", "um", "an"], icon: "✈️", tip: "月份前固定用 <b>im</b>。" },
@@ -134,7 +135,11 @@
 
         function initQuiz() {
             if (currentIndex === 0) shuffledQuiz = [...quizBank].sort(() => Math.random() - 0.5);
-            if (currentIndex >= shuffledQuiz.length) { document.getElementById('win-layer').style.display = 'flex'; return; }
+            if (currentIndex >= shuffledQuiz.length) { 
+                document.getElementById('win-layer').style.display = 'flex'; 
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                return; 
+            }
 
             const data = shuffledQuiz[currentIndex];
             document.getElementById('progress-fill').style.width = ((currentIndex + 1) / shuffledQuiz.length * 100) + '%';
@@ -161,16 +166,20 @@
                 if(!isMuted) sndSuccess.play();
                 btn.classList.add('correct');
                 document.getElementById('gap-field').innerText = selected;
-                confetti({ particleCount: 40, spread: 60, origin: { y: 0.8 } });
-                setTimeout(() => { currentIndex++; initQuiz(); }, 3000);
+                confetti({ particleCount: 30, spread: 50, origin: { y: 0.8 } });
+                setTimeout(() => { currentIndex++; initQuiz(); }, 1500);
             } else {
                 if(!isMuted) sndFail.play();
                 btn.classList.add('wrong');
-                setTimeout(() => { document.getElementById('tip-msg').innerHTML = tip; document.getElementById('tip-layer').style.display = 'flex'; }, 500);
+                setTimeout(() => { 
+                    document.getElementById('tip-msg').innerHTML = tip; 
+                    document.getElementById('tip-layer').style.display = 'flex'; 
+                }, 500);
             }
         }
 
         function toggleMute() { isMuted = !isMuted; document.getElementById('mute-btn').innerText = isMuted ? "🔇" : "🔊"; }
+        
         function closeTip() {
             document.getElementById('tip-layer').style.display = 'none';
             const data = shuffledQuiz[currentIndex];
@@ -179,7 +188,13 @@
                 b.onclick = () => checkAnswer(b.innerText, data.ans, data.tip, b);
             });
         }
-        function finishLevel() { localStorage.setItem('level19_cleared', 'true'); location.href = 'index.html'; }
+
+        function finishLevel() { 
+            // 核心：设置此 key 确保 index.html 能识别并点亮第 20 关
+            localStorage.setItem('level20_cleared', 'true'); 
+            location.href = 'index.html'; 
+        }
+
         initQuiz();
     </script>
 </body>
