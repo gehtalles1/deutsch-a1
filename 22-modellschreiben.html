@@ -73,8 +73,8 @@
 
     <div id="modal" class="fixed inset-0 z-[999] hidden flex-col items-center justify-center p-8 text-center">
         <div class="text-6xl mb-6 animate-bounce">🏆</div>
-        <h2 class="text-3xl font-black mb-2 text-white">同步完成</h2>
-        <p class="text-white/50 mb-8 text-sm leading-relaxed">20组核心表达已存入记忆区<br>德语语序逻辑已解锁</p>
+        <h2 class="text-3xl font-black mb-2 text-white">综合挑战达成</h2>
+        <p class="text-white/50 mb-8 text-sm leading-relaxed">20组A1核心表达已存入记忆区<br>德语语序逻辑已解锁</p>
         <button id="final-btn" class="w-full max-w-[200px] py-4 bg-cyan-400 text-black font-black rounded-xl shadow-lg active:scale-95 transition-transform">确认返回地图</button>
     </div>
 
@@ -84,7 +84,7 @@
             { i: "📅", h: "我很乐意在周六下午两点来。", w: ["Ich", "komme", "gerne", "am", "Samstag", "um", "14", "Uhr."] },
             { i: "🤒", h: "我很抱歉，我生病了不能去上班。", w: ["Es", "tut", "mir", "leid,", "ich", "bin", "krank", "und", "kann", "nicht", "arbeiten."] },
             { i: "🤝", h: "我们能不能改到明天见面？", w: ["Können", "wir", "uns", "vielleicht", "erst", "morgen", "treffen?"] },
-            { i: "📞", h: "请您在下午五点后再给我打电话。", w: ["Bitte", "rufen", "Sie", "mich", "nach", "17", "Uhr", "noch", "einmal", "an."], flexIdx: [5, 8, 9] }, // Bitte, noch, einmal 是灵活的
+            { i: "📞", h: "请您在下午五点后再给我打电话。", w: ["Bitte", "rufen", "Sie", "mich", "nach", "17", "Uhr", "noch", "einmal", "an."], flexIdx: [0, 7, 8] },
             { i: "✍️", h: "期待您的回复，此致敬礼。", w: ["Ich", "warte", "auf", "Ihre", "Antwort.", "Mit", "freundlichen", "Grüßen."] },
             { i: "🌈", h: "祝您在德国生活愉快，万事如意。", w: ["Ich", "wünsche", "Ihnen", "viel", "Spaß", "und", "alles", "Gute", "in", "Deutschland!"] },
             { i: "🏢", h: "这里附近有银行或者超市吗？", w: ["Gibt", "es", "hier", "in", "der", "Nähe", "eine", "Bank", "oder", "einen", "Supermarkt?"] },
@@ -96,7 +96,7 @@
             { i: "☕️", h: "您想喝杯咖啡还是茶？", w: ["Möchten", "Sie", "lieber", "einen", "Kaffee", "oder", "einen", "Tee?"] },
             { i: "🏠", h: "我目前住在柏林。", w: ["Ich", "wohne", "jetzt", "in", "Berlin."] },
             { i: "🚆", h: "火车在五分钟后出发。", w: ["Der", "Zug", "fährt", "in", "fünf", "Minuten", "ab."] },
-            { i: "💼", h: "我已经在上海做过三年工程师。", w: ["Ich", "habe", "drei", "Jahre", "als", "Ingenieur", "gearbeitet."] },
+            { i: "💼", h: "我曾在上海做过三年工程师。", w: ["Ich", "habe", "drei", "Jahre", "als", "Ingenieur", "gearbeitet."] },
             { i: "👨‍👩‍👧", h: "我有两个孩子，一个儿子一个女儿。", w: ["Ich", "habe", "zwei", "Kinder,", "einen", "Sohn", "und", "eine", "Tochter."] },
             { i: "🥘", h: "那顿晚餐非常好吃，多谢。", w: ["Das", "Abendessen", "war", "sehr", "lecker,", "vielen", "Dank!"] },
             { i: "❓", h: "您可以再说一遍您的名字吗？", w: ["Können", "Sie", "Ihren", "Namen", "bitte", "noch", "einmal", "sagen?"], flexIdx: [4, 5, 6] }
@@ -117,8 +117,12 @@
 
         function loadLevel() {
             if (curIdx >= levelData.length) {
+                // 通关核心逻辑：设置本地存储，让地图页识别已通关
+                localStorage.setItem('level22_cleared', 'true');
+                
                 document.getElementById('modal').style.display = "flex";
-                confetti(); return;
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#00f2ff', '#00ffcc', '#ffffff'] });
+                return;
             }
             const data = levelData[curIdx];
             selectedWords = [];
@@ -131,7 +135,7 @@
 
             const area = document.getElementById('card-area');
             area.innerHTML = "";
-            [...data.w].sort(() => Math.random() - 0.5).forEach((w, i) => {
+            [...data.w].sort(() => Math.random() - 0.5).forEach((w) => {
                 const btn = document.createElement('button');
                 btn.className = "word-btn";
                 btn.innerText = w;
@@ -144,13 +148,16 @@
             const data = levelData[curIdx];
             const targetPos = selectedWords.length;
             
-            // 语序灵活性逻辑：
-            // 如果当前位置在灵活索引范围内(flexIdx)，则判断点击的词是否属于这几个词之一
             let isCorrect = false;
+            // 处理语序灵活性（如有 flexIdx 标记）
             if (data.flexIdx && data.flexIdx.includes(targetPos)) {
-                const flexiblePool = data.flexIdx.map(i => data.w[i]);
-                const remainingPool = flexiblePool.filter(w => !selectedWords.slice(Math.min(...data.flexIdx)).includes(w));
-                if (remainingPool.includes(val)) isCorrect = true;
+                const flexibleWords = data.flexIdx.map(idx => data.w[idx]);
+                const remainingFlexible = flexibleWords.filter(word => {
+                    const usedCount = selectedWords.filter(sw => sw === word).length;
+                    const totalCount = flexibleWords.filter(fw => fw === word).length;
+                    return usedCount < totalCount;
+                });
+                if (remainingFlexible.includes(val)) isCorrect = true;
             } else {
                 if (val === data.w[targetPos]) isCorrect = true;
             }
@@ -160,14 +167,18 @@
                 btn.classList.add('used');
                 selectedWords.push(val);
                 const s = document.createElement('span');
-                s.className = "text-xl font-bold text-white animate-in zoom-in duration-300";
+                s.className = "text-xl font-bold text-white transition-all duration-300 transform scale-100";
                 s.innerText = val;
                 document.getElementById('display-panel').appendChild(s);
 
                 if (selectedWords.length === data.w.length) {
                     document.getElementById('display-panel').classList.add('success-glow');
                     document.getElementById('card-area').style.pointerEvents = "none";
-                    setTimeout(() => { curIdx++; document.getElementById('card-area').style.pointerEvents = "auto"; loadLevel(); }, 3000);
+                    setTimeout(() => { 
+                        curIdx++; 
+                        document.getElementById('card-area').style.pointerEvents = "auto"; 
+                        loadLevel(); 
+                    }, 1200);
                 }
             } else {
                 playNote(120, 0.3);
@@ -176,7 +187,8 @@
             }
         }
 
-        document.getElementById('final-btn').onclick = () => window.location.href = 'map.html';
+        // 修改返回路径，确保跳转到你的 index.html 或 map.html
+        document.getElementById('final-btn').onclick = () => window.location.href = 'index.html';
         window.onload = loadLevel;
     </script>
 </body>
