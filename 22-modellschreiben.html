@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Level 22 | A1 Writing Synthesis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;500;700&family=JetBrains+Mono:wght@400;700&display=swap');
+        
+        :root { --cyan: #00f2ff; --emerald: #00ffcc; --bg-dark: #0a0b14; --bg-graded: #1a1b2e; }
+
+        body { 
+            background: radial-gradient(circle at 50% 40%, var(--bg-graded) 0%, var(--bg-dark) 100%);
+            font-family: 'Noto Sans SC', sans-serif;
+            color: #e0e0e0; overflow: hidden; height: 100dvh; margin: 0;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        body::before {
+            content: ""; position: absolute; inset: 0;
+            background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), 
+                              linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 30px 30px; pointer-events: none; z-index: -1;
+        }
+
+        .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 24px; }
+
+        .word-btn {
+            background: rgba(45, 48, 75, 0.9); border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 10px 16px; border-radius: 12px; font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem; color: white; transition: all 0.2s; -webkit-tap-highlight-color: transparent;
+        }
+        .word-btn.used { opacity: 0; pointer-events: none; transform: scale(0.5); }
+
+        @keyframes error-bounce { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-5px); border-color: #ff4d4d; } 40%, 80% { transform: translateX(5px); } }
+        .wrong-selection { animation: error-bounce 0.4s ease; }
+
+        .progress-track { flex: 1; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
+        #progress-bar { height: 100%; background: linear-gradient(90deg, var(--cyan), var(--emerald)); width: 0%; transition: width 0.4s; }
+
+        .success-glow { color: var(--emerald) !important; text-shadow: 0 0 15px var(--emerald); border-color: rgba(0, 255, 204, 0.4) !important; }
+
+        #modal { background: rgba(10, 11, 20, 0.98); backdrop-filter: blur(20px); }
+    </style>
+</head>
+<body>
+
+    <div class="w-full max-w-md h-screen flex flex-col px-5 py-3 box-border relative">
+        <div class="flex flex-col mb-4">
+            <div class="flex justify-between items-center mb-1">
+                <button onclick="window.history.back()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+                <div class="progress-track mx-4"><div id="progress-bar"></div></div>
+                <button onclick="toggleMute()" id="mute-btn" class="w-10 h-10 text-xl bg-white/5 rounded-xl">🔊</button>
+            </div>
+            <div id="counter" class="text-center font-mono text-cyan-400 text-[10px] font-bold tracking-widest">01 / 20</div>
+        </div>
+
+        <div class="flex flex-col items-center mb-3 flex-shrink-0">
+            <div id="level-icon" class="text-3xl mb-1 p-2 rounded-xl bg-white/10">✉️</div>
+            <p id="hint-text" class="text-lg font-bold text-center px-2 leading-tight"></p>
+        </div>
+
+        <div id="display-panel" class="glass-card p-4 mb-4 min-h-[120px] flex-1 flex flex-wrap content-center justify-center gap-2 min-h-0"></div>
+
+        <div id="card-area" class="flex-1 flex flex-wrap gap-2 justify-center content-start overflow-y-auto pb-2"></div>
+
+        <div class="text-center pb-1 opacity-20 text-[8px] tracking-[0.3em] uppercase">Flexible Syntax Engine</div>
+    </div>
+
+    <div id="modal" class="fixed inset-0 z-[999] hidden flex-col items-center justify-center p-8 text-center">
+        <div class="text-6xl mb-6 animate-bounce">🏆</div>
+        <h2 class="text-3xl font-black mb-2 text-white">同步完成</h2>
+        <p class="text-white/50 mb-8 text-sm leading-relaxed">20组核心表达已存入记忆区<br>德语语序逻辑已解锁</p>
+        <button id="final-btn" class="w-full max-w-[200px] py-4 bg-cyan-400 text-black font-black rounded-xl shadow-lg active:scale-95 transition-transform">确认返回地图</button>
+    </div>
+
+    <script>
+        const rawData = [
+            { i: "✉️", h: "非常感谢您的来信。", w: ["Vielen", "Dank", "für", "Ihren", "freundlichen", "Brief."] },
+            { i: "📅", h: "我很乐意在周六下午两点来。", w: ["Ich", "komme", "gerne", "am", "Samstag", "um", "14", "Uhr."] },
+            { i: "🤒", h: "我很抱歉，我生病了不能去上班。", w: ["Es", "tut", "mir", "leid,", "ich", "bin", "krank", "und", "kann", "nicht", "arbeiten."] },
+            { i: "🤝", h: "我们能不能改到明天见面？", w: ["Können", "wir", "uns", "vielleicht", "erst", "morgen", "treffen?"] },
+            { i: "📞", h: "请您在下午五点后再给我打电话。", w: ["Bitte", "rufen", "Sie", "mich", "nach", "17", "Uhr", "noch", "einmal", "an."], flexIdx: [5, 8, 9] }, // Bitte, noch, einmal 是灵活的
+            { i: "✍️", h: "期待您的回复，此致敬礼。", w: ["Ich", "warte", "auf", "Ihre", "Antwort.", "Mit", "freundlichen", "Grüßen."] },
+            { i: "🌈", h: "祝您在德国生活愉快，万事如意。", w: ["Ich", "wünsche", "Ihnen", "viel", "Spaß", "und", "alles", "Gute", "in", "Deutschland!"] },
+            { i: "🏢", h: "这里附近有银行或者超市吗？", w: ["Gibt", "es", "hier", "in", "der", "Nähe", "eine", "Bank", "oder", "einen", "Supermarkt?"] },
+            { i: "🎂", h: "我想邀请您参加我的生日派对。", w: ["Ich", "möchte", "Sie", "herzlich", "zu", "meiner", "Geburtstagsparty", "einladen."] },
+            { i: "🚶", h: "去火车站的路怎么走？", w: ["Wie", "komme", "ich", "am", "besten", "zum", "Bahnhof?"] },
+            { i: "🍎", h: "我需要一公斤苹果和两瓶牛奶。", w: ["Ich", "brauche", "ein", "Kilo", "Äpfel", "und", "zwei", "Flaschen", "Milch."] },
+            { i: "🎓", h: "我每天在学校学习四个小时德语。", w: ["Ich", "lerne", "jeden", "Tag", "vier", "Stunden", "Deutsch."] },
+            { i: "🔑", h: "我找不到钥匙了，您可以帮我吗？", w: ["Ich", "finde", "meinen", "Schlüssel", "nicht,", "können", "Sie", "mir", "helfen?"] },
+            { i: "☕️", h: "您想喝杯咖啡还是茶？", w: ["Möchten", "Sie", "lieber", "einen", "Kaffee", "oder", "einen", "Tee?"] },
+            { i: "🏠", h: "我目前住在柏林。", w: ["Ich", "wohne", "jetzt", "in", "Berlin."] },
+            { i: "🚆", h: "火车在五分钟后出发。", w: ["Der", "Zug", "fährt", "in", "fünf", "Minuten", "ab."] },
+            { i: "💼", h: "我已经在上海做过三年工程师。", w: ["Ich", "habe", "drei", "Jahre", "als", "Ingenieur", "gearbeitet."] },
+            { i: "👨‍👩‍👧", h: "我有两个孩子，一个儿子一个女儿。", w: ["Ich", "habe", "zwei", "Kinder,", "einen", "Sohn", "und", "eine", "Tochter."] },
+            { i: "🥘", h: "那顿晚餐非常好吃，多谢。", w: ["Das", "Abendessen", "war", "sehr", "lecker,", "vielen", "Dank!"] },
+            { i: "❓", h: "您可以再说一遍您的名字吗？", w: ["Können", "Sie", "Ihren", "Namen", "bitte", "noch", "einmal", "sagen?"], flexIdx: [4, 5, 6] }
+        ];
+
+        let levelData = [...rawData].sort(() => Math.random() - 0.5);
+        let curIdx = 0, selectedWords = [], muted = false;
+
+        function playNote(f, d = 0.1) {
+            if (muted) return;
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const o = ctx.createOscillator(), g = ctx.createGain();
+            o.frequency.value = f; g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + d);
+            o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime + d);
+        }
+
+        function toggleMute() { muted = !muted; document.getElementById('mute-btn').innerText = muted ? "🔇" : "🔊"; }
+
+        function loadLevel() {
+            if (curIdx >= levelData.length) {
+                document.getElementById('modal').style.display = "flex";
+                confetti(); return;
+            }
+            const data = levelData[curIdx];
+            selectedWords = [];
+            document.getElementById('level-icon').innerText = data.i;
+            document.getElementById('hint-text').innerText = data.h;
+            document.getElementById('counter').innerText = `${String(curIdx + 1).padStart(2, '0')} / 20`;
+            document.getElementById('progress-bar').style.width = `${(curIdx / 20) * 100}%`;
+            document.getElementById('display-panel').innerHTML = "";
+            document.getElementById('display-panel').classList.remove('success-glow');
+
+            const area = document.getElementById('card-area');
+            area.innerHTML = "";
+            [...data.w].sort(() => Math.random() - 0.5).forEach((w, i) => {
+                const btn = document.createElement('button');
+                btn.className = "word-btn";
+                btn.innerText = w;
+                btn.onclick = () => checkWord(w, btn);
+                area.appendChild(btn);
+            });
+        }
+
+        function checkWord(val, btn) {
+            const data = levelData[curIdx];
+            const targetPos = selectedWords.length;
+            
+            // 语序灵活性逻辑：
+            // 如果当前位置在灵活索引范围内(flexIdx)，则判断点击的词是否属于这几个词之一
+            let isCorrect = false;
+            if (data.flexIdx && data.flexIdx.includes(targetPos)) {
+                const flexiblePool = data.flexIdx.map(i => data.w[i]);
+                const remainingPool = flexiblePool.filter(w => !selectedWords.slice(Math.min(...data.flexIdx)).includes(w));
+                if (remainingPool.includes(val)) isCorrect = true;
+            } else {
+                if (val === data.w[targetPos]) isCorrect = true;
+            }
+
+            if (isCorrect) {
+                playNote(600 + (targetPos * 60));
+                btn.classList.add('used');
+                selectedWords.push(val);
+                const s = document.createElement('span');
+                s.className = "text-xl font-bold text-white animate-in zoom-in duration-300";
+                s.innerText = val;
+                document.getElementById('display-panel').appendChild(s);
+
+                if (selectedWords.length === data.w.length) {
+                    document.getElementById('display-panel').classList.add('success-glow');
+                    document.getElementById('card-area').style.pointerEvents = "none";
+                    setTimeout(() => { curIdx++; document.getElementById('card-area').style.pointerEvents = "auto"; loadLevel(); }, 3000);
+                }
+            } else {
+                playNote(120, 0.3);
+                btn.classList.add('wrong-selection');
+                setTimeout(() => btn.classList.remove('wrong-selection'), 400);
+            }
+        }
+
+        document.getElementById('final-btn').onclick = () => window.location.href = 'map.html';
+        window.onload = loadLevel;
+    </script>
+</body>
+</html>
