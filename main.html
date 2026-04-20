@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>A1德语通关营 | 轻松搞定入门</title>
+    
+    <script>
+        // 这里的暗号必须和 index.html 里的保持一致，否则自己也进不来
+        if (localStorage.getItem('map_access') !== "Hallo2026") {
+            window.location.href = "index.html";
+        }
+    </script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
@@ -253,25 +261,30 @@
         </footer>
     </div>
 
+    <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; overflow: hidden;">
+        <div style="position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%) rotate(-25deg); opacity: 0.08; font-size: 32px; color: #000; white-space: nowrap; font-weight: bold; font-family: sans-serif;">
+            正版授权：gehtalles1 德语课堂
+        </div>
+    </div>
+
     <script>
-        // 更新关卡 ID 列表，包含 lvl22
         const levelIds = ['lvl1', 'lvl2', 'lvl3', 'lvl4', 'lvl5', 'lvl6', 'lvl7', 'lvl8', 'lvl9', 'lvl10', 'lvl11', 'lvl12', 'lvl13', 'lvl14', 'lvl15', 'lvl16', 'lvl17', 'lvl18', 'lvl19', 'lvl20', 'lvl21', 'lvl22'];
 
         function checkStatus() {
             const unlocked = localStorage.getItem('isUnlocked') === 'true';
             if (unlocked) {
-                document.getElementById('auth-group').style.display = 'none';
+                const authGroup = document.getElementById('auth-group');
+                if(authGroup) authGroup.style.display = 'none';
                 levelIds.forEach(id => {
                     const el = document.getElementById(id);
                     if(el) el.classList.remove('locked-state');
                 });
             }
 
-            // 通关图标展示逻辑
+            // 图标逻辑
             const s1Score = localStorage.getItem('stage1_score'); 
             if (s1Score === 'gold') document.getElementById('m1').innerText = "🥇";
             else if (s1Score === 'silver') document.getElementById('m1').innerText = "🥈";
-
             if (localStorage.getItem('level2_cleared') === 'true') document.getElementById('m2').innerText = "🏅";
             if (localStorage.getItem('level3_cleared') === 'true') document.getElementById('m3').innerText = "🧪";
             if (localStorage.getItem('level4_cleared') === 'true') document.getElementById('m4').innerText = "⚔️";
@@ -292,8 +305,6 @@
             if (localStorage.getItem('level19_cleared') === 'true') document.getElementById('m19').innerText = "🚫";
             if (localStorage.getItem('level20_cleared') === 'true') document.getElementById('m20').innerText = "⏰";
             if (localStorage.getItem('level21_cleared') === 'true') document.getElementById('m21').innerText = "📡";
-            
-            // 新增第 22 关通关图标：写信图标
             if (localStorage.getItem('level22_cleared') === 'true') document.getElementById('m22').innerText = "📝";
         }
 
@@ -309,28 +320,13 @@
         function go(n) {
             if (localStorage.getItem('isUnlocked') !== 'true') return;
             const pages = {
-                1: '01-gender.html',
-                2: '02-classify.html',
-                3: '03-plural.html',
-                4: '04-verbs.html',
-                5: '05-starke-verben.html',
-                6: '06-trennbare-verben.html',
-                7: '07-modalverben.html',
-                8: '08-praesens-mix.html',
-                9: '09-Perfekt-Master.html',
-                10: '10_Artikel_Check.html',
-                11: '11-dativ.html',
-                12: '12-nodaakk-mix.html',
-                13: '13-praeposition.html',
-                14: '14-Possessivpro.html',
-                15: '15-partikeln.html',
-                16: '16-Praeteritum.html',
-                17: '17-satzbau.html',
-                18: '18-Imperativ.html',
-                19: '19-negation.html',
-                20: '20-zeitendaten.html',
-                21: '21-zahlen.html',
-                22: '22-modellschreiben.html' // 关联第 22 关
+                1: '01-gender.html', 2: '02-classify.html', 3: '03-plural.html', 4: '04-verbs.html',
+                5: '05-starke-verben.html', 6: '06-trennbare-verben.html', 7: '07-modalverben.html',
+                8: '08-praesens-mix.html', 9: '09-Perfekt-Master.html', 10: '10_Artikel_Check.html',
+                11: '11-dativ.html', 12: '12-nodaakk-mix.html', 13: '13-praeposition.html',
+                14: '14-Possessivpro.html', 15: '15-partikeln.html', 16: '16-Praeteritum.html',
+                17: '17-satzbau.html', 18: '18-Imperativ.html', 19: '19-negation.html',
+                20: '20-zeitendaten.html', 21: '21-zahlen.html', 22: '22-modellschreiben.html'
             };
             window.location.href = pages[n];
         }
@@ -341,6 +337,14 @@
                 location.reload();
             }
         }
+
+        // 【新增：安全屏蔽逻辑】
+        document.oncontextmenu = function() { return false; };
+        document.onkeydown = function(e) {
+            if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 73)) {
+                return false;
+            }
+        };
 
         window.onload = checkStatus;
     </script>
