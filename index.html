@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>德语A1通关挑战营</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #0a0b14; color: white; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .box { background: rgba(255,255,255,0.05); padding: 40px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.1); text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1 class="text-3xl font-bold mb-6">德语A1通关挑战营</h1>
+        <p class="text-slate-400 mb-8">本内容仅供正版学员使用</p>
+        <button onclick="enterMap()" class="bg-cyan-500 hover:bg-cyan-600 text-black font-bold py-3 px-8 rounded-xl transition-all">
+            点击进入地图
+        </button>
+    </div>
+
+    <script>
+        function enterMap() {
+            // 你以后想改暗号，就改下面这个引号里的内容
+            const secret = "Hallo2026"; 
+            
+            const input = prompt("请输入发货清单中的『地图激活暗号』：");
+            if (input === secret) {
+                // 如果暗号对了，就在浏览器存一个“通行证”
+                localStorage.setItem('map_access', secret);
+                window.location.href = "main.html";
+            } else if (input !== null) {
+                alert("暗号错误，请查看您的购买订单。");
+            }
+        }
+    </script>
+</body>
+</html>
