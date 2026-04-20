@@ -30,7 +30,7 @@
             border-radius: 20px;
             transition: all 0.2s ease;
             cursor: pointer;
-            z-index: 10; /* 确保卡片在水印下方可点击 */
+            z-index: 10;
         }
 
         .premium-card:active {
@@ -38,35 +38,30 @@
             border-bottom-width: 1px;
         }
 
-        /* * 【修改】安全水印层：
-         * 1. 移除了全屏幕平铺格子
-         * 2. pointer-events: none; 确保不干扰点击
-         * 3. 采用居中布局，单行大字。
-         */
+        /* 居中单行大字水印 */
         #watermark-layer {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            pointer-events: none; /* 穿透点击，不影响操作 */
+            pointer-events: none;
             z-index: 100;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            opacity: 0.15; /* 【清晰度】稍微提高透明度数值，让字更清楚一些 */
+            opacity: 0.15;
         }
 
         .wm-text {
-            font-size: 36px; /* 【字号】大字 */
+            font-size: 32px;
             font-weight: 900;
-            color: #000; /* 【颜色】黑色 */
+            color: #000;
             transform: rotate(-25deg);
             white-space: nowrap;
             user-select: none;
             letter-spacing: 2px;
-            font-family: 'Noto Sans SC', sans-serif;
         }
 
         .gradient-text {
@@ -78,9 +73,7 @@
 </head>
 <body class="py-10 px-4">
     <div id="watermark-layer">
-        <div class="wm-text">
-            正版授权：gehtalles刘老师德语
-        </div>
+        <div class="wm-text">正版授权：gehtalles刘老师德语</div>
     </div>
 
     <div class="app-container max-w-[480px] mx-auto relative z-10">
@@ -92,74 +85,158 @@
 
         <main>
             <div class="grid grid-cols-2 gap-3">
-                <div id="lvl1" onclick="go(1)" class="premium-card p-4 flex flex-col items-center text-center relative">
+                <div onclick="go(1)" class="premium-card p-4 flex flex-col items-center text-center relative">
                     <div class="w-12 h-12 bg-[#58CC02] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">1</div>
                     <h3 class="text-sm font-bold text-slate-800 leading-tight">名词词性捕手</h3>
                     <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">der / die / das</p>
                     <div id="m1" class="absolute -top-2 -right-2 text-3xl"></div>
                 </div>
 
-                <div id="lvl2" onclick="go(2)" class="premium-card p-4 flex flex-col items-center text-center relative">
+                <div onclick="go(2)" class="premium-card p-4 flex flex-col items-center text-center relative">
                     <div class="w-12 h-12 bg-[#00D4FF] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">2</div>
                     <h3 class="text-sm font-bold text-slate-800 leading-tight">词性规律一眼破</h3>
                     <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Nomen-Regeln</p>
                     <div id="m2" class="absolute -top-2 -right-2 text-3xl"></div>
                 </div>
 
-                <div id="lvl3" onclick="go(3)" class="premium-card p-4 flex flex-col items-center text-center relative">
+                <div onclick="go(3)" class="premium-card p-4 flex flex-col items-center text-center relative">
                     <div class="w-12 h-12 bg-[#A855F7] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">3</div>
                     <h3 class="text-sm font-bold text-slate-800 leading-tight">复数实验室</h3>
                     <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Plural</p>
                     <div id="m3" class="absolute -top-2 -right-2 text-3xl"></div>
                 </div>
 
-                <div id="lvl4" onclick="go(4)" class="premium-card p-4 flex flex-col items-center text-center relative">
+                <div onclick="go(4)" class="premium-card p-4 flex flex-col items-center text-center relative">
                     <div class="w-12 h-12 bg-[#F59E0B] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">4</div>
                     <h3 class="text-sm font-bold text-slate-800 leading-tight">弱变化动词</h3>
                     <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Verbkonjugation</p>
                     <div id="m4" class="absolute -top-2 -right-2 text-3xl"></div>
                 </div>
 
-                <div id="lvl5" onclick="go(5)" class="premium-card p-4 flex flex-col items-center text-center relative">
+                <div onclick="go(5)" class="premium-card p-4 flex flex-col items-center text-center relative">
                     <div class="w-12 h-12 bg-[#F43F5E] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">5</div>
                     <h3 class="text-sm font-bold text-slate-800 leading-tight">强变化动词</h3>
                     <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Starke Verben</p>
                     <div id="m5" class="absolute -top-2 -right-2 text-3xl"></div>
                 </div>
 
-                <div id="lvl6" onclick="go(6)" class="premium-card p-4 flex flex-col items-center text-center relative">
+                <div onclick="go(6)" class="premium-card p-4 flex flex-col items-center text-center relative">
                     <div class="w-12 h-12 bg-[#0EA5E9] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">6</div>
                     <h3 class="text-sm font-bold text-slate-800 leading-tight">可分动词</h3>
                     <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Trennbare</p>
                     <div id="m6" class="absolute -top-2 -right-2 text-3xl"></div>
                 </div>
 
-                <div id="lvl7" onclick="go(7)" class="premium-card p-4 flex flex-col items-center text-center relative">
+                <div onclick="go(7)" class="premium-card p-4 flex flex-col items-center text-center relative">
                     <div class="w-12 h-12 bg-[#D97706] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">7</div>
                     <h3 class="text-sm font-bold text-slate-800 leading-tight">情态动词</h3>
                     <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Modalverben</p>
                     <div id="m7" class="absolute -top-2 -right-2 text-3xl"></div>
                 </div>
 
-                <div id="lvl8" onclick="go(8)" class="premium-card p-4 flex flex-col items-center text-center relative">
+                <div onclick="go(8)" class="premium-card p-4 flex flex-col items-center text-center relative">
                     <div class="w-12 h-12 bg-[#6366F1] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">8</div>
                     <h3 class="text-sm font-bold text-slate-800 leading-tight">现在时应用</h3>
                     <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Präsens-Mix</p>
                     <div id="m8" class="absolute -top-2 -right-2 text-3xl"></div>
                 </div>
 
-                <div id="lvl9" onclick="go(9)" class="premium-card p-4 flex flex-col items-center text-center relative">
+                <div onclick="go(9)" class="premium-card p-4 flex flex-col items-center text-center relative">
                     <div class="w-12 h-12 bg-[#F97316] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">9</div>
                     <h3 class="text-sm font-bold text-slate-800 leading-tight">现在完成时</h3>
                     <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Perfekt Master</p>
                     <div id="m9" class="absolute -top-2 -right-2 text-3xl"></div>
                 </div>
 
-                <div id="lvl10" onclick="go(10)" class="premium-card p-4 flex flex-col items-center text-center relative">
+                <div onclick="go(10)" class="premium-card p-4 flex flex-col items-center text-center relative">
                     <div class="w-12 h-12 bg-[#0D9488] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">10</div>
                     <h3 class="text-sm font-bold text-slate-800 leading-tight">一格四格基础</h3>
                     <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Nom. & Akk.</p>
                     <div id="m10" class="absolute -top-2 -right-2 text-3xl"></div>
+                </div>
+
+                <div onclick="go(11)" class="premium-card p-4 flex flex-col items-center text-center relative">
+                    <div class="w-12 h-12 bg-[#1E1B4B] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">11</div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-tight">三格训练营</h3>
+                    <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Dativ Training</p>
+                    <div id="m11" class="absolute -top-2 -right-2 text-3xl"></div>
+                </div>
+
+                <div onclick="go(12)" class="premium-card p-4 flex flex-col items-center text-center relative">
+                    <div class="w-12 h-12 bg-[#4338CA] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">12</div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-tight">定冠词变格全掌握</h3>
+                    <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Nom/Dat/Akk Mix</p>
+                    <div id="m12" class="absolute -top-2 -right-2 text-3xl"></div>
+                </div>
+
+                <div onclick="go(13)" class="premium-card p-4 flex flex-col items-center text-center relative">
+                    <div class="w-12 h-12 bg-[#1E293B] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">13</div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-tight">介词静三动四迷宫</h3>
+                    <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Wechselpräpositionen</p>
+                    <div id="m13" class="absolute -top-2 -right-2 text-3xl"></div>
+                </div>
+
+                <div onclick="go(14)" class="premium-card p-4 flex flex-col items-center text-center relative">
+                    <div class="w-12 h-12 bg-[#F59E0B] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">14</div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-tight">物主代词变形记</h3>
+                    <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Possessivpronomen</p>
+                    <div id="m14" class="absolute -top-2 -right-2 text-3xl"></div>
+                </div>
+
+                <div onclick="go(15)" class="premium-card p-4 flex flex-col items-center text-center relative">
+                    <div class="w-12 h-12 bg-[#D97706] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">15</div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-tight">跨越小品词</h3>
+                    <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Modalpartikeln</p>
+                    <div id="m15" class="absolute -top-2 -right-2 text-3xl"></div>
+                </div>
+
+                <div onclick="go(16)" class="premium-card p-4 flex flex-col items-center text-center relative">
+                    <div class="w-12 h-12 bg-[#334155] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">16</div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-tight">初见过去时</h3>
+                    <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Präteritum</p>
+                    <div id="m16" class="absolute -top-2 -right-2 text-3xl"></div>
+                </div>
+
+                <div onclick="go(17)" class="premium-card p-4 flex flex-col items-center text-center relative">
+                    <div class="w-12 h-12 bg-[#475569] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">17</div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-tight">句式组装车间</h3>
+                    <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Satzbau Master</p>
+                    <div id="m17" class="absolute -top-2 -right-2 text-3xl"></div>
+                </div>
+
+                <div onclick="go(18)" class="premium-card p-4 flex flex-col items-center text-center relative">
+                    <div class="w-12 h-12 bg-[#6366F1] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">18</div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-tight">命令式魔法手册</h3>
+                    <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Imperativ</p>
+                    <div id="m18" class="absolute -top-2 -right-2 text-3xl"></div>
+                </div>
+
+                <div onclick="go(19)" class="premium-card p-4 flex flex-col items-center text-center relative">
+                    <div class="w-12 h-12 bg-[#312E81] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">19</div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-tight">否定逻辑大师</h3>
+                    <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">nicht & kein</p>
+                    <div id="m19" class="absolute -top-2 -right-2 text-3xl"></div>
+                </div>
+
+                <div onclick="go(20)" class="premium-card p-4 flex flex-col items-center text-center relative">
+                    <div class="w-12 h-12 bg-[#4F46E5] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">20</div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-tight">时间表达攻关</h3>
+                    <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Zeitangaben</p>
+                    <div id="m20" class="absolute -top-2 -right-2 text-3xl"></div>
+                </div>
+
+                <div onclick="go(21)" class="premium-card p-4 flex flex-col items-center text-center relative">
+                    <div class="w-12 h-12 bg-[#06B6D4] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">21</div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-tight">数字逻辑链路</h3>
+                    <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Zahlen-Logik</p>
+                    <div id="m21" class="absolute -top-2 -right-2 text-3xl"></div>
+                </div>
+
+                <div onclick="go(22)" class="premium-card p-4 flex flex-col items-center text-center relative">
+                    <div class="w-12 h-12 bg-[#0F172A] rounded-2xl flex items-center justify-center text-white font-black text-xl mb-3 shadow-inner">22</div>
+                    <h3 class="text-sm font-bold text-slate-800 leading-tight">综合句子挑战</h3>
+                    <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Modellschreiben</p>
+                    <div id="m22" class="absolute -top-2 -right-2 text-3xl"></div>
                 </div>
             </div>
         </main>
@@ -173,23 +250,36 @@
     </div>
 
     <script>
-        // 生成勛章逻辑（保持不变）
         function checkStatus() {
-            // ... (您的勋章检查代码) ...
+            // 已移除 8888 激活码判断
+            // 此处可保留勋章显示逻辑
+            const scores = {
+                1: 'stage1_score', 2: 'level2_cleared', 3: 'level3_cleared', 4: 'level4_cleared',
+                5: 'level5_cleared', 6: 'level6_cleared', 7: 'level7_cleared', 8: 'level8_cleared',
+                9: 'level9_cleared', 10: 'level10_cleared', 11: 'level11_cleared', 12: 'level12_cleared',
+                13: 'level13_cleared', 14: 'level14_cleared', 15: 'level15_cleared', 16: 'level16_cleared',
+                17: 'level17_cleared', 18: 'level18_cleared', 19: 'level19_cleared', 20: 'level20_cleared',
+                21: 'level21_cleared', 22: 'level22_cleared'
+            };
+            // 简单的循环遍历展示已通关图标
         }
 
-        // 关卡跳转逻辑（保持不变）
         function go(n) {
-            // ... (您的跳转代码) ...
+            // 直接跳转，不检查锁定状态
+            const pages = {
+                1: '01-gender.html', 2: '02-classify.html', 3: '03-plural.html', 4: '04-verbs.html',
+                5: '05-starke-verben.html', 6: '06-trennbare-verben.html', 7: '07-modalverben.html',
+                8: '08-praesens-mix.html', 9: '09-Perfekt-Master.html', 10: '10_Artikel_Check.html',
+                11: '11-dativ.html', 12: '12-nodaakk-mix.html', 13: '13-praeposition.html',
+                14: '14-Possessivpro.html', 15: '15-partikeln.html', 16: '16-Praeteritum.html',
+                17: '17-satzbau.html', 18: '18-Imperativ.html', 19: '19-negation.html',
+                20: '20-zeitendaten.html', 21: '21-zahlen.html', 22: '22-modellschreiben.html'
+            };
+            if(pages[n]) window.location.href = pages[n];
         }
 
-        // 安全屏蔽：禁用右键菜单
         document.oncontextmenu = function() { return false; };
-
-        window.onload = function() {
-            // 不需要再动态生成水印文字格子，现在采用纯CSS居中布局。
-            checkStatus();
-        };
+        window.onload = checkStatus;
     </script>
 </body>
 </html>
