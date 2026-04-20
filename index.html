@@ -2,37 +2,135 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>德语A1通关挑战营</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>德语A1通关挑战营 | 授权中心</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background: #0a0b14; color: white; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .box { background: rgba(255,255,255,0.05); padding: 40px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.1); text-align: center; }
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        
+        body { 
+            background: #020617; 
+            color: white; 
+            font-family: 'Noto Sans SC', sans-serif; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            height: 100vh; 
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* 磨砂玻璃效果 */
+        .glass-card {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* 渐变动画按钮 */
+        .btn-premium {
+            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5);
+        }
+
+        .btn-premium:active {
+            transform: translateY(0);
+        }
+
+        /* 呼吸背景 */
+        .bg-glow {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+            z-index: -1;
+            filter: blur(40px);
+            animation: pulse 8s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.5; }
+            100% { transform: scale(1.5); opacity: 0.8; }
+        }
     </style>
 </head>
-<body>
-    <div class="box">
-        <h1 class="text-3xl font-bold mb-6">德语A1通关挑战营</h1>
-        <p class="text-slate-400 mb-8">本内容仅供正版学员使用</p>
-        <button onclick="enterMap()" class="bg-cyan-500 hover:bg-cyan-600 text-black font-bold py-3 px-8 rounded-xl transition-all">
-            点击进入地图
-        </button>
+<body onload="autoCheck()">
+    <div class="bg-glow"></div>
+    
+    <div class="glass-card w-[90%] max-w-[400px] p-10 text-center">
+        <div class="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+        </div>
+
+        <h1 class="text-2xl font-black tracking-tight mb-2">德语A1通关挑战营</h1>
+        <p class="text-slate-400 text-sm mb-8 font-medium">授权成功后将永久解锁当前设备</p>
+
+        <div class="space-y-4">
+            <div class="text-left">
+                <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold ml-2">刘老师提示：</label>
+                <input 
+                    id="authCode"
+                    type="text" 
+                    placeholder="请输入A1训练营激活码" 
+                    class="w-full mt-1 bg-slate-900/50 border border-slate-700 rounded-2xl py-4 px-6 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-center font-bold text-lg tracking-wider"
+                >
+            </div>
+            
+            <button onclick="verifyCode()" class="w-full btn-premium py-4 rounded-2xl text-white font-bold text-lg">
+                立即解锁
+            </button>
+        </div>
+
+        <p class="mt-8 text-[10px] text-slate-600 font-medium">
+            Copyright © 2026 GEHTALLES Education.
+        </p>
     </div>
 
     <script>
-        function enterMap() {
-            // 你以后想改暗号，就改下面这个引号里的内容
-            const secret = "Hallo2026"; 
-            
-            const input = prompt("请输入发货清单中的『地图激活暗号』：");
-            if (input === secret) {
-                // 如果暗号对了，就在浏览器存一个“通行证”
-                localStorage.setItem('map_access', secret);
+        const secret = "Hallo2026";
+
+        // 页面加载时自动检查
+        function autoCheck() {
+            if (localStorage.getItem('map_access') === secret) {
+                // 如果已经输入过且正确，直接进入
                 window.location.href = "main.html";
-            } else if (input !== null) {
-                alert("暗号错误，请查看您的购买订单。");
             }
         }
+
+        function verifyCode() {
+            const input = document.getElementById('authCode').value.trim();
+            
+            if (input === secret) {
+                // 存入通行证，永久有效
+                localStorage.setItem('map_access', secret);
+                
+                // 成功反馈
+                const btn = document.querySelector('button');
+                btn.innerHTML = "解锁成功，正在进入...";
+                btn.style.background = "#10b981";
+                
+                setTimeout(() => {
+                    window.location.href = "main.html";
+                }, 800);
+            } else {
+                alert("激活码有误，请核对后输入。");
+            }
+        }
+
+        // 支持回车键提交
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') verifyCode();
+        });
     </script>
 </body>
 </html>
