@@ -2,15 +2,16 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>德语A1通关挑战营 | 授权中心</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
         
         body { 
-            background: #020617; 
-            color: white; 
+            /* 新背景：Duolingo 深绿渐变 */
+            background: linear-gradient(135deg, #005a00 0%, #00a000 100%); 
+            color: #1E293B; 
             font-family: 'Noto Sans SC', sans-serif; 
             display: flex; 
             align-items: center; 
@@ -20,78 +21,113 @@
             overflow: hidden;
         }
 
-        /* 磨砂玻璃效果 */
+        /* 磨砂玻璃卡片 */
         .glass-card {
-            background: rgba(30, 41, 59, 0.5);
-            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 32px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border-radius: 36px;
+            box-shadow: 0 25px 60px -10px rgba(0,0,0,0.3);
         }
 
-        /* 渐变动画按钮 */
+        /* 输入框样式 */
+        .duo-input {
+            background: #FFFFFF;
+            border: 2px solid #E2E8F0;
+            border-radius: 20px;
+            color: #1E293B;
+            transition: all 0.2s;
+        }
+        .duo-input:focus {
+            outline: none;
+            border-color: #58CC02;
+            box-shadow: 0 0 0 3px rgba(88, 204, 2, 0.2);
+        }
+
+        /* 多邻国风绿色按钮 */
         .btn-premium {
-            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #58CC02;
+            border-bottom: 4px solid #46A302;
+            color: white;
+            border-radius: 20px;
+            font-weight: 900;
+            transition: all 0.2s cubic-bezier(0.17, 0.89, 0.32, 1.49);
+            text-shadow: 0 1px 1px rgba(0,0,0,0.2);
         }
 
         .btn-premium:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5);
+            background: #61E002;
         }
 
         .btn-premium:active {
-            transform: translateY(0);
+            transform: translateY(2px);
+            border-bottom-width: 1px;
         }
 
-        /* 呼吸背景 */
+        /* 呼吸光背景 */
         .bg-glow {
             position: absolute;
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
             z-index: -1;
-            filter: blur(40px);
-            animation: pulse 8s infinite alternate;
+            filter: blur(50px);
+            animation: pulse 10s infinite alternate;
         }
 
         @keyframes pulse {
             0% { transform: scale(1); opacity: 0.5; }
-            100% { transform: scale(1.5); opacity: 0.8; }
+            100% { transform: scale(1.6); opacity: 0.9; }
+        }
+
+        /* 锁头动画：多邻国滑稽风抖动 */
+        .animate-lock {
+            animation: duo-wiggle 1.5s ease-in-out infinite;
+            transform-origin: center;
+        }
+
+        @keyframes duo-wiggle {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            10% { transform: rotate(-8deg) scale(1.05); }
+            20% { transform: rotate(8deg) scale(1.05); }
+            30% { transform: rotate(-5deg) scale(1); }
+            40% { transform: rotate(5deg) scale(1); }
+            50% { transform: rotate(0deg) scale(1); }
         }
     </style>
 </head>
 <body onload="autoCheck()">
     <div class="bg-glow"></div>
     
-    <div class="glass-card w-[90%] max-w-[400px] p-10 text-center">
-        <div class="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+    <div class="glass-card w-[92%] max-w-[420px] p-10 text-center animate-in fade-in zoom-in duration-500">
+        
+        <div class="w-20 h-20 bg-emerald-100 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-inner animate-lock">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
         </div>
 
-        <h1 class="text-2xl font-black tracking-tight mb-2">德语A1通关挑战营</h1>
-        <p class="text-slate-400 text-sm mb-8 font-medium">授权成功后将永久解锁当前设备</p>
+        <h1 class="text-3xl font-black text-slate-900 tracking-tighter mb-2">德语A1通关挑战营</h1>
+        <p class="text-slate-500 text-sm mb-10 font-medium">授权成功后将永久解锁当前设备</p>
 
         <div class="space-y-4">
             <div class="text-left">
-                <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold ml-2">刘老师提示：</label>
+                <label class="text-[11px] uppercase tracking-widest text-slate-600 font-bold ml-3">刘老师提示：</label>
                 <input 
                     id="authCode"
                     type="text" 
                     placeholder="请输入A1训练营激活码" 
-                    class="w-full mt-1 bg-slate-900/50 border border-slate-700 rounded-2xl py-4 px-6 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-center font-bold text-lg tracking-wider"
+                    class="duo-input w-full mt-1.5 py-4.5 px-7 outline-none font-bold text-2xl tracking-wider text-center"
                 >
             </div>
             
-            <button onclick="verifyCode()" class="w-full btn-premium py-4 rounded-2xl text-white font-bold text-lg">
+            <button onclick="verifyCode()" class="w-full btn-premium py-4.5 text-xl">
                 立即解锁
             </button>
         </div>
 
-        <p class="mt-8 text-[10px] text-slate-600 font-medium">
+        <p class="mt-10 text-[10px] text-slate-400 font-medium tracking-wide">
             Copyright © 2026 GEHTALLES Education.
         </p>
     </div>
@@ -99,31 +135,38 @@
     <script>
         const secret = "Hallo2026";
 
-        // 页面加载时自动检查
         function autoCheck() {
             if (localStorage.getItem('map_access') === secret) {
-                // 如果已经输入过且正确，直接进入
                 window.location.href = "main.html";
             }
         }
 
         function verifyCode() {
             const input = document.getElementById('authCode').value.trim();
+            const btn = document.querySelector('button');
+            const lockIcon = document.querySelector('.animate-lock');
             
             if (input === secret) {
-                // 存入通行证，永久有效
                 localStorage.setItem('map_access', secret);
                 
-                // 成功反馈
-                const btn = document.querySelector('button');
-                btn.innerHTML = "解锁成功，正在进入...";
-                btn.style.background = "#10b981";
+                // 解锁成功，更改样式
+                btn.innerHTML = "解锁成功，正在加载地图...";
+                btn.style.background = "#059669";
+                btn.style.borderColor = "#047857";
+                
+                // 停止抖动，改为放大
+                lockIcon.style.animation = "medalPop 0.5s cubic-bezier(0.17, 0.89, 0.32, 1.49) forwards";
                 
                 setTimeout(() => {
                     window.location.href = "main.html";
-                }, 800);
-            } else {
+                }, 1000);
+            } else if (input !== '') {
+                // 激活码错误，图标剧烈抖动
+                lockIcon.style.animation = "error-shake 0.4s ease";
                 alert("激活码有误，请核对后输入。");
+                setTimeout(() => { lockIcon.style.animation = "duo-wiggle 1.5s ease-in-out infinite"; }, 400);
+            } else {
+                alert("请输入激活码。");
             }
         }
 
@@ -132,5 +175,11 @@
             if (e.key === 'Enter') verifyCode();
         });
     </script>
+    <style>
+        /* 错误时抖动 */
+        @keyframes error-shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
+        /* 成功时放大 */
+        @keyframes medalPop { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    </style>
 </body>
 </html>
