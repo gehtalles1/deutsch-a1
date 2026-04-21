@@ -20,6 +20,7 @@
             overflow: hidden;
         }
 
+        /* 磨砂玻璃卡片 */
         .glass-card {
             background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(20px);
@@ -28,6 +29,7 @@
             box-shadow: 0 25px 60px -10px rgba(0,0,0,0.3);
         }
 
+        /* 输入框样式 */
         .duo-input {
             background: #FFFFFF;
             border: 2px solid #E2E8F0;
@@ -36,11 +38,11 @@
             transition: all 0.2s;
         }
 
-        /* 【核心修改】精准控制占位符字号，确保显示完整 */
+        /* 占位符样式：已调优字号与颜色 */
         .duo-input::placeholder {
-            font-size: 15px !important;
+            font-size: 18px !important;
             font-weight: 500;
-            letter-spacing: 0px;
+            letter-spacing: 2px;
             color: #94A3B8;
         }
 
@@ -50,6 +52,7 @@
             box-shadow: 0 0 0 3px rgba(88, 204, 2, 0.2);
         }
 
+        /* 多邻国风绿色按钮 */
         .btn-premium {
             background: #58CC02;
             border-bottom: 4px solid #46A302;
@@ -70,6 +73,7 @@
             border-bottom-width: 1px;
         }
 
+        /* 呼吸光背景 */
         .bg-glow {
             position: absolute;
             width: 400px;
@@ -85,6 +89,7 @@
             100% { transform: scale(1.6); opacity: 0.9; }
         }
 
+        /* 锁头动画 */
         .animate-lock {
             animation: duo-wiggle 1.5s ease-in-out infinite;
             transform-origin: center;
@@ -123,7 +128,7 @@
                 <input 
                     id="authCode"
                     type="text" 
-                    placeholder="请输入A1训练营激活码" 
+                    placeholder="激活码" 
                     class="duo-input w-full mt-1.5 py-4.5 px-4 outline-none font-bold text-2xl tracking-wider text-center"
                 >
             </div>
@@ -154,15 +159,20 @@
             
             if (input === secret) {
                 localStorage.setItem('map_access', secret);
+                
+                // 解锁成功样式
                 btn.innerHTML = "解锁成功，正在加载地图...";
                 btn.style.background = "#059669";
                 btn.style.borderColor = "#047857";
+                
+                // 锁头成功动画
                 lockIcon.style.animation = "medalPop 0.5s cubic-bezier(0.17, 0.89, 0.32, 1.49) forwards";
                 
                 setTimeout(() => {
                     window.location.href = "main.html";
                 }, 1000);
             } else if (input !== '') {
+                // 激活码错误动画
                 lockIcon.style.animation = "error-shake 0.4s ease";
                 alert("激活码有误，请核对后输入。");
                 setTimeout(() => { lockIcon.style.animation = "duo-wiggle 1.5s ease-in-out infinite"; }, 400);
@@ -171,6 +181,7 @@
             }
         }
 
+        // 支持回车键
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') verifyCode();
         });
