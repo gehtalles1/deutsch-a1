@@ -36,14 +36,16 @@
             border-radius: 20px;
             color: #1E293B;
             transition: all 0.2s;
+            line-height: normal; /* 修正默认行高导致的偏移 */
         }
 
-        /* 占位符样式：已调优字号与颜色 */
+        /* 占位符垂直居中修正 */
         .duo-input::placeholder {
             font-size: 18px !important;
             font-weight: 500;
             letter-spacing: 2px;
             color: #94A3B8;
+            vertical-align: middle;
         }
 
         .duo-input:focus {
@@ -129,7 +131,7 @@
                     id="authCode"
                     type="text" 
                     placeholder="激活码" 
-                    class="duo-input w-full mt-1.5 py-4.5 px-4 outline-none font-bold text-2xl tracking-wider text-center"
+                    class="duo-input w-full mt-1.5 h-16 px-4 outline-none font-bold text-2xl tracking-wider text-center leading-none"
                 >
             </div>
             
@@ -159,20 +161,15 @@
             
             if (input === secret) {
                 localStorage.setItem('map_access', secret);
-                
-                // 解锁成功样式
                 btn.innerHTML = "解锁成功，正在加载地图...";
                 btn.style.background = "#059669";
                 btn.style.borderColor = "#047857";
-                
-                // 锁头成功动画
                 lockIcon.style.animation = "medalPop 0.5s cubic-bezier(0.17, 0.89, 0.32, 1.49) forwards";
                 
                 setTimeout(() => {
                     window.location.href = "main.html";
                 }, 1000);
             } else if (input !== '') {
-                // 激活码错误动画
                 lockIcon.style.animation = "error-shake 0.4s ease";
                 alert("激活码有误，请核对后输入。");
                 setTimeout(() => { lockIcon.style.animation = "duo-wiggle 1.5s ease-in-out infinite"; }, 400);
@@ -181,7 +178,6 @@
             }
         }
 
-        // 支持回车键
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') verifyCode();
         });
