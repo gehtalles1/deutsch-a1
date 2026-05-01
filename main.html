@@ -242,16 +242,12 @@
         </main>
 
         <footer class="mt-12 text-center pb-10">
-            <div class="inline-flex items-center px-6 py-2 bg-white border border-slate-200 rounded-full shadow-sm mb-6">
-                <span class="text-[10px] font-black text-slate-300 uppercase tracking-widest">咨询微信:</span>
-                <span class="text-xs font-black text-slate-500 ml-2">gehtalles</span>
-            </div>
+            <!-- 咨询信息已移除 -->
         </footer>
     </div>
 
     <script>
         function checkStatus() {
-            // 已移除 8888 激活码判断
             // 此处可保留勋章显示逻辑
             const scores = {
                 1: 'stage1_score', 2: 'level2_cleared', 3: 'level3_cleared', 4: 'level4_cleared',
@@ -261,11 +257,9 @@
                 17: 'level17_cleared', 18: 'level18_cleared', 19: 'level19_cleared', 20: 'level20_cleared',
                 21: 'level21_cleared', 22: 'level22_cleared'
             };
-            // 简单的循环遍历展示已通关图标
         }
 
         function go(n) {
-            // 直接跳转，不检查锁定状态
             const pages = {
                 1: '01-gender.html', 2: '02-classify.html', 3: '03-plural.html', 4: '04-verbs.html',
                 5: '05-starke-verben.html', 6: '06-trennbare-verben.html', 7: '07-modalverben.html',
